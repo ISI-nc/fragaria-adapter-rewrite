@@ -1,32 +1,47 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
-import java.util.Map;
 
-import org.testng.collections.Maps;
+import com.mysema.query.BooleanBuilder;
+import com.mysema.query.support.Expressions;
+import com.mysema.query.types.Constant;
+import com.mysema.query.types.Ops;
+import com.mysema.query.types.Path;
+import com.mysema.query.types.Predicate;
 
 public class Query<T extends Entity> {
-	private final Map<String, Object> params = Maps.newHashMap();
 	private final Class<T> type;
 	private Class<? extends View> view;
+	private final Path<T> entityPath;
+	private BooleanBuilder builder;
 
 	public Query(Class<T> type) {
 		this.type = type;
+		this.entityPath = (Path<T>) Expressions.path(type, type.getSimpleName());
 	}
 
 	public Class<T> getType() {
 		return type;
 	}
 
-	public Map<String, Object> getParams() {
-		return params;
-	}
-
 	public Class<? extends View> getView() {
 		return view;
 	}
 
-	public Query<T> put(String key, Object value) {
-		params.put(key, value);
+	public Query<T> where(String key, Object value) {
+		Predicate predicate = createPredicate(key, value);
+		builder = new BooleanBuilder(predicate);
+		return this;
+	}
+	
+	public Query<T> and(String key, Object value) {
+		Predicate predicate = createPredicate(key, value);
+		builder.and(predicate);
+		return this;
+	}
+	
+	public Query<T> or(String key, Object value) {
+		Predicate predicate = createPredicate(key, value);
+		builder.or(predicate);
 		return this;
 	}
 
@@ -35,4 +50,16 @@ public class Query<T extends Entity> {
 		return this;
 	}
 
+	public Predicate getPredicate() {
+		return builder.getValue();
+	}
+	
+	private Predicate createPredicate(String key, Object value) {
+		Path<Object> propertyPath = (Path<Object>) Expressions.path(Object.class, entityPath, key);
+		Constant<?> constant = (Constant<?>) Expressions.constant(value);
+		Predicate predicate = Expressions.predicate(Ops.EQ,constant,propertyPath);
+		return predicate;
+	}
+
 }
+

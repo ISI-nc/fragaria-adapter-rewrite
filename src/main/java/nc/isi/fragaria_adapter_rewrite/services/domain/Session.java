@@ -9,7 +9,7 @@ public interface Session {
 
 	public <T extends Entity> T getUnique(Query<T> query);
 
-	public <T> T create(Class<T> entityClass);
+	public <T extends Entity> T create(Class<T> entityClass);
 
 	public void delete(Entity... entity);
 
@@ -28,5 +28,7 @@ public interface Session {
 	public void addChild(Session session);
 
 	public AdapterManager getAdapterManager();
+	
+	public EntityBuilder getEntityBuilder();
 
 }
