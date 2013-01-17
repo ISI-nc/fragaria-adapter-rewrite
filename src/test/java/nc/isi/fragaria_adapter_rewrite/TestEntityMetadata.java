@@ -3,6 +3,7 @@ package nc.isi.fragaria_adapter_rewrite;
 import java.lang.reflect.Type;
 
 import junit.framework.TestCase;
+import nc.isi.fragaria_adapter_rewrite.PersonViews.NameView;
 import nc.isi.fragaria_adapter_rewrite.services.domain.EntityMetadata;
 
 public class TestEntityMetadata extends TestCase {
@@ -18,6 +19,7 @@ public class TestEntityMetadata extends TestCase {
 			System.out.println(message);
 			System.out.println(entityMetadata.getBackReference(name));
 		}
+		System.out.println(entityMetadata.propertyNames(NameView.class));
 	}
 
 }

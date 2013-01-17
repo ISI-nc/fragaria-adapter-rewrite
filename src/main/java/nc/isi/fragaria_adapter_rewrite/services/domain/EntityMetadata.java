@@ -11,15 +11,19 @@ import java.util.Set;
 
 import org.springframework.beans.BeanUtils;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 public class EntityMetadata {
 	private final Class<? extends Entity> entityClass;
 	private ImmutableSet<String> propertyNames;
 	private BiMap<String, PropertyDescriptor> cache = HashBiMap.create();
+	private Multimap<Class<?>, String> viewProperties = HashMultimap.create();
 	private String dsKey;
 
 	public EntityMetadata(Class<? extends Entity> entityClass) {
@@ -48,10 +52,10 @@ public class EntityMetadata {
 	public String getBackReference(String propertyName) {
 		BackReference reference = getPropertyAnnotation(propertyName,
 				BackReference.class);
-		return reference != null ? (reference.value().equals(BackReference.DEFAULT) ? entityClass
-				.getSimpleName().substring(0, 1).toLowerCase()
-				+ entityClass.getSimpleName().substring(1)
-				: reference.value())
+		return reference != null ? (reference.value().equals(
+				BackReference.DEFAULT) ? entityClass.getSimpleName()
+				.substring(0, 1).toLowerCase()
+				+ entityClass.getSimpleName().substring(1) : reference.value())
 				: null;
 	}
 
@@ -78,7 +82,23 @@ public class EntityMetadata {
 	}
 
 	public Collection<String> propertyNames(Class<? extends View> view) {
-		return null;
+		if (viewProperties.isEmpty()) {
+			for (String name : propertyNames) {
+				JsonView annotation = getPropertyAnnotation(name,
+						JsonView.class);
+				if (annotation != null) {
+					for (Class<?> tempView : annotation.value()) {
+						viewProperties.put(tempView, name);
+					}
+				}
+			}
+		}
+		Collection<String> properties = viewProperties.get(view);
+		if (View.class.isAssignableFrom(view.getSuperclass())) {
+			properties.addAll(propertyNames((Class<? extends View>) view
+					.getSuperclass()));
+		}
+		return properties;
 	}
 
 	public Class<? extends Entity> getEntityClass() {
