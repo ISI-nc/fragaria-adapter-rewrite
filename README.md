@@ -1,0 +1,2 @@
+fragaria-adapter-rewrite
+========================
