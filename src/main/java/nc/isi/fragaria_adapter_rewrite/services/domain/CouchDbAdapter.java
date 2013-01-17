@@ -1,8 +1,8 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -86,11 +86,17 @@ public class CouchDbAdapter implements Adapter {
 		return null;
 	}
 
+	@Override
 	public void post(Entity... entities) {
-		post(Arrays.asList(entities));
+		LinkedList<Entity> list = new LinkedList<>();
+		for (Entity entity : entities) {
+			list.addLast(entity);
+		}
+		post(list);
 	}
 
-	public void post(Collection<Entity> entities) {
+	@Override
+	public void post(LinkedList<Entity> entities) {
 		Set<CouchDbConnector> connectorsToFlush = Sets.newHashSet();
 		for (Entity entity : entities) {
 			CouchDbConnector couchDbConnector = getConnector(entity

@@ -1,11 +1,9 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.LinkedListMultimap;
 
 public class AdapterManagerImpl implements AdapterManager {
 	private final Map<String, Adapter> adapters;
@@ -62,19 +60,28 @@ public class AdapterManagerImpl implements AdapterManager {
 
 	@Override
 	public void post(Entity... entities) {
-		post(Arrays.asList(entities));
+		LinkedList<Entity> list = new LinkedList<>();
+		for (Entity entity : entities) {
+			list.addLast(entity);
+		}
+		post(list);
 	}
 
 	@Override
-	public void post(Collection<Entity> entities) {
-		Multimap<Adapter, Entity> dispatch = HashMultimap.create();
+	public void post(LinkedList<Entity> entities) {
+		LinkedListMultimap<Adapter, Entity> dispatch = LinkedListMultimap
+				.create();
 		for (Entity entity : entities) {
-			dispatch.put(adapters.get(getDsType(entity.getMetadata())), entity);
+			dispatch.put(adapters.get(getDsType(entity)), entity);
 		}
 		for (Adapter adapter : dispatch.keySet()) {
-			adapter.post(dispatch.get(adapter));
+			adapter.post(new LinkedList<>(dispatch.get(adapter)));
 		}
 
+	}
+
+	protected String getDsType(Entity entity) {
+		return getDsType(entity.getMetadata());
 	}
 
 	protected String getDsType(EntityMetadata entityMetadata) {

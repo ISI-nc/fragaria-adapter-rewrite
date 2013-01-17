@@ -1,6 +1,6 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
-import java.util.Collection;
+import java.util.LinkedList;
 
 public interface Adapter {
 
@@ -12,6 +12,6 @@ public interface Adapter {
 
 	public void post(Entity... entities);
 
-	public void post(Collection<Entity> entities);
+	public void post(LinkedList<Entity> entities);
 
 }
