@@ -4,20 +4,26 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 public class AdapterManagerImpl implements AdapterManager {
-	private final Map<String, Adapter> adapters = Maps.newHashMap();
+	private final Map<String, Adapter> adapters;
 	private final DataSourceProvider dataSourceProvider;
+	private final EntityMetadataFactory entityMetadataFactory;
 
-	public AdapterManagerImpl(DataSourceProvider dataSourceProvider) {
+	public AdapterManagerImpl(DataSourceProvider dataSourceProvider,
+			EntityMetadataFactory entityMetadataFactory,
+			Map<String, Adapter> adapters) {
+		this.adapters = adapters;
 		this.dataSourceProvider = dataSourceProvider;
+		this.entityMetadataFactory = entityMetadataFactory;
 	}
 
 	public <T extends Entity> QueryResponse<T> executeQuery(Query<T> query) {
-		EntityMetadata entityMetadata = new EntityMetadata(query.getType());
-		String dsType = dataSourceProvider.provide(entityMetadata.getDsKey())
-				.getDsMetadata().getType();
+		EntityMetadata entityMetadata = entityMetadataFactory.create(query
+				.getType());
+		String dsType = getDsType(entityMetadata);
 		QueryResponse<T> queryResponse = adapters.get(dsType).executeQuery(
 				query);
 		if (queryResponse instanceof CollectionQueryResponse) {
@@ -51,10 +57,19 @@ public class AdapterManagerImpl implements AdapterManager {
 
 	@Override
 	public void post(Collection<Entity> entities) {
-		// filtre les objets par classes
-		// filtre les classes par databaseType
-		// envoie les objets par database à l'adapter
+		Multimap<Adapter, Entity> dispatch = HashMultimap.create();
+		for (Entity entity : entities) {
+			dispatch.put(adapters.get(getDsType(entity.getMetadata())), entity);
+		}
+		for (Adapter adapter : dispatch.keySet()) {
+			adapter.post(dispatch.get(adapter));
+		}
 
+	}
+
+	protected String getDsType(EntityMetadata entityMetadata) {
+		return dataSourceProvider.provide(entityMetadata.getDsKey())
+				.getDsMetadata().getType();
 	}
 
 }
