@@ -44,8 +44,8 @@ public class ObjectResolverImpl implements ObjectResolver {
 
 	private void complete(ObjectNode node, Entity entity) {
 		Class<? extends Entity> entityClass = entity.getClass();
-		Entity fromDB = session.getUnique(new Query<>(entityClass).put(
-				Entity.ID, entity.getId()).put(Entity.REV, entity.getRev()));
+		Entity fromDB = session.getUnique(new Query<>(entityClass).where(
+				Entity.ID, entity.getId()).and(Entity.REV, entity.getRev()));
 		EntityMetadata entityMetadata = entity.getMetadata();
 		for (String propertyName : entityMetadata.propertyNames()) {
 			if (node.has(propertyName))
@@ -90,7 +90,7 @@ public class ObjectResolverImpl implements ObjectResolver {
 						.asSubclass(Entity.class);
 				entity.writeProperty(propertyName, session.get(new Query<>(
 						propertyEntity).setView(
-						entity.getMetadata().getPartial(propertyName)).put(
+						entity.getMetadata().getPartial(propertyName)).where(
 						entity.getMetadata().getBackReference(propertyName),
 						entity.getId())));
 			} else {

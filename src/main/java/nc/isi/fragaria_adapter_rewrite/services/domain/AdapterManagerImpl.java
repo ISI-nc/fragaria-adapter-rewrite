@@ -20,18 +20,28 @@ public class AdapterManagerImpl implements AdapterManager {
 		this.entityMetadataFactory = entityMetadataFactory;
 	}
 
-	public <T extends Entity> QueryResponse<T> executeQuery(Query<T> query) {
+	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
+			Query<T> query) {
 		EntityMetadata entityMetadata = entityMetadataFactory.create(query
 				.getType());
 		String dsType = getDsType(entityMetadata);
-		QueryResponse<T> queryResponse = adapters.get(dsType).executeQuery(
-				query);
-		if (queryResponse instanceof CollectionQueryResponse) {
-			CollectionQueryResponse<T> collectionQueryResponse = (CollectionQueryResponse<T>) queryResponse;
-			for (T response : collectionQueryResponse.getResponse()) {
-				init(response, query, entityMetadata);
-			}
+		CollectionQueryResponse<T> queryResponse = adapters.get(dsType)
+				.executeQuery(query);
+		CollectionQueryResponse<T> collectionQueryResponse = (CollectionQueryResponse<T>) queryResponse;
+		for (T response : collectionQueryResponse.getResponse()) {
+			init(response, query, entityMetadata);
 		}
+		return queryResponse;
+	}
+
+	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
+			Query<T> query) {
+		EntityMetadata entityMetadata = entityMetadataFactory.create(query
+				.getType());
+		String dsType = getDsType(entityMetadata);
+		UniqueQueryResponse<T> queryResponse = adapters.get(dsType)
+				.executeUniqueQuery(query);
+		init(queryResponse.getResponse(), query, entityMetadata);
 		return queryResponse;
 	}
 

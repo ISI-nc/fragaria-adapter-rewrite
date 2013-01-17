@@ -1,20 +1,19 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
-
 import static com.mysema.query.alias.Alias.$;
 import static com.mysema.query.alias.Alias.alias;
 import static com.mysema.query.collections.MiniApi.from;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
 
+import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
 public class SessionImpl implements Session {
-
 
 	private final AdapterManager adapterManager;
 	private final UUID id = UUID.randomUUID();
@@ -22,21 +21,21 @@ public class SessionImpl implements Session {
 	private final Collection<Session> childs = Lists.newArrayList();
 	private final EntityBuilder entityBuilder;
 
-	private final Multimap<Class<?>, Object> createdObjects = Multimaps
-			.newMultimap(null, null);
-	private final Multimap<Class<?>, Object> deletedObjects = Multimaps
-			.newMultimap(null, null);
-	private final Multimap<Class<?>, Object> updatedObjects = Multimaps
-			.newMultimap(null, null);
-	
+	private final Multimap<Class<?>, Object> createdObjects = LinkedListMultimap
+			.create();
+	private final Multimap<Class<?>, Object> deletedObjects = LinkedListMultimap
+			.create();;
+	private final Multimap<Class<?>, Object> updatedObjects = LinkedListMultimap
+			.create();
 
-	public SessionImpl(AdapterManager adapterManager,EntityBuilder entityBuilder) {
+	public SessionImpl(AdapterManager adapterManager,
+			EntityBuilder entityBuilder) {
 		this.parent = null;
 		this.adapterManager = adapterManager;
 		this.entityBuilder = entityBuilder;
-		
+
 	}
-	
+
 	public SessionImpl(Session parent) {
 		this.parent = parent;
 		this.adapterManager = parent.getAdapterManager();
@@ -44,18 +43,22 @@ public class SessionImpl implements Session {
 	}
 
 	@Override
-	public  <T extends Entity> Collection<T> get(Query<T> query) {
+	public <T extends Entity> Collection<T> get(Query<T> query) {
 		Collection<T> objects;
-		if(parent!=null)
+		if (parent != null)
 			objects = parent.get(query);
-		else{
-			CollectionQueryResponse<T> response = (CollectionQueryResponse<T>) adapterManager.executeQuery(query); 
+		else {
+			CollectionQueryResponse<T> response = (CollectionQueryResponse<T>) adapterManager
+					.executeQuery(query);
 			objects = (Collection<T>) response.getResponse();
 		}
-			
-		objects.addAll( (Collection<T>) createdObjects.get(objects.getClass().getComponentType()));
-		objects.removeAll(deletedObjects.get( objects.getClass().getComponentType()));
-		for (Object o : updatedObjects.get(objects.getClass().getComponentType())) {
+
+		objects.addAll((Collection<T>) createdObjects.get(objects.getClass()
+				.getComponentType()));
+		objects.removeAll(deletedObjects.get(objects.getClass()
+				.getComponentType()));
+		for (Object o : updatedObjects.get(objects.getClass()
+				.getComponentType())) {
 			objects.remove(o);
 			objects.add((T) o);
 		}
@@ -65,15 +68,16 @@ public class SessionImpl implements Session {
 	@Override
 	public <T extends Entity> T getUnique(Query<T> query) {
 		T object = getObjectFromCacheFor(query);
-		if(object==null){
-			if (parent!=null)
+		if (object == null) {
+			if (parent != null)
 				object = parent.getUnique(query);
-			else{
-				UniqueQueryResponse<T> response = (UniqueQueryResponse<T>) adapterManager.executeQuery(query); 
+			else {
+				UniqueQueryResponse<T> response = (UniqueQueryResponse<T>) adapterManager
+						.executeQuery(query);
 				object = response.getResponse();
 			}
 		}
-		return object;			
+		return object;
 	}
 
 	@Override
@@ -94,29 +98,23 @@ public class SessionImpl implements Session {
 		return null;
 	}
 
-
 	@Override
 	public Session cancel() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
-	public void delete(Entity... entity) {
-		if (createdObjects.values().contains(entity))
-			createdObjects.remove(entity.getClass(), entity);
-		if (updatedObjects.values().contains(entity))
-			updatedObjects.remove(entity.getClass(), entity);
-		if (!deletedObjects.values().contains(entity))
-			deletedObjects.put(entity.getClass(),entity);	
+	public void delete(Entity... entities) {
+		delete(Arrays.asList(entities));
 	}
 
 	@Override
 	public void delete(Collection<Entity> entities) {
-		for(Entity entity :entities){
-			delete(entity);
+		for (Entity entity : entities) {
+			register(Operation.DELETE, entity);
 		}
-		
+
 	}
 
 	@Override
@@ -134,7 +132,8 @@ public class SessionImpl implements Session {
 			if (deletedObjects.values().contains(object))
 				throw new RuntimeException(
 						"impossible d'updater un objet deleté");
-			if(!createdObjects.values().contains(object)&&!updatedObjects.values().contains(object))
+			if (!createdObjects.values().contains(object)
+					&& !updatedObjects.values().contains(object))
 				updatedObjects.put(object.getClass(), object);
 			break;
 		case DELETE:
@@ -145,7 +144,7 @@ public class SessionImpl implements Session {
 			if (deletedObjects.values().contains(object))
 				break;
 			if (!deletedObjects.values().contains(object))
-				deletedObjects.put(object.getClass(),object);
+				deletedObjects.put(object.getClass(), object);
 			break;
 		default:
 			break;
@@ -159,13 +158,13 @@ public class SessionImpl implements Session {
 		addChild(session);
 		return session;
 	}
-	
+
 	public UUID getId() {
 		return id;
 	}
 
 	public void addChild(Session session) {
-		if(parent!=null)
+		if (parent != null)
 			parent.addChild(session);
 		childs.add(session);
 	}
@@ -174,48 +173,47 @@ public class SessionImpl implements Session {
 	public AdapterManager getAdapterManager() {
 		return adapterManager;
 	}
-	
-	private <T extends Entity> T getObjectFromCacheFor(Query<T> query){
+
+	private <T extends Entity> T getObjectFromCacheFor(Query<T> query) {
 		T object = null;
-		
-		object = (T) getUniqueObjectFromCollFor((Collection<T>)updatedObjects.get(query.getType()),query);
-		if(object==null)
-			object = (T) getUniqueObjectFromCollFor((Collection<T>)createdObjects.get(query.getType()),query);
-		else if(getUniqueObjectFromCollFor((Collection<T>)deletedObjects.get(query.getType()),query)!=null)
-			throw new RuntimeException(
-					"Impossible de getter un objet deleté");
-		
-		if(object==null)
-			if (parent!=null)	
+
+		object = (T) getUniqueObjectFromCollFor(
+				(Collection<T>) updatedObjects.get(query.getType()), query);
+		if (object == null)
+			object = (T) getUniqueObjectFromCollFor(
+					(Collection<T>) createdObjects.get(query.getType()), query);
+		else if (getUniqueObjectFromCollFor(
+				(Collection<T>) deletedObjects.get(query.getType()), query) != null)
+			throw new RuntimeException("Impossible de getter un objet deleté");
+
+		if (object == null)
+			if (parent != null)
 				object = parent.getUnique(query);
-			else{
-				UniqueQueryResponse<T> response = (UniqueQueryResponse<T>) adapterManager.executeQuery(query); 
+			else {
+				UniqueQueryResponse<T> response = (UniqueQueryResponse<T>) adapterManager
+						.executeQuery(query);
 				object = (T) response.getResponse();
 			}
-		
+
 		return object;
 	}
 
 	private <T extends Entity> T getUniqueObjectFromCollFor(Collection<T> coll,
-			Query<T> query) { 
+			Query<T> query) {
 		T t = alias(query.getType(), query.getType().getSimpleName());
-		T object = from($(t),coll)
-		  .where(query.getPredicate())
-		  .uniqueResult($(t));
+		T object = from($(t), coll).where(query.getPredicate()).uniqueResult(
+				$(t));
 		return object;
 	}
-	
+
 	public EntityBuilder getEntityBuilder() {
 		return entityBuilder;
 	}
-	
 
 	private void flush() {
 		createdObjects.clear();
 		updatedObjects.clear();
 		deletedObjects.clear();
 	}
-
-
 
 }

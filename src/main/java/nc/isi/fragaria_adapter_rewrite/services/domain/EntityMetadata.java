@@ -81,6 +81,7 @@ public class EntityMetadata {
 		return propertyNames;
 	}
 
+	@SuppressWarnings("unchecked")
 	public Collection<String> propertyNames(Class<? extends View> view) {
 		if (viewProperties.isEmpty()) {
 			for (String name : propertyNames) {

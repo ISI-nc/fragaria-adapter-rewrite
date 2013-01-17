@@ -22,17 +22,24 @@ public class CouchDbSerializer implements Serializer<ObjectNode> {
 	}
 
 	@Override
-	public Collection<Entity> deSerialize(Collection<ObjectNode> objects) {
-		Collection<Entity> collection = Lists.newArrayList();
-		for (ObjectNode objectNode : objects) {
-			collection.add(entityBuilder.build(objectNode,
-					getEntityType(objectNode)));
-		}
-		return null;
+	public ObjectNode serialize(Entity object) {
+		return object.toJSON();
 	}
 
-	private Class<? extends Entity> getEntityType(ObjectNode objectNode) {
-		return AbstractEntity.class;
+	@Override
+	public <E extends Entity> Collection<E> deSerialize(
+			Collection<ObjectNode> objects, Class<E> entityClass) {
+		Collection<E> collection = Lists.newArrayList();
+		for (ObjectNode objectNode : objects) {
+			collection.add(entityBuilder.build(objectNode, entityClass));
+		}
+		return collection;
+	}
+
+	@Override
+	public <E extends Entity> E deSerialize(ObjectNode objectNode,
+			Class<E> entityClass) {
+		return entityBuilder.build(objectNode, entityClass);
 	}
 
 }

@@ -4,10 +4,14 @@ import java.util.Collection;
 
 public interface Adapter {
 
-	public <T extends Entity> QueryResponse<T> executeQuery(Query<T> query);
+	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
+			Query<T> query);
 
-	public void post(Object... objects);
+	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
+			Query<T> query);
 
-	public void post(Collection<Object> objects);
+	public void post(Entity... entities);
+
+	public void post(Collection<Entity> entities);
 
 }
