@@ -39,20 +39,35 @@ public class Query<T extends Entity> {
 	}
 
 	public Query<T> where(String key, Object value) {
-		builder = new BooleanBuilder(createPredicate(key, value));
+		return where(createPredicate(key, value));
+	}
+
+	public Query<T> where(Predicate predicate) {
+		checkState(builder == null,
+				"where a déjà été appelé veuillez préciser l'association via or | and");
+		builder = new BooleanBuilder(predicate);
 		return this;
 	}
 
 	public Query<T> and(String key, Object value) {
+		return and(createPredicate(key, value));
+	}
+
+	public Query<T> and(Predicate predicate) {
 		checkState(builder != null, "Appelez where en premier");
-		builder.and(createPredicate(key, value));
+		builder.and(predicate);
 		return this;
 	}
 
 	public Query<T> or(String key, Object value) {
+		return or(createPredicate(key, value));
+	}
+
+	public Query<T> or(Predicate predicate) {
 		checkState(builder != null, "Appelez where en premier");
-		builder.or(createPredicate(key, value));
+		builder.or(predicate);
 		return this;
+
 	}
 
 	public Query<T> setView(Class<? extends View> view) {
