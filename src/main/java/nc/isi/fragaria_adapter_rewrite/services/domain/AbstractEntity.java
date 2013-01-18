@@ -121,7 +121,17 @@ public abstract class AbstractEntity implements Entity {
 
 	@Override
 	public void setState(State state) {
+		checkChange(this.state, state);
 		this.state = state;
+	}
+
+	private void checkChange(State oldState, State newSate) {
+		boolean error = oldState == State.DELETED;
+		if (!error)
+			error = oldState == State.MODIFIED && newSate == State.NEW;
+		if (error)
+			throw new StateChangeException(oldState, newSate);
+
 	}
 
 	@Override
