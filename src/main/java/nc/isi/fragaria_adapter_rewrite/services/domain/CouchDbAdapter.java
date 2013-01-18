@@ -18,9 +18,12 @@ import org.ektorp.impl.StdCouchDbConnector;
 import org.ektorp.impl.StdCouchDbInstance;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import com.mysema.query.QueryException;
 
 public class CouchDbAdapter implements Adapter {
 	private final Map<URL, CouchDbInstance> instanceCache = Maps
@@ -62,21 +65,40 @@ public class CouchDbAdapter implements Adapter {
 
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 			Query<T> query) {
-		EntityMetadata entityMetadata = entityMetadataFactory.create(query
-				.getType());
-		CouchDbConnector connector = getConnector(entityMetadata);
+		ViewQuery viewQuery = new ViewQuery().designDocId(
+				query.getType().getSimpleName()).viewName(
+				query.hasView() ? query.getView().getSimpleName() : "all");
 		return null;
 	}
 
-	private <T extends Entity> CollectionQueryResponse<T> executeQuery(
-			CouchDbConnector connector, ViewQuery viewQuery, Class<T> type) {
-		ViewResult result = connector.queryView(viewQuery);
+	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
+			ViewQuery viewQuery, Class<T> type) {
+		EntityMetadata entityMetadata = entityMetadataFactory.create(type);
+		ViewResult result = getConnector(entityMetadata).queryView(viewQuery);
 		Collection<T> collection = Lists.newArrayList();
 		for (Row row : result) {
 			collection.add(serializer.deSerialize(
 					ObjectNode.class.cast(row.getDocAsNode()), type));
 		}
 		return new CollectionQueryResponse<>(collection);
+	}
+
+	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
+			String id, Class<T> type) {
+		EntityMetadata entityMetadata = entityMetadataFactory.create(type);
+		return new UniqueQueryResponse<T>(getConnector(entityMetadata).get(
+				type, id));
+	}
+
+	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
+			ViewQuery viewQuery, Class<T> type) {
+		EntityMetadata entityMetadata = entityMetadataFactory.create(type);
+		ViewResult result = getConnector(entityMetadata).queryView(viewQuery);
+		if (result.getTotalRows() > 1)
+			throw new QueryException("Unique query return multiple result : "
+					+ result.getTotalRows());
+		return new UniqueQueryResponse<T>(serializer.deSerialize(
+				ObjectNode.class.cast(result.getRows().get(0)), type));
 	}
 
 	@Override
@@ -97,8 +119,9 @@ public class CouchDbAdapter implements Adapter {
 
 	@Override
 	public void post(LinkedList<Entity> entities) {
+		LinkedList<Entity> filtered = cleanMultipleEntries(entities);
 		Set<CouchDbConnector> connectorsToFlush = Sets.newHashSet();
-		for (Entity entity : entities) {
+		for (Entity entity : filtered) {
 			CouchDbConnector couchDbConnector = getConnector(entity
 					.getMetadata());
 			if (!connectorsToFlush.contains(couchDbConnector))
@@ -108,6 +131,69 @@ public class CouchDbAdapter implements Adapter {
 		for (CouchDbConnector connector : connectorsToFlush) {
 			connector.flushBulkBuffer();
 		}
+	}
+
+	private LinkedList<Entity> cleanMultipleEntries(LinkedList<Entity> entities) {
+		LinkedList<Entity> filtered = new LinkedList<>();
+		Multimap<State, Entity> dispatch = LinkedListMultimap.create();
+		for (Entity entity : entities) {
+			State state = entity.getState();
+			if (!dispatch.containsValue(entity)) {
+				dispatch.put(state, entity);
+				continue;
+			}
+			State oldState = lookForEntityState(dispatch, entity);
+			manage(dispatch, state, oldState, entity);
+		}
+		return filtered;
+	}
+
+	private void manage(Multimap<State, Entity> dispatch, State state,
+			State oldState, Entity entity) {
+		switch (state) {
+		case MODIFIED:
+			switch (oldState) {
+			case NEW:
+				dispatch.put(oldState, entity);
+				break;
+			case MODIFIED:
+				dispatch.put(oldState, entity);
+				break;
+			default:
+				commitError(entity, oldState, state);
+			}
+		case DELETED:
+			switch (oldState) {
+			case NEW:
+				dispatch.remove(oldState, entity);
+				break;
+			case MODIFIED:
+				dispatch.remove(oldState, entity);
+				dispatch.put(state, entity);
+				break;
+			default:
+				commitError(entity, oldState, state);
+			}
+		default:
+			commitError(entity, oldState, state);
+		}
+
+	}
+
+	private void commitError(Entity entity, State oldState, State state) {
+		throw new RuntimeException(
+				String.format(
+						"Erreur sur l'état de l'objet %s, déjà enregistré avec l'état %s et demande à passer à %s ",
+						entity, oldState, state));
+	}
+
+	private State lookForEntityState(Multimap<State, Entity> dispatch,
+			Entity entity) {
+		for (State state : dispatch.keySet()) {
+			if (dispatch.get(state).contains(entity))
+				return state;
+		}
+		return null;
 	}
 
 	protected CouchDbConnector getConnector(EntityMetadata entityMetadata) {

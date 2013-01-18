@@ -14,24 +14,30 @@ public class CouchDbSerializer implements Serializer<ObjectNode> {
 
 	@Override
 	public Collection<ObjectNode> serialize(Collection<Entity> objects) {
+		if (objects == null)
+			return null;
 		Collection<ObjectNode> collection = Lists.newArrayList();
 		for (Entity entity : objects) {
-			collection.add(entity.toJSON());
+			collection.add(serialize(entity));
 		}
 		return collection;
 	}
 
 	@Override
 	public ObjectNode serialize(Entity object) {
+		if (object == null)
+			return null;
 		return object.toJSON();
 	}
 
 	@Override
 	public <E extends Entity> Collection<E> deSerialize(
 			Collection<ObjectNode> objects, Class<E> entityClass) {
+		if (objects == null)
+			return null;
 		Collection<E> collection = Lists.newArrayList();
 		for (ObjectNode objectNode : objects) {
-			collection.add(entityBuilder.build(objectNode, entityClass));
+			collection.add(deSerialize(objectNode, entityClass));
 		}
 		return collection;
 	}
@@ -39,6 +45,8 @@ public class CouchDbSerializer implements Serializer<ObjectNode> {
 	@Override
 	public <E extends Entity> E deSerialize(ObjectNode objectNode,
 			Class<E> entityClass) {
+		if (objectNode == null)
+			return null;
 		return entityBuilder.build(objectNode, entityClass);
 	}
 
