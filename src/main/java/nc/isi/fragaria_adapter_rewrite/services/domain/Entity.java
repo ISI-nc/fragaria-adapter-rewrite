@@ -29,6 +29,12 @@ public interface Entity extends Serializable, Partialable {
 
 	public void registerListener(Object o);
 
+	public void unregisterListener(Object listener);
+
 	public EntityMetadata getMetadata();
+	
+	public Session getSession();
+
+	public void setSession(Session session);
 
 }

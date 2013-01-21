@@ -9,9 +9,9 @@ import static com.mysema.query.collections.MiniApi.from;
 import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import org.ektorp.BulkDeleteDocument;
 import org.ektorp.CouchDbConnector;
@@ -25,55 +25,60 @@ import org.ektorp.impl.StdCouchDbConnector;
 import org.ektorp.impl.StdCouchDbInstance;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 public class CouchDbAdapter implements Adapter {
-	private final Map<URL, CouchDbInstance> instanceCache = Maps
-			.newConcurrentMap();
-	private final Map<String, Datasource> datasources = Maps.newConcurrentMap();
-	private final Map<Datasource, CouchDbConnector> connectors = Maps
-			.newConcurrentMap();
+	private final DataSourceProvider dataSourceProvider;
 	private final EntityMetadataFactory entityMetadataFactory;
 	private final CouchDbSerializer serializer;
 	private final ElasticSearchAdapter elasticSearchAdapter;
+	private final LoadingCache<URL, CouchDbInstance> instanceCache = CacheBuilder
+			.newBuilder().build(new CacheLoader<URL, CouchDbInstance>() {
 
-	public CouchDbAdapter(Collection<Datasource> datasources,
+				@Override
+				public CouchDbInstance load(URL key) throws Exception {
+					HttpClient httpClient = new StdHttpClient.Builder()
+							.url(key).build();
+					return new StdCouchDbInstance(httpClient);
+				}
+
+			});
+	private final LoadingCache<Datasource, CouchDbConnector> connectors = CacheBuilder
+			.newBuilder().build(
+					new CacheLoader<Datasource, CouchDbConnector>() {
+
+						@Override
+						public CouchDbConnector load(Datasource key)
+								throws Exception {
+							CouchdbConnectionData couchdbConnectionData = CouchdbConnectionData.class
+									.cast(key.getDsMetadata()
+											.getConnectionData());
+							return new StdCouchDbConnector(
+									couchdbConnectionData.getDbName(),
+									instanceCache.get(couchdbConnectionData
+											.getUrl()));
+						}
+		
+	});
+
+	public CouchDbAdapter(DataSourceProvider dataSourceProvider,
 			CouchDbSerializer serializer,
 			EntityMetadataFactory entityMetadataFactory,
 			ElasticSearchAdapter elasticSearchAdapter) {
-		init(datasources);
 		this.serializer = serializer;
 		this.entityMetadataFactory = entityMetadataFactory;
 		this.elasticSearchAdapter = elasticSearchAdapter;
-	}
-
-	private void init(Collection<Datasource> datasources) {
-		for (Datasource datasource : datasources) {
-			this.datasources.put(datasource.getKey(), datasource);
-			CouchdbConnectionData couchdbConnectionData = CouchdbConnectionData.class
-					.cast(datasource.getDsMetadata().getConnectionData());
-			if (!instanceCache.containsKey(couchdbConnectionData.getUrl()))
-				addInstance(couchdbConnectionData);
-			connectors.put(datasource,
-					new StdCouchDbConnector(couchdbConnectionData.getDbName(),
-							instanceCache.get(couchdbConnectionData.getUrl())));
-
-		}
-	}
-
-	protected void addInstance(CouchdbConnectionData couchdbConnectionData) {
-		HttpClient httpClient = new StdHttpClient.Builder().url(
-				couchdbConnectionData.getUrl()).build();
-		instanceCache.put(couchdbConnectionData.getUrl(),
-				new StdCouchDbInstance(httpClient));
+		this.dataSourceProvider = dataSourceProvider;
 	}
 
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
-			Query<T> query) {
+			final Query<T> query) {
 		checkNotNull(query);
 		if (query instanceof IdQuery)
 			throw new IllegalArgumentException(
@@ -226,8 +231,13 @@ public class CouchDbAdapter implements Adapter {
 	}
 
 	protected CouchDbConnector getConnector(EntityMetadata entityMetadata) {
-		Datasource ds = datasources.get(entityMetadata.getDsKey());
-		CouchDbConnector couchDbConnector = connectors.get(ds);
+		Datasource ds = dataSourceProvider.provide(entityMetadata.getDsKey());
+		CouchDbConnector couchDbConnector;
+		try {
+			couchDbConnector = connectors.get(ds);
+		} catch (ExecutionException e) {
+			throw new RuntimeException(e);
+		}
 		return couchDbConnector;
 	}
 

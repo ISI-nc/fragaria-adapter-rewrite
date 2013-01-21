@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
@@ -23,7 +24,8 @@ public class ElasticSearchAdapter {
 	private final ObjectMapper objectMapper;
 	private final EntityBuilder entityBuilder;
 
-	public ElasticSearchAdapter(String clusterName,
+	public ElasticSearchAdapter(
+			@Symbol("{elasticsearch-cluster}") String clusterName,
 			EntityMetadataFactory entityMetadataFactory,
 			ObjectMapperProvider objectMapperProvider,
 			EntityBuilder entityBuilder) {

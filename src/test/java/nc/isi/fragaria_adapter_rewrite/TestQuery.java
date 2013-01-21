@@ -9,12 +9,13 @@ import java.util.List;
 import java.util.UUID;
 
 import junit.framework.TestCase;
+import nc.isi.fragaria_adapter_rewrite.services.domain.ByViewQuery;
 import nc.isi.fragaria_adapter_rewrite.services.domain.Completion;
 import nc.isi.fragaria_adapter_rewrite.services.domain.Entity;
 import nc.isi.fragaria_adapter_rewrite.services.domain.EntityMetadata;
-import nc.isi.fragaria_adapter_rewrite.services.domain.ByViewQuery;
+import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.All;
+import nc.isi.fragaria_adapter_rewrite.services.domain.Session;
 import nc.isi.fragaria_adapter_rewrite.services.domain.State;
-import nc.isi.fragaria_adapter_rewrite.services.domain.ByViewQuery;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
@@ -107,6 +108,24 @@ public class TestQuery extends TestCase {
 				// TODO Auto-generated method stub
 				return null;
 			}
+
+			@Override
+			public void unregisterListener(Object listener) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public Session getSession() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public void setSession(Session session) {
+				// TODO Auto-generated method stub
+
+			}
 		};
 	}
 
@@ -121,7 +140,8 @@ public class TestQuery extends TestCase {
 	public void testQuery() {
 		List<Entity> entities = buildEntityCollection();
 		UUID id = entities.get(0).getId();
-		ByViewQuery<Entity> query = new ViewQueryImpl<>(Entity.class).where("id", id);
+		ByViewQuery<Entity> query = new ByViewQuery<>(Entity.class, All.class)
+				.where("id", id);
 		System.out.println(query.getPredicate());
 		System.out.println(id);
 		Entity entity = alias(Entity.class);

@@ -12,14 +12,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ObjectResolverImpl implements ObjectResolver {
-	private final Session session;
 	private final ObjectMapper objectMapper;
 	private static final Logger LOGGER = Logger
 			.getLogger(ObjectResolverImpl.class);
 
-	public ObjectResolverImpl(SessionManager sessionManager,
+	public ObjectResolverImpl(
 			ObjectMapperProvider objectMapperProvider) {
-		this.session = sessionManager.createSession();
 		this.objectMapper = objectMapperProvider.provide();
 	}
 
@@ -44,7 +42,8 @@ public class ObjectResolverImpl implements ObjectResolver {
 
 	private void complete(ObjectNode node, Entity entity) {
 		Class<? extends Entity> entityClass = entity.getClass();
-		Entity fromDB = session.getUnique(new IdQuery<>(entityClass, entity
+		Entity fromDB = entity.getSession().getUnique(
+				new IdQuery<>(entityClass, entity
 				.getId()));
 		EntityMetadata entityMetadata = entity.getMetadata();
 		for (String propertyName : entityMetadata.propertyNames()) {
@@ -88,7 +87,9 @@ public class ObjectResolverImpl implements ObjectResolver {
 					return result;
 				Class<? extends Entity> propertyEntity = propertyType
 						.asSubclass(Entity.class);
-				entity.writeProperty(propertyName, session
+				entity.writeProperty(
+						propertyName,
+						entity.getSession()
 						.get(new ByViewQuery<>(propertyEntity, entity
 								.getMetadata().getPartial(propertyName))
 								.filterBy(entity.getMetadata()

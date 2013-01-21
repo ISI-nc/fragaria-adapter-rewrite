@@ -49,6 +49,7 @@ public abstract class AbstractEntity implements Entity {
 	private final LinkedList<String> types;
 	private State state = State.NEW;
 	private Completion completion;
+	private Session session;
 
 	public AbstractEntity(ObjectNode objectNode, ObjectResolver objectResolver,
 			EntityMetadataFactory entityMetadataFactory) {
@@ -90,6 +91,7 @@ public abstract class AbstractEntity implements Entity {
 		return propertyType.cast(cache.get(propertyName));
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T> Collection<T> readCollection(Class<T> collectionGenericType,
 			String collectionName) {
 		checkGlobalSanity(collectionName, Action.READ);
@@ -145,6 +147,12 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	@Override
+	public void unregisterListener(Object listener) {
+		eventBus.unregister(listener);
+
+	}
+
+	@Override
 	public Completion getCompletion() {
 		return this.completion;
 	}
@@ -183,6 +191,19 @@ public abstract class AbstractEntity implements Entity {
 	@Override
 	public EntityMetadata getMetadata() {
 		return entityMetadata;
+	}
+
+	@Override
+	public Session getSession() {
+		return session;
+	}
+
+	@Override
+	public void setSession(Session session) {
+		if (this.session != null)
+			unregisterListener(this.session);
+		this.session = session;
+		registerListener(session);
 	}
 
 }
