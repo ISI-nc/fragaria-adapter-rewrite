@@ -6,4 +6,4 @@ Fragaria est un framework de dévelopement web visant à associer autour de Tape
 Ce repo contient les sources de la première ébauche pour une couche d'abstraction sur les sources de données
 
 
-Ce code n'est pas à utiliser en production, il est au stage de la réflexion.
+Ce code n'est pas à utiliser en production, il est au stade de la réflexion.
