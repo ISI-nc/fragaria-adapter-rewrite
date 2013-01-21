@@ -6,9 +6,11 @@ public interface Adapter {
 
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 			Query<T> query);
+	
 
 	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
 			Query<T> query);
+	
 
 	/**
 	 * Post un ensemble d'entités ayant été altérées pendant le traitement, On

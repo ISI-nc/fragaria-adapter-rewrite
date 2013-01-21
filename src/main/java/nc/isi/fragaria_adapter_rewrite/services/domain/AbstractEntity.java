@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.IdView;
+import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.Id;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -162,7 +162,7 @@ public abstract class AbstractEntity implements Entity {
 				propertyName, getClass());
 	}
 
-	@JsonView(IdView.class)
+	@JsonView(Id.class)
 	public UUID getId() {
 		return readProperty(UUID.class, ID);
 	}
@@ -171,7 +171,7 @@ public abstract class AbstractEntity implements Entity {
 		writeProperty(ID, id);
 	}
 
-	@JsonView(IdView.class)
+	@JsonView(Id.class)
 	public UUID getRev() {
 		return readProperty(UUID.class, REV);
 	}

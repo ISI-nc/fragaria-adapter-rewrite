@@ -1,10 +1,17 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static com.mysema.query.alias.Alias.$;
+import static com.mysema.query.alias.Alias.alias;
+import static com.mysema.query.collections.MiniApi.from;
+
 import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.ektorp.BulkDeleteDocument;
 import org.ektorp.CouchDbConnector;
@@ -23,7 +30,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import com.mysema.query.QueryException;
 
 public class CouchDbAdapter implements Adapter {
 	private final Map<URL, CouchDbInstance> instanceCache = Maps
@@ -33,13 +39,16 @@ public class CouchDbAdapter implements Adapter {
 			.newConcurrentMap();
 	private final EntityMetadataFactory entityMetadataFactory;
 	private final CouchDbSerializer serializer;
+	private final ElasticSearchAdapter elasticSearchAdapter;
 
 	public CouchDbAdapter(Collection<Datasource> datasources,
 			CouchDbSerializer serializer,
-			EntityMetadataFactory entityMetadataFactory) {
+			EntityMetadataFactory entityMetadataFactory,
+			ElasticSearchAdapter elasticSearchAdapter) {
 		init(datasources);
 		this.serializer = serializer;
 		this.entityMetadataFactory = entityMetadataFactory;
+		this.elasticSearchAdapter = elasticSearchAdapter;
 	}
 
 	private void init(Collection<Datasource> datasources) {
@@ -65,14 +74,35 @@ public class CouchDbAdapter implements Adapter {
 
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 			Query<T> query) {
-		ViewQuery viewQuery = new ViewQuery().designDocId(
-				query.getType().getSimpleName()).viewName(
-				query.hasView() ? query.getView().getSimpleName() : "all");
-		return null;
+		checkNotNull(query);
+		if (query instanceof IdQuery)
+			throw new IllegalArgumentException(
+					"Impossible de renvoyer une Collection depuis une IdQuery");
+		if (query instanceof ByViewQuery) {
+			ByViewQuery<T> bVQuery = (ByViewQuery<T>) query;
+			CollectionQueryResponse<T> response = executeQuery(
+					new ViewQuery()
+							.designDocId(
+									bVQuery.getResultType().getSimpleName())
+							.viewName(bVQuery.getView().getSimpleName())
+							.keys(bVQuery.getFilter().values()),
+					bVQuery.getResultType());
+			T entity = alias(query.getResultType());
+			return new CollectionQueryResponse<>(from($(entity),
+					response.getResponse()).where(bVQuery.getPredicate()).list(
+					$(entity)));
+		}
+		if (query instanceof SearchQuery) {
+			return elasticSearchAdapter.executeQuery((SearchQuery<T>) query);
+		}
+		throw new IllegalArgumentException(String.format(
+				"Type de query inconnu : %s", query.getClass()));
 	}
 
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 			ViewQuery viewQuery, Class<T> type) {
+		checkNotNull(viewQuery);
+		checkNotNull(type);
 		EntityMetadata entityMetadata = entityMetadataFactory.create(type);
 		ViewResult result = getConnector(entityMetadata).queryView(viewQuery);
 		Collection<T> collection = Lists.newArrayList();
@@ -84,28 +114,27 @@ public class CouchDbAdapter implements Adapter {
 	}
 
 	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
-			String id, Class<T> type) {
+			UUID id, Class<T> type) {
+		checkNotNull(id);
+		checkNotNull(type);
 		EntityMetadata entityMetadata = entityMetadataFactory.create(type);
 		return new UniqueQueryResponse<T>(getConnector(entityMetadata).get(
-				type, id));
-	}
-
-	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
-			ViewQuery viewQuery, Class<T> type) {
-		EntityMetadata entityMetadata = entityMetadataFactory.create(type);
-		ViewResult result = getConnector(entityMetadata).queryView(viewQuery);
-		if (result.getTotalRows() > 1)
-			throw new QueryException("Unique query return multiple result : "
-					+ result.getTotalRows());
-		return new UniqueQueryResponse<T>(serializer.deSerialize(
-				ObjectNode.class.cast(result.getRows().get(0)), type));
+				type, id.toString()));
 	}
 
 	@Override
 	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
 			Query<T> query) {
-		// TODO Auto-generated method stub
-		return null;
+		checkNotNull(query);
+		if (query instanceof IdQuery) {
+			return executeUniqueQuery(((IdQuery<T>) query).getId(),
+					query.getResultType());
+		}
+		CollectionQueryResponse<T> response = executeQuery(query);
+		checkState(response.getResponse().size() == 1,
+				"La requête a renvoyé trop de résultat");
+		return new UniqueQueryResponse<>(response.getResponse().iterator()
+				.next());
 	}
 
 	@Override

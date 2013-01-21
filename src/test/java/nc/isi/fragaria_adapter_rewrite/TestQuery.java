@@ -12,8 +12,9 @@ import junit.framework.TestCase;
 import nc.isi.fragaria_adapter_rewrite.services.domain.Completion;
 import nc.isi.fragaria_adapter_rewrite.services.domain.Entity;
 import nc.isi.fragaria_adapter_rewrite.services.domain.EntityMetadata;
-import nc.isi.fragaria_adapter_rewrite.services.domain.Query;
+import nc.isi.fragaria_adapter_rewrite.services.domain.ByViewQuery;
 import nc.isi.fragaria_adapter_rewrite.services.domain.State;
+import nc.isi.fragaria_adapter_rewrite.services.domain.ByViewQuery;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
@@ -120,7 +121,7 @@ public class TestQuery extends TestCase {
 	public void testQuery() {
 		List<Entity> entities = buildEntityCollection();
 		UUID id = entities.get(0).getId();
-		Query<Entity> query = new Query<>(Entity.class).where("id", id);
+		ByViewQuery<Entity> query = new ViewQueryImpl<>(Entity.class).where("id", id);
 		System.out.println(query.getPredicate());
 		System.out.println(id);
 		Entity entity = alias(Entity.class);

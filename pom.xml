@@ -123,6 +123,16 @@
 			<artifactId>maven-cayenne-modeler-plugin</artifactId>
 			<version>3.1M3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.elasticsearch</groupId>
+			<artifactId>elasticsearch</artifactId>
+			<version>0.20.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.elasticsearch</groupId>
+			<artifactId>elasticsearch-river-couchdb</artifactId>
+			<version>1.1.0</version>
+		</dependency>
 
 	</dependencies>
 	<build>

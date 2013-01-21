@@ -2,19 +2,20 @@ package nc.isi.fragaria_adapter_rewrite.services.domain;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class EntityBuilderImpl implements EntityBuilder {
 	private final EntityMetadataFactory entityMetadataFactory;
 	private final ObjectResolver objectResolver;
-	private final ObjectMapperProvider objectMapperProvider;
+	private final ObjectMapper objectMapper;
 
 	public EntityBuilderImpl(EntityMetadataFactory entityMetadataFactory,
 			ObjectResolver objectResolver,
 			ObjectMapperProvider objectMapperProvider) {
 		this.entityMetadataFactory = entityMetadataFactory;
 		this.objectResolver = objectResolver;
-		this.objectMapperProvider = objectMapperProvider;
+		this.objectMapper = objectMapperProvider.provide();
 	}
 
 	@Override
@@ -34,8 +35,7 @@ public class EntityBuilderImpl implements EntityBuilder {
 
 	@Override
 	public <E extends Entity> E build(Class<E> entityClass) {
-		return build(new ObjectNode(objectMapperProvider.provide()
-				.getNodeFactory()), entityClass);
+		return build(objectMapper.createObjectNode(), entityClass);
 	}
 
 }

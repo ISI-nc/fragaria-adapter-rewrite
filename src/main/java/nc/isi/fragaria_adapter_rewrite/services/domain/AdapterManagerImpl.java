@@ -21,7 +21,7 @@ public class AdapterManagerImpl implements AdapterManager {
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 			Query<T> query) {
 		EntityMetadata entityMetadata = entityMetadataFactory.create(query
-				.getType());
+				.getResultType());
 		String dsType = getDsType(entityMetadata);
 		CollectionQueryResponse<T> queryResponse = adapters.get(dsType)
 				.executeQuery(query);
@@ -35,7 +35,7 @@ public class AdapterManagerImpl implements AdapterManager {
 	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
 			Query<T> query) {
 		EntityMetadata entityMetadata = entityMetadataFactory.create(query
-				.getType());
+				.getResultType());
 		String dsType = getDsType(entityMetadata);
 		UniqueQueryResponse<T> queryResponse = adapters.get(dsType)
 				.executeUniqueQuery(query);
@@ -45,14 +45,17 @@ public class AdapterManagerImpl implements AdapterManager {
 
 	protected <T extends Entity> void init(T entity, Query<T> query,
 			EntityMetadata entityMetadata) {
-		if (query.getView() == null) {
-			entity.setCompletion(Completion.FULL);
-			return;
-		}
-		if (entityMetadata.propertyNames(query.getView()).containsAll(
-				entityMetadata.propertyNames())) {
-			entity.setCompletion(Completion.FULL);
-			return;
+		if (query instanceof ByViewQuery) {
+			ByViewQuery<?> vQuery = ByViewQuery.class.cast(query);
+			if (vQuery.getView() == null) {
+				entity.setCompletion(Completion.FULL);
+				return;
+			}
+			if (entityMetadata.propertyNames(vQuery.getView()).containsAll(
+					entityMetadata.propertyNames())) {
+				entity.setCompletion(Completion.FULL);
+				return;
+			}
 		}
 		entity.setCompletion(Completion.PARTIAL);
 		entity.setState(State.COMMITED);

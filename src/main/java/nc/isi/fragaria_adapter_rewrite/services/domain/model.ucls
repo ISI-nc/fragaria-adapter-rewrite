@@ -90,7 +90,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="10" corner="BOTTOM_RIGHT" language="java" name="nc.isi.fragaria_adapter_rewrite.services.domain.Query" 
+  <class id="10" corner="BOTTOM_RIGHT" language="java" name="nc.isi.fragaria_adapter_rewrite.services.domain.ViewQueryImpl" 
     project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/Query.java" 
     binary="false">    
