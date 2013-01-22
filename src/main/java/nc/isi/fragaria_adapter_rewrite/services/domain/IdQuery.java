@@ -1,5 +1,9 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
+import com.mysema.query.BooleanBuilder;
+import com.mysema.query.types.Predicate;
+
+
 
 /**
  * Utilisée pour faire une requête par ID, on peut ajouter la REV pour récupérer
@@ -9,14 +13,13 @@ package nc.isi.fragaria_adapter_rewrite.services.domain;
  * 
  * @param <T>
  */
-public class IdQuery<T extends Entity> implements Query<T> {
-	private final Class<T> resultType;
+public class IdQuery<T extends Entity> extends AbstractQuery<T> implements Query<T> {
 	private final String id;
 	private String rev;
 
 	public IdQuery(Class<T> resultType, String id) {
+		super(resultType);
 		this.id = id;
-		this.resultType = resultType;
 	}
 
 	@Override
@@ -35,5 +38,14 @@ public class IdQuery<T extends Entity> implements Query<T> {
 	public String getId() {
 		return id;
 	}
+	
+	@Override 	
+	public Predicate getPredicate() {
+		if (builder == null)
+			builder = new BooleanBuilder(createPredicate("id", id));
+		return builder.getValue();
+	}
+	
+	
 
 }

@@ -19,20 +19,20 @@ public class QueryExecutorForCollectionImpl implements
 	public <T extends Entity> T getUniqueObjectFromEntityCollFor(Query<T> query, Collection<T> coll) {
 		if(coll!=null){
 			if(query instanceof ByViewQuery)
-				return getUniqueObjectFromEntityCollFor((ByViewQuery<T>)query, coll);
+				return getUniqueObjectByViewQuery((ByViewQuery<T>)query, coll);
 			else if(query instanceof IdQuery)
-				return getUniqueObjectFromEntityCollFor((IdQuery<T>)query, coll);
+				return getUniqueObjectByIdQuery((IdQuery<T>)query, coll);
 		}
 		return null;
 	}
 	
-	public <T extends Entity> T getUniqueObjectFromCollFor(ByViewQuery<T> query,Collection<T> coll){
-		T alias = Alias.alias(query.getResultType());
-		return (T) from($(alias), coll).where(query.getPredicate());	
+	public <T extends Entity> T getUniqueObjectByViewQuery(ByViewQuery<T> query,Collection<T> coll){
+		T entity = Alias.alias(query.getResultType());
+		return (T) from($(entity), coll).where(query.getPredicate()).uniqueResult($(entity));
 	}
-	public  <T extends Entity> T getUniqueObjectFromCollFor(IdQuery<T> query,Collection<T> coll){
-		T alias = Alias.alias(query.getResultType());
-		return (T) from($(alias), coll).where($(alias.getId()).eq(query.getId()));	
+	public  <T extends Entity> T getUniqueObjectByIdQuery(IdQuery<T> query,Collection<T> coll){
+		T entity = Alias.alias(query.getResultType());
+		return (T) from($(entity), coll).where($(entity.getId()).eq(query.getId())).uniqueResult($(entity));	
 	}
 
 }
