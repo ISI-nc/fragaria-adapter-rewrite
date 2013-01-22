@@ -18,6 +18,7 @@ public class AdapterManagerImpl implements AdapterManager {
 		this.entityMetadataFactory = entityMetadataFactory;
 	}
 
+	@Override
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 			Query<T> query) {
 		EntityMetadata entityMetadata = entityMetadataFactory.create(query
@@ -32,6 +33,7 @@ public class AdapterManagerImpl implements AdapterManager {
 		return queryResponse;
 	}
 
+	@Override
 	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
 			Query<T> query) {
 		EntityMetadata entityMetadata = entityMetadataFactory.create(query

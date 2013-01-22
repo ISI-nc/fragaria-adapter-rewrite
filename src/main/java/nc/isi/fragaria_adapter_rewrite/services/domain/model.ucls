@@ -90,17 +90,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="10" corner="BOTTOM_RIGHT" language="java" name="nc.isi.fragaria_adapter_rewrite.services.domain.ViewQueryImpl" 
-    project="fragaria-adapter-rewrite" 
-    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/Query.java" 
-    binary="false">    
-    <position height="212" width="204" x="41" y="37"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </class>  
-  <interface id="11" corner="BOTTOM_RIGHT" language="java" 
+  <interface id="10" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.ConnectionDataBuilder" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/ConnectionDataBuilder.java" 
     binary="false">    
@@ -110,7 +100,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <enumeration id="12" corner="BOTTOM_RIGHT" language="java" 
+  <enumeration id="11" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.AbstractEntity.Action" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/AbstractEntity.java" 
     binary="false">    
@@ -120,7 +110,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </enumeration>  
-  <class id="13" corner="BOTTOM_RIGHT" language="java" 
+  <class id="12" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.CouchdbQueryParser" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/CouchdbQueryParser.java" 
     binary="false">    
@@ -130,7 +120,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <interface id="14" corner="BOTTOM_RIGHT" language="java" 
+  <interface id="13" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.SessionManager" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/SessionManager.java" 
     binary="false">    
@@ -140,7 +130,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <annotation id="15" corner="BOTTOM_RIGHT" language="java" name="nc.isi.fragaria_adapter_rewrite.services.domain.DsKey" 
+  <annotation id="14" corner="BOTTOM_RIGHT" language="java" name="nc.isi.fragaria_adapter_rewrite.services.domain.DsKey" 
     project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/DsKey.java" 
     binary="false">    
@@ -150,7 +140,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </annotation>  
-  <enumeration id="16" corner="BOTTOM_RIGHT" language="java" 
+  <enumeration id="15" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.Completion" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/Completion.java" 
     binary="false">    
@@ -160,7 +150,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </enumeration>  
-  <interface id="17" corner="BOTTOM_RIGHT" language="java" 
+  <interface id="16" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.Session" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/Session.java" 
     binary="false">    
@@ -170,7 +160,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <class id="18" corner="BOTTOM_RIGHT" language="java" 
+  <class id="17" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.CollectionQueryResponse" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/CollectionQueryResponse.java" 
     binary="false">    
@@ -180,7 +170,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="19" corner="BOTTOM_RIGHT" language="java" 
+  <class id="18" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.CouchDbSerializer" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/CouchDbSerializer.java" 
     binary="false">    
@@ -190,7 +180,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="20" corner="BOTTOM_RIGHT" language="java" 
+  <class id="19" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.CouchDbAdapter" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/CouchDbAdapter.java" 
     binary="false">    
@@ -200,7 +190,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="21" corner="BOTTOM_RIGHT" language="java" 
+  <class id="20" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.ObjectResolverImpl" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/ObjectResolverImpl.java" 
     binary="false">    
@@ -210,7 +200,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <interface id="22" corner="BOTTOM_RIGHT" language="java" name="nc.isi.fragaria_adapter_rewrite.services.domain.Entity" 
+  <interface id="21" corner="BOTTOM_RIGHT" language="java" name="nc.isi.fragaria_adapter_rewrite.services.domain.Entity" 
     project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/Entity.java" 
     binary="false">    
@@ -220,7 +210,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <interface id="23" corner="BOTTOM_RIGHT" language="java" 
+  <interface id="22" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.ObjectMapperProvider" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/ObjectMapperProvider.java" 
     binary="false">    
@@ -230,7 +220,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <class id="24" corner="BOTTOM_RIGHT" language="java" 
+  <class id="23" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.CouchdbConnectionData" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/CouchdbConnectionData.java" 
     binary="false">    
@@ -240,7 +230,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="25" corner="BOTTOM_RIGHT" language="java" 
+  <class id="24" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.AdapterManagerImpl" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/AdapterManagerImpl.java" 
     binary="false">    
@@ -250,7 +240,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="26" corner="BOTTOM_RIGHT" language="java" 
+  <class id="25" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.EntityMetadata" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/EntityMetadata.java" 
     binary="false">    
@@ -260,7 +250,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="27" corner="BOTTOM_RIGHT" language="java" 
+  <class id="26" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.ObjectMapperProviderImpl" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/ObjectMapperProviderImpl.java" 
     binary="false">    
@@ -270,7 +260,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <interface id="28" corner="BOTTOM_RIGHT" language="java" 
+  <interface id="27" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.Partialable" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/Partialable.java" 
     binary="false">    
@@ -280,7 +270,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <interface id="29" corner="BOTTOM_RIGHT" language="java" 
+  <interface id="28" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.ConnectionData" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/ConnectionData.java" 
     binary="false">    
@@ -290,7 +280,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <class id="30" corner="BOTTOM_RIGHT" language="java" 
+  <class id="29" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.DataSourceProviderImpl" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/DataSourceProviderImpl.java" 
     binary="false">    
@@ -300,7 +290,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <interface id="31" corner="BOTTOM_RIGHT" language="java" 
+  <interface id="30" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.Adapter" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/Adapter.java" 
     binary="false">    
@@ -310,7 +300,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <interface id="32" corner="BOTTOM_RIGHT" language="java" 
+  <interface id="31" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.Datasource" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/Datasource.java" 
     binary="false">    
@@ -320,7 +310,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <class id="33" corner="BOTTOM_RIGHT" language="java" 
+  <class id="32" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.UniqueQueryResponse" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/UniqueQueryResponse.java" 
     binary="false">    
@@ -330,7 +320,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <enumeration id="34" corner="BOTTOM_RIGHT" language="java" 
+  <enumeration id="33" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.State" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/State.java" 
     binary="false">    
@@ -340,7 +330,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </enumeration>  
-  <class id="35" corner="BOTTOM_RIGHT" language="java" 
+  <class id="34" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.DataSourceMetadata" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/DataSourceMetadata.java" 
     binary="false">    
@@ -350,7 +340,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <interface id="36" corner="BOTTOM_RIGHT" language="java" 
+  <interface id="35" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.EntityMetadataFactory" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/EntityMetadataFactory.java" 
     binary="false">    
@@ -360,7 +350,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <interface id="37" corner="BOTTOM_RIGHT" language="java" 
+  <interface id="36" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.QueryResponse" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/QueryResponse.java" 
     binary="false">    
@@ -370,7 +360,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <class id="38" corner="BOTTOM_RIGHT" language="java" 
+  <class id="37" corner="BOTTOM_RIGHT" language="java" 
     name="nc.isi.fragaria_adapter_rewrite.services.domain.EntityBuilderImpl" project="fragaria-adapter-rewrite" 
     file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/services/domain/EntityBuilderImpl.java" 
     binary="false">    
@@ -380,196 +370,172 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <association id="39">    
-    <end type="SOURCE" refId="38" navigable="false">      
-      <attribute id="40" name="objectMapperProvider"/>      
-      <multiplicity id="41" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="23" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="42">    
-    <end type="SOURCE" refId="18" navigable="false">      
-      <attribute id="43" name="response"/>      
-      <multiplicity id="44" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="22" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="45">    
-    <end type="SOURCE" refId="21"/>    
-    <end type="TARGET" refId="8"/>  
-  </realization>  
-  <association id="46">    
-    <end type="SOURCE" refId="38" navigable="false">      
-      <attribute id="47" name="entityMetadataFactory"/>      
-      <multiplicity id="48" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="36" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="49">    
-    <end type="SOURCE" refId="38"/>    
-    <end type="TARGET" refId="1"/>  
-  </realization>  
-  <nesting id="50">    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="12"/>  
-  </nesting>  
-  <association id="51">    
-    <end type="SOURCE" refId="38" navigable="false">      
-      <attribute id="52" name="objectResolver"/>      
-      <multiplicity id="53" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="8" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="54">    
-    <end type="SOURCE" refId="22"/>    
-    <end type="TARGET" refId="28"/>  
-  </generalization>  
-  <association id="55">    
-    <end type="SOURCE" refId="4" navigable="false">      
-      <attribute id="56" name="entityMetadata"/>      
-      <multiplicity id="57" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="26" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="58">    
-    <end type="SOURCE" refId="27"/>    
-    <end type="TARGET" refId="23"/>  
-  </realization>  
-  <realization id="59">    
-    <end type="SOURCE" refId="20"/>    
-    <end type="TARGET" refId="31"/>  
-  </realization>  
-  <realization id="60">    
+  <realization id="38">    
     <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="36"/>  
+    <end type="TARGET" refId="35"/>  
   </realization>  
-  <realization id="61">    
-    <end type="SOURCE" refId="30"/>    
-    <end type="TARGET" refId="7"/>  
+  <realization id="39">    
+    <end type="SOURCE" refId="23"/>    
+    <end type="TARGET" refId="28"/>  
   </realization>  
-  <association id="62">    
-    <end type="SOURCE" refId="20" navigable="false">      
-      <attribute id="63" name="datasources"/>      
-      <multiplicity id="64" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="32" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="65">    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="22"/>  
-  </realization>  
-  <association id="66">    
-    <end type="SOURCE" refId="30" navigable="false">      
-      <attribute id="67" name="map"/>      
-      <multiplicity id="68" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="32" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="69">    
-    <end type="SOURCE" refId="24"/>    
-    <end type="TARGET" refId="29"/>  
-  </realization>  
-  <association id="70">    
-    <end type="SOURCE" refId="4" navigable="false">      
-      <attribute id="71" name="objectResolver"/>      
-      <multiplicity id="72" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="8" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="73">    
-    <end type="SOURCE" refId="19"/>    
-    <end type="TARGET" refId="3"/>  
-  </realization>  
-  <realization id="74">    
-    <end type="SOURCE" refId="33"/>    
-    <end type="TARGET" refId="37"/>  
-  </realization>  
-  <realization id="75">    
-    <end type="SOURCE" refId="13"/>    
-    <end type="TARGET" refId="6"/>  
-  </realization>  
-  <realization id="76">    
-    <end type="SOURCE" refId="25"/>    
-    <end type="TARGET" refId="2"/>  
-  </realization>  
-  <realization id="77">    
-    <end type="SOURCE" refId="9"/>    
-    <end type="TARGET" refId="11"/>  
-  </realization>  
-  <association id="78">    
-    <end type="SOURCE" refId="25" navigable="false">      
-      <attribute id="79" name="adapters"/>      
-      <multiplicity id="80" minimum="0" maximum="2147483647"/>    
+  <association id="40">    
+    <end type="SOURCE" refId="29" navigable="false">      
+      <attribute id="41" name="map"/>      
+      <multiplicity id="42" minimum="0" maximum="2147483647"/>    
     </end>    
     <end type="TARGET" refId="31" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="81">    
+  <association id="43">    
+    <end type="SOURCE" refId="34" navigable="false">      
+      <attribute id="44" name="connectionData"/>      
+      <multiplicity id="45" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="28" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="46">    
     <end type="SOURCE" refId="4" navigable="false">      
-      <attribute id="82" name="state"/>      
-      <multiplicity id="83" minimum="0" maximum="1"/>    
+      <attribute id="47" name="entityMetadata"/>      
+      <multiplicity id="48" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="34" navigable="true"/>    
+    <end type="TARGET" refId="25" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="84">    
-    <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="85" name="cache"/>      
-      <multiplicity id="86" minimum="0" maximum="2147483647"/>    
+  <association id="49">    
+    <end type="SOURCE" refId="24" navigable="false">      
+      <attribute id="50" name="adapters"/>      
+      <multiplicity id="51" minimum="0" maximum="2147483647"/>    
     </end>    
-    <end type="TARGET" refId="26" navigable="true"/>    
+    <end type="TARGET" refId="30" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="87">    
-    <end type="SOURCE" refId="19" navigable="false">      
-      <attribute id="88" name="entityBuilder"/>      
-      <multiplicity id="89" minimum="0" maximum="1"/>    
+  <association id="52">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="53" name="objectResolver"/>      
+      <multiplicity id="54" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="1" navigable="true"/>    
+    <end type="TARGET" refId="8" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="90">    
-    <end type="SOURCE" refId="18"/>    
-    <end type="TARGET" refId="37"/>  
+  <realization id="55">    
+    <end type="SOURCE" refId="29"/>    
+    <end type="TARGET" refId="7"/>  
   </realization>  
-  <association id="91">    
-    <end type="SOURCE" refId="21" navigable="false">      
-      <attribute id="92" name="session"/>      
-      <multiplicity id="93" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="17" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="94">    
-    <end type="SOURCE" refId="4" navigable="false">      
-      <attribute id="95" name="completion"/>      
-      <multiplicity id="96" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="16" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="97">    
-    <end type="SOURCE" refId="25" navigable="false">      
-      <attribute id="98" name="dataSourceProvider"/>      
-      <multiplicity id="99" minimum="0" maximum="1"/>    
+  <realization id="56">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="10"/>  
+  </realization>  
+  <realization id="57">    
+    <end type="SOURCE" refId="24"/>    
+    <end type="TARGET" refId="2"/>  
+  </realization>  
+  <association id="58">    
+    <end type="SOURCE" refId="24" navigable="false">      
+      <attribute id="59" name="dataSourceProvider"/>      
+      <multiplicity id="60" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="7" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="100">    
-    <end type="SOURCE" refId="35" navigable="false">      
-      <attribute id="101" name="connectionData"/>      
-      <multiplicity id="102" minimum="0" maximum="1"/>    
+  <realization id="61">    
+    <end type="SOURCE" refId="20"/>    
+    <end type="TARGET" refId="8"/>  
+  </realization>  
+  <realization id="62">    
+    <end type="SOURCE" refId="26"/>    
+    <end type="TARGET" refId="22"/>  
+  </realization>  
+  <realization id="63">    
+    <end type="SOURCE" refId="32"/>    
+    <end type="TARGET" refId="36"/>  
+  </realization>  
+  <realization id="64">    
+    <end type="SOURCE" refId="37"/>    
+    <end type="TARGET" refId="1"/>  
+  </realization>  
+  <association id="65">    
+    <end type="SOURCE" refId="17" navigable="false">      
+      <attribute id="66" name="response"/>      
+      <multiplicity id="67" minimum="0" maximum="2147483647"/>    
     </end>    
-    <end type="TARGET" refId="29" navigable="true"/>    
+    <end type="TARGET" refId="21" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="68">    
+    <end type="SOURCE" refId="37" navigable="false">      
+      <attribute id="69" name="objectResolver"/>      
+      <multiplicity id="70" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="71">    
+    <end type="SOURCE" refId="17"/>    
+    <end type="TARGET" refId="36"/>  
+  </realization>  
+  <realization id="72">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="3"/>  
+  </realization>  
+  <nesting id="73">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="11"/>  
+  </nesting>  
+  <realization id="74">    
+    <end type="SOURCE" refId="19"/>    
+    <end type="TARGET" refId="30"/>  
+  </realization>  
+  <generalization id="75">    
+    <end type="SOURCE" refId="21"/>    
+    <end type="TARGET" refId="27"/>  
+  </generalization>  
+  <association id="76">    
+    <end type="SOURCE" refId="18" navigable="false">      
+      <attribute id="77" name="entityBuilder"/>      
+      <multiplicity id="78" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="79">    
+    <end type="SOURCE" refId="37" navigable="false">      
+      <attribute id="80" name="entityMetadataFactory"/>      
+      <multiplicity id="81" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="35" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="82">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="83" name="cache"/>      
+      <multiplicity id="84" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="25" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="85">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="6"/>  
+  </realization>  
+  <realization id="86">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="21"/>  
+  </realization>  
+  <association id="87">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="88" name="completion"/>      
+      <multiplicity id="89" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="15" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="90">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="91" name="state"/>      
+      <multiplicity id="92" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="33" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 

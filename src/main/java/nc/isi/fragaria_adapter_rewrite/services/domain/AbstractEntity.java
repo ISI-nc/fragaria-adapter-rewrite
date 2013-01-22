@@ -13,6 +13,8 @@ import java.util.UUID;
 
 import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.Id;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
@@ -56,24 +58,17 @@ public abstract class AbstractEntity implements Entity {
 		this.objectNode = checkNotNull(objectNode);
 		this.objectResolver = objectResolver;
 		this.entityMetadata = entityMetadataFactory.create(getClass());
-		types = initTypes();
-		setId(UUID.randomUUID());
+		setId(UUID.randomUUID().toString());
+		this.types = initTypes();
 	}
 
 	private LinkedList<String> initTypes() {
 		LinkedList<String> types = new LinkedList<>();
-		if (state == State.NEW) {
-			Collection<String> loadedTypes = readCollection(String.class, TYPES);
-			if (loadedTypes != null) {
-				types.addAll(loadedTypes);
-				return types;
-			}
-			for (Class<?> type = getClass(); Entity.class
-					.isAssignableFrom(type); type = type.getSuperclass()) {
-				types.addLast(type.getName());
-			}
-			writeProperty(TYPES, types);
+		for (Class<?> type = getClass(); Entity.class.isAssignableFrom(type); type = type
+				.getSuperclass()) {
+			types.addLast(type.getName());
 		}
+		writeProperty(TYPES, types);
 		return types;
 	}
 
@@ -105,9 +100,7 @@ public abstract class AbstractEntity implements Entity {
 	public void writeProperty(String propertyName, Object value) {
 		checkGlobalSanity(propertyName, Action.WRITE);
 		Object oldValue = cache.get(propertyName);
-		Class<? extends View> view = entityMetadata.getEmbeded(propertyName);
-		if (view != null)
-			objectResolver.write(objectNode, propertyName, value, view);
+		objectResolver.write(objectNode, propertyName, value, this);
 		cache.put(propertyName, value);
 		PropertyChangeEvent propertyChangeEvent = new PropertyChangeEvent(this,
 				propertyName, oldValue, value);
@@ -158,6 +151,7 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	@Override
+	@JsonIgnore
 	public void setCompletion(Completion completion) {
 		this.completion = completion;
 	}
@@ -171,21 +165,25 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	@JsonView(Id.class)
-	public UUID getId() {
-		return readProperty(UUID.class, ID);
+	@JsonProperty("_id")
+	public String getId() {
+		return readProperty(String.class, ID);
 	}
 
-	public void setId(UUID id) {
+	@JsonProperty("_id")
+	public void setId(String id) {
 		writeProperty(ID, id);
 	}
 
 	@JsonView(Id.class)
-	public UUID getRev() {
-		return readProperty(UUID.class, REV);
+	@JsonProperty("_rev")
+	public String getRev() {
+		return readProperty(String.class, REV);
 	}
 
-	public void setRev(UUID id) {
-		writeProperty(REV, id);
+	@JsonProperty("_rev")
+	public void setRev(String rev) {
+		writeProperty(REV, rev);
 	}
 
 	@Override

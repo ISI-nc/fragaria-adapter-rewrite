@@ -5,22 +5,19 @@ import java.util.Map;
 
 import nc.isi.fragaria_adapter_rewrite.services.domain.Datasource;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 
 public class MasterDsLoaderImpl implements MasterDsLoader {
 
-	List<SpecificDsLoader> list = Lists.newArrayList();
-	
+	private final Map<String, Datasource> map = Maps.newHashMap();;
+
 	public MasterDsLoaderImpl(List<SpecificDsLoader> list) {
-		this.list = list;
+		for (SpecificDsLoader loader : list)
+			map.putAll(loader.getDs());
 	}
-	
+
 	@Override
 	public Map<String, Datasource> getDs() {
-		Map<String,Datasource> map = Maps.newHashMap();
-		for(SpecificDsLoader loader :  list)
-			map.putAll(loader.getDs());
 		return map;
 	}
 

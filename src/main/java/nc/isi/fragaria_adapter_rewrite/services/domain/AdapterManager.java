@@ -5,6 +5,9 @@ import java.util.LinkedList;
 public interface AdapterManager {
 	public <T extends Entity> QueryResponse<T> executeQuery(Query<T> query);
 
+	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
+			Query<T> query);
+
 	public void post(Entity... entities);
 
 	public void post(LinkedList<Entity> entities);
