@@ -1,7 +1,6 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
 import com.mysema.query.BooleanBuilder;
-import com.mysema.query.types.Predicate;
 
 
 
@@ -20,6 +19,7 @@ public class IdQuery<T extends Entity> extends AbstractQuery<T> implements Query
 	public IdQuery(Class<T> resultType, String id) {
 		super(resultType);
 		this.id = id;
+		builder = new BooleanBuilder(createPredicate("id", id));
 	}
 
 	@Override
@@ -39,12 +39,6 @@ public class IdQuery<T extends Entity> extends AbstractQuery<T> implements Query
 		return id;
 	}
 	
-	@Override 	
-	public Predicate getPredicate() {
-		if (builder == null)
-			builder = new BooleanBuilder(createPredicate("id", id));
-		return builder.getValue();
-	}
 	
 	
 
