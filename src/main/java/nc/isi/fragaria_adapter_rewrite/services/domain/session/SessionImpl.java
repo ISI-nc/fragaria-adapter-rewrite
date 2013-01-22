@@ -1,5 +1,6 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain.session;
 
+import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -88,17 +89,16 @@ public class SessionImpl implements Session {
 	@Override
 	public Entity getUnique(Query<Entity> query) {
 		Entity entity;
-		if(query!=null)
-			entity = getObjectFromCacheFor(query);
-//		if (entity == null) {
+		entity = getObjectFromCacheFor(query);
+		if (entity == null) {
 //			if (parent != null)
 //				entity = parent.getUnique(query);
 //			else {
-				UniqueQueryResponse<Entity> response = (UniqueQueryResponse<Entity>) adapterManager
-						.executeQuery(query);
+				UniqueQueryResponse<Entity> response = 
+						(UniqueQueryResponse<Entity>) adapterManager.executeUniqueQuery(query);
 				entity = response.getResponse();
 //			}
-//		}
+		}
 		setSessionTo(entity);
 		return entity;
 	}
@@ -138,7 +138,6 @@ public class SessionImpl implements Session {
 	}
 
 
-	@Subscribe
 	@Override
 	public void register(OperationType o, Entity entity) {
 		switch (o) {
@@ -179,6 +178,10 @@ public class SessionImpl implements Session {
 		queue.add(entity);
 	}
 
+    @Subscribe void recordPropertyChange(PropertyChangeEvent e) {
+        	register(OperationType.UPDATE, (Entity) e.getSource());
+      }
+	
 	private void setSessionTo(Collection<Entity> entities) {
 		for(Entity entity : entities){
 			entity.setSession(this);
@@ -192,14 +195,16 @@ public class SessionImpl implements Session {
 	private Entity getObjectFromCacheFor(Query<Entity> query) {
 		Entity object = null;
 		
-		object = (Entity)qExecutor.getUniqueObjectFromEntityCollFor(
-				query,(Collection<Entity>)updatedObjects.get(query.getResultType()));
-		if (object == null)
+		if(updatedObjects.size()>0)
+			object = (Entity)qExecutor.getUniqueObjectFromEntityCollFor(
+					query,(Collection<Entity>)updatedObjects.get(query.getResultType()));
+		if (object == null && createdObjects.size()>0)
 			object = (Entity)qExecutor.getUniqueObjectFromEntityCollFor(
 					query,(Collection<Entity>)createdObjects.get(query.getResultType()));
-		else if (qExecutor.getUniqueObjectFromEntityCollFor(
-				query,(Collection<Entity>)deletedObjects.get(query.getResultType())) != null)
-			throw new RuntimeException("Impossible de getter un objet déleté");
+		if(deletedObjects.size()>0)
+			if (qExecutor.getUniqueObjectFromEntityCollFor(
+					query,(Collection<Entity>)deletedObjects.get(query.getResultType())) != null)
+				throw new RuntimeException("Impossible de getter un objet déleté");
 		
 		return object;
 	}
