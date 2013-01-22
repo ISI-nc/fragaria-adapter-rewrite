@@ -1,9 +1,10 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -13,31 +14,48 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.testng.collections.Sets;
 
-import com.google.common.collect.Maps;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 public class ResourceFinderImpl implements ResourceFinder {
-	Map<String,Reflections> map = Maps.newHashMap();
-	
-	
-	public ResourceFinderImpl(List<String> packageNames) {
-		for(String packageName : packageNames){
-			map.put(packageName, new Reflections(new ConfigurationBuilder()
-          .setUrls(ClasspathHelper.forPackage(packageName))
-          .setScanners(new ResourcesScanner())));
+	private final Reflections reflections;
+	private final LoadingCache<String, Set<File>> cache = CacheBuilder
+			.newBuilder().maximumSize(10)
+			.expireAfterAccess(600L, TimeUnit.SECONDS)
+			.build(new CacheLoader<String, Set<File>>() {
+
+				@Override
+				public Set<File> load(String key) throws Exception {
+					Set<File> resources = Sets.newHashSet();
+					Set<String> resFiles = reflections.getResources(Pattern
+							.compile(key));
+					for (String res : resFiles) {
+						resources.add(FileUtils.toFile(this.getClass()
+								.getResource("/" + res)));
+					}
+					return resources;
+				}
+			});
+
+	public ResourceFinderImpl(ReflectionFactory reflectionFactory,
+			Collection<String> packageNames) {
+		ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+		for (String packageName : packageNames) {
+			configurationBuilder.addUrls(ClasspathHelper
+					.forPackage(packageName));
 		}
+		reflections = reflectionFactory.create(configurationBuilder
+				.setScanners(new ResourcesScanner()));
 	}
-	
+
 	@Override
 	public Set<File> getResourcesMatching(String regExp) {
-		Set<File> resources = Sets.newHashSet();   
-		for(Reflections reflections : map.values()){
-			 Set<String> resFiles = reflections.getResources(Pattern.compile(regExp));
-			   for(String res : resFiles){
-					resources.add(FileUtils.toFile(
-						            this.getClass().getResource("/"+res)));
-			   }
+		try {
+			return cache.get(regExp);
+		} catch (ExecutionException e) {
+			throw new RuntimeException(e);
 		}
-		return resources;
 	}
 
 }
