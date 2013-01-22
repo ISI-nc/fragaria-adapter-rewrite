@@ -1,0 +1,5 @@
+type           : COUCHDB
+canEmbed       : true
+connectionData :
+  url    : http://localhost:5984/
+  dbName : fragaria
