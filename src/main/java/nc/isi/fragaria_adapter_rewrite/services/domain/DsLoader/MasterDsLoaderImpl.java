@@ -9,17 +9,15 @@ import com.google.common.collect.Maps;
 
 public class MasterDsLoaderImpl implements MasterDsLoader {
 
-	private final List<SpecificDsLoader> list;
+	private final Map<String, Datasource> map = Maps.newHashMap();;
 
 	public MasterDsLoaderImpl(List<SpecificDsLoader> list) {
-		this.list = list;
+		for (SpecificDsLoader loader : list)
+			map.putAll(loader.getDs());
 	}
 
 	@Override
 	public Map<String, Datasource> getDs() {
-		Map<String, Datasource> map = Maps.newHashMap();
-		for (SpecificDsLoader loader : list)
-			map.putAll(loader.getDs());
 		return map;
 	}
 

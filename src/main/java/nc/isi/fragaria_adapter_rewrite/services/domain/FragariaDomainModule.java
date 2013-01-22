@@ -2,6 +2,8 @@ package nc.isi.fragaria_adapter_rewrite.services.domain;
 
 import java.util.Map;
 
+import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.MasterDsLoader;
+import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.MasterDsLoaderImpl;
 import nc.isi.fragaria_adapter_rewrite.services.domain.jackson.JacksonModule;
 
 import org.apache.tapestry5.ioc.MappedConfiguration;
@@ -29,6 +31,7 @@ public class FragariaDomainModule {
 				EntityMetadataFactoryImpl.class);
 		binder.bind(ObjectMapperProvider.class, ObjectMapperProviderImpl.class);
 		binder.bind(ObjectResolver.class, ObjectResolverImpl.class);
+		binder.bind(MasterDsLoader.class, MasterDsLoaderImpl.class);
 	}
 
 	public void contributeApplicationDefaults(
@@ -36,6 +39,14 @@ public class FragariaDomainModule {
 		configuration.add("elasticsearch.cluster", "test");
 		configuration.add("dstype.couchdb", "CouchDB");
 		configuration.add("dstype.jdbc", "jdbc");
+	}
+
+	public void contributeDataSourceProvider(
+			MappedConfiguration<String, Datasource> configuration,
+			MasterDsLoader masterDsLoader) {
+		Map<String, Datasource> map = masterDsLoader.getDs();
+		for (String key : map.keySet())
+			configuration.add(key, map.get(key));
 	}
 
 	public static DataSourceProvider buildDataSourceProvider() {

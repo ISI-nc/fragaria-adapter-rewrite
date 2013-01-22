@@ -23,7 +23,7 @@ public class YamlDatasourceMetadata {
 			return connectionData;
 		}
 
-		public boolean isCanEmbed() {
+		public boolean canEmbed() {
 			return canEmbed;
 		}
 		
