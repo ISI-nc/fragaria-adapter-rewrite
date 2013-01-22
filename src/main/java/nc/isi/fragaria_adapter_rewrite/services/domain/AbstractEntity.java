@@ -87,6 +87,7 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public <T> Collection<T> readCollection(Class<T> collectionGenericType,
 			String collectionName) {
 		checkGlobalSanity(collectionName, Action.READ);
@@ -196,6 +197,10 @@ public abstract class AbstractEntity implements Entity {
 		return session;
 	}
 
+	/**
+	 * seté la {@link Session} d'une {@link Entity} enregistre cette session
+	 * comme listener de l'entité et supprime la session précédente des listener
+	 */
 	@Override
 	public void setSession(Session session) {
 		if (this.session != null)

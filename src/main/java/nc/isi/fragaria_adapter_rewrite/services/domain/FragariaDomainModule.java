@@ -6,6 +6,7 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.MasterDsLoader;
 import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.MasterDsLoaderImpl;
 import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.SpecificDsLoader;
 import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.YamlDsLoader;
+import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.YamlSerializer;
 import nc.isi.fragaria_adapter_rewrite.services.domain.jackson.JacksonModule;
 
 import org.apache.tapestry5.ioc.Configuration;
@@ -37,6 +38,8 @@ public class FragariaDomainModule {
 		binder.bind(MasterDsLoader.class, MasterDsLoaderImpl.class);
 		binder.bind(ResourceFinder.class, ResourceFinderImpl.class);
 		binder.bind(YamlDsLoader.class);
+		binder.bind(YamlSerializer.class);
+		binder.bind(DataSourceProvider.class, DataSourceProviderImpl.class);
 	}
 
 	public void contributeMasterDsLoader(
@@ -45,7 +48,7 @@ public class FragariaDomainModule {
 		configuration.add(yamlDsLoader);
 	}
 
-	public void contributeRessourceFinder(Configuration<String> configuration) {
+	public void contributeResourceFinder(Configuration<String> configuration) {
 		configuration.add("nc.isi.fragaria_adapter_rewrite");
 	}
 
@@ -62,11 +65,7 @@ public class FragariaDomainModule {
 		Map<String, Datasource> map = masterDsLoader.getDs();
 		for (String key : map.keySet())
 			configuration.add(key, map.get(key));
-	}
-
-	public static DataSourceProvider buildDataSourceProvider() {
-		Map<String, Datasource> map = Maps.newHashMap();
-		map.put("test", new Datasource() {
+		configuration.add("test", new Datasource() {
 
 			@Override
 			public String getKey() {
@@ -80,7 +79,6 @@ public class FragariaDomainModule {
 								"rer"), true);
 			}
 		});
-		return new DataSourceProviderImpl(map);
 	}
 
 	public void contributeAdapterManager(
