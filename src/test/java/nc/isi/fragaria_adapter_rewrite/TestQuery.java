@@ -14,7 +14,7 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.Completion;
 import nc.isi.fragaria_adapter_rewrite.services.domain.Entity;
 import nc.isi.fragaria_adapter_rewrite.services.domain.EntityMetadata;
 import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.All;
-import nc.isi.fragaria_adapter_rewrite.services.domain.Session;
+import nc.isi.fragaria_adapter_rewrite.services.domain.session.Session;
 import nc.isi.fragaria_adapter_rewrite.services.domain.State;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

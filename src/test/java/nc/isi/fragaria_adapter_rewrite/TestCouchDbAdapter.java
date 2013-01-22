@@ -14,7 +14,7 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.FragariaDomainModule;
 import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.All;
 import nc.isi.fragaria_adapter_rewrite.services.domain.OperationType;
 import nc.isi.fragaria_adapter_rewrite.services.domain.Query;
-import nc.isi.fragaria_adapter_rewrite.services.domain.Session;
+import nc.isi.fragaria_adapter_rewrite.services.domain.session.Session;
 
 import org.apache.tapestry5.ioc.Registry;
 import org.apache.tapestry5.ioc.RegistryBuilder;
