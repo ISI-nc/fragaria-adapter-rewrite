@@ -87,16 +87,18 @@ public class SessionImpl implements Session {
 
 	@Override
 	public Entity getUnique(Query<Entity> query) {
-		Entity entity = getObjectFromCacheFor(query);
-		if (entity == null) {
-			if (parent != null)
-				entity = parent.getUnique(query);
-			else {
+		Entity entity;
+		if(query!=null)
+			entity = getObjectFromCacheFor(query);
+//		if (entity == null) {
+//			if (parent != null)
+//				entity = parent.getUnique(query);
+//			else {
 				UniqueQueryResponse<Entity> response = (UniqueQueryResponse<Entity>) adapterManager
 						.executeQuery(query);
 				entity = response.getResponse();
-			}
-		}
+//			}
+//		}
 		setSessionTo(entity);
 		return entity;
 	}
@@ -198,16 +200,7 @@ public class SessionImpl implements Session {
 		else if (qExecutor.getUniqueObjectFromEntityCollFor(
 				query,(Collection<Entity>)deletedObjects.get(query.getResultType())) != null)
 			throw new RuntimeException("Impossible de getter un objet déleté");
-
-		if (object == null)
-			if (parent != null)
-				object = parent.getUnique(query);
-			else {
-				UniqueQueryResponse<Entity> response = (UniqueQueryResponse<Entity>) adapterManager
-						.executeQuery(query);
-				object = (Entity) response.getResponse();
-			}
-
+		
 		return object;
 	}
 	

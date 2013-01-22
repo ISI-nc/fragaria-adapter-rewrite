@@ -17,10 +17,12 @@ public class QueryExecutorForCollectionImpl implements
 
 	@Override
 	public <T extends Entity> T getUniqueObjectFromEntityCollFor(Query<T> query, Collection<T> coll) {
-		if(query instanceof ByViewQuery)
-			return getUniqueObjectFromEntityCollFor((ByViewQuery<T>)query, coll);
-		else if(query instanceof IdQuery)
-			return getUniqueObjectFromEntityCollFor((IdQuery<T>)query, coll);
+		if(coll!=null){
+			if(query instanceof ByViewQuery)
+				return getUniqueObjectFromEntityCollFor((ByViewQuery<T>)query, coll);
+			else if(query instanceof IdQuery)
+				return getUniqueObjectFromEntityCollFor((IdQuery<T>)query, coll);
+		}
 		return null;
 	}
 	
