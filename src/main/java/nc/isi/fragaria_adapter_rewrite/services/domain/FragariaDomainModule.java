@@ -4,8 +4,11 @@ import java.util.Map;
 
 import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.MasterDsLoader;
 import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.MasterDsLoaderImpl;
+import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.SpecificDsLoader;
+import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.YamlDsLoader;
 import nc.isi.fragaria_adapter_rewrite.services.domain.jackson.JacksonModule;
 
+import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Inject;
@@ -32,6 +35,18 @@ public class FragariaDomainModule {
 		binder.bind(ObjectMapperProvider.class, ObjectMapperProviderImpl.class);
 		binder.bind(ObjectResolver.class, ObjectResolverImpl.class);
 		binder.bind(MasterDsLoader.class, MasterDsLoaderImpl.class);
+		binder.bind(ResourceFinder.class, ResourceFinderImpl.class);
+		binder.bind(YamlDsLoader.class);
+	}
+
+	public void contributeMasterDsLoader(
+			Configuration<SpecificDsLoader> configuration,
+			YamlDsLoader yamlDsLoader) {
+		configuration.add(yamlDsLoader);
+	}
+
+	public void contributeRessourceFinder(Configuration<String> configuration) {
+		configuration.add("nc.isi.fragaria_adapter_rewrite");
 	}
 
 	public void contributeApplicationDefaults(

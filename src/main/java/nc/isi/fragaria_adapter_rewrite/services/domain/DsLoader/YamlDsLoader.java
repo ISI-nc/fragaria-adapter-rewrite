@@ -29,8 +29,8 @@ public class YamlDsLoader implements SpecificDsLoader {
 		for (File dsFile : finder.getResourcesMatching(YAML_REG_EXP)) {
 			String dsKey = getDsKeyFrom(dsFile.getName());
 			try {
-				DataSourceMetadata dsMeta = buildDsMetadataFrom(dsFile);
-				map.put(dsKey, new DatasourceImpl(dsKey, dsMeta));
+				map.put(dsKey, new DatasourceImpl(dsKey,
+						buildDsMetadataFrom(dsFile)));
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}
