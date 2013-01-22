@@ -21,6 +21,7 @@ public class CouchdbConnectionData implements ConnectionData {
 		this.dbName = dbName;
 	}
 
+
 	public URL getUrl() {
 		return url;
 	}

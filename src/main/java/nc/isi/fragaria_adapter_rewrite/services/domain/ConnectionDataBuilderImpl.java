@@ -19,6 +19,7 @@ public class ConnectionDataBuilderImpl implements ConnectionDataBuilder {
 		for (int i = 0; i < params.length; i++) {
 			paramClasses[i] = params[i].getClass();
 		}
+		
 		try {
 			Constructor<? extends ConnectionData> constructor = map.get(dsType)
 					.getConstructor(paramClasses);

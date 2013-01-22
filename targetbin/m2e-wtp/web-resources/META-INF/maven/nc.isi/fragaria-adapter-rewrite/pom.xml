@@ -133,6 +133,26 @@
 			<artifactId>elasticsearch-river-couchdb</artifactId>
 			<version>1.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.11</version>
+		</dependency>
 
 	</dependencies>
 	<build>
@@ -209,5 +229,6 @@
 		<easymock-release-version>3.0</easymock-release-version>
 		<querydsl.version>2.7.0</querydsl.version>
 		<jackson-version>2.1.2</jackson-version>
+		<slf4j.version>1.6.4</slf4j.version>
 	</properties>
 </project>

@@ -1,9 +1,5 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
-import static com.mysema.query.alias.Alias.$;
-import static com.mysema.query.alias.Alias.alias;
-import static com.mysema.query.collections.MiniApi.from;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -93,7 +89,7 @@ public class SessionImpl implements Session {
 		entities.addAll((Collection<? extends Entity>) createdObjects.values());
 		entities.addAll((Collection<? extends Entity>) updatedObjects.values());
 		entities.addAll((Collection<? extends Entity>) deletedObjects.values());
-		adapterManager.post(entities);
+//		adapterManager.post(entities);
 		flush();
 		return null;
 	}
@@ -112,13 +108,13 @@ public class SessionImpl implements Session {
 	@Override
 	public void delete(Collection<Entity> entities) {
 		for (Entity entity : entities) {
-			register(Operation.DELETE, entity);
+			register(OperationType.DELETE, entity);
 		}
 
 	}
 
 	@Override
-	public void register(Operation o, Object object) {
+	public void register(OperationType o, Object object) {
 		switch (o) {
 		case CREATE:
 			if (!createdObjects.values().contains(object))
@@ -177,33 +173,34 @@ public class SessionImpl implements Session {
 	private <T extends Entity> T getObjectFromCacheFor(Query<T> query) {
 		T object = null;
 
-		object = (T) getUniqueObjectFromCollFor(
-				(Collection<T>) updatedObjects.get(query.getType()), query);
-		if (object == null)
-			object = (T) getUniqueObjectFromCollFor(
-					(Collection<T>) createdObjects.get(query.getType()), query);
-		else if (getUniqueObjectFromCollFor(
-				(Collection<T>) deletedObjects.get(query.getType()), query) != null)
-			throw new RuntimeException("Impossible de getter un objet deleté");
-
-		if (object == null)
-			if (parent != null)
-				object = parent.getUnique(query);
-			else {
-				UniqueQueryResponse<T> response = (UniqueQueryResponse<T>) adapterManager
-						.executeQuery(query);
-				object = (T) response.getResponse();
-			}
+//		object = (T) getUniqueObjectFromCollFor(
+//				(Collection<T>) updatedObjects.get(query.getType()), query);
+//		if (object == null)
+//			object = (T) getUniqueObjectFromCollFor(
+//					(Collection<T>) createdObjects.get(query.getType()), query);
+//		else if (getUniqueObjectFromCollFor(
+//				(Collection<T>) deletedObjects.get(query.getType()), query) != null)
+//			throw new RuntimeException("Impossible de getter un objet deleté");
+//
+//		if (object == null)
+//			if (parent != null)
+//				object = parent.getUnique(query);
+//			else {
+//				UniqueQueryResponse<T> response = (UniqueQueryResponse<T>) adapterManager
+//						.executeQuery(query);
+//				object = (T) response.getResponse();
+//			}
 
 		return object;
 	}
 
 	private <T extends Entity> T getUniqueObjectFromCollFor(Collection<T> coll,
 			Query<T> query) {
-		T t = alias(query.getType(), query.getType().getSimpleName());
-		T object = from($(t), coll).where(query.getPredicate()).uniqueResult(
-				$(t));
-		return object;
+				return null;
+//		T t = alias(query.getType(), query.getType().getSimpleName());
+//		T object = from($(t), coll).where(query.getPredicate()).uniqueResult(
+//				$(t));
+//		return object;
 	}
 
 	public EntityBuilder getEntityBuilder() {

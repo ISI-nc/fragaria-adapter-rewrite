@@ -7,6 +7,7 @@ import java.util.Map;
 import nc.isi.fragaria_adapter_rewrite.services.domain.ConnectionDataBuilder;
 import nc.isi.fragaria_adapter_rewrite.services.domain.DataSourceMetadata;
 import nc.isi.fragaria_adapter_rewrite.services.domain.Datasource;
+import nc.isi.fragaria_adapter_rewrite.services.domain.DatasourceImpl;
 import nc.isi.fragaria_adapter_rewrite.services.domain.ResourceFinder;
 
 import com.beust.jcommander.internal.Maps;
@@ -51,7 +52,7 @@ public class YamlDsLoader implements SpecificDsLoader {
 		YamlDatasourceMetadata yamlDs = serializer.serializeFromFileAs(dsFile,
 				YamlDatasourceMetadata.class);
 		return new DataSourceMetadata(yamlDs.getType(), builder.build(
-				yamlDs.getType(), yamlDs.getConnectionData()),
+				yamlDs.getType(), yamlDs.getConnectionData().values().toArray(new Object[yamlDs.getConnectionData().values().size()])),
 				yamlDs.canEmbed());
 	}
 
