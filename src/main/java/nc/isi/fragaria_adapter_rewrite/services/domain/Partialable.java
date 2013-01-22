@@ -1,6 +1,6 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public interface Partialable {
 
@@ -8,8 +8,16 @@ public interface Partialable {
 
 	public void setCompletion(Completion completion);
 
-	public UUID getId();
+	@JsonProperty("_id")
+	public String getId();
 
-	public UUID getRev();
+	@JsonProperty("_rev")
+	public String getRev();
+
+	@JsonProperty("_id")
+	public void setId(String id);
+
+	@JsonProperty("_rev")
+	public void setRev(String rev);
 
 }

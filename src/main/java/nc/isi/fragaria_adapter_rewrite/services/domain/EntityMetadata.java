@@ -9,8 +9,11 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Set;
 
+import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.Id;
+
 import org.springframework.beans.BeanUtils;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -41,7 +44,8 @@ public class EntityMetadata {
 
 	public Class<? extends View> getEmbeded(String propertyName) {
 		Embeded embeded = getPropertyAnnotation(propertyName, Embeded.class);
-		return embeded != null ? embeded.value() : null;
+		return embeded != null ? embeded.value() : Entity.class
+				.isAssignableFrom(propertyType(propertyName)) ? Id.class : null;
 	}
 
 	public Class<? extends View> getPartial(String propertyName) {
@@ -110,6 +114,12 @@ public class EntityMetadata {
 		return getPropertyDescriptor(propertyName).getPropertyType();
 	}
 
+	public String getJsonPropertyName(String propertyName) {
+		JsonProperty jsonProperty = getPropertyAnnotation(propertyName,
+				JsonProperty.class);
+		return jsonProperty == null ? propertyName : jsonProperty.value();
+	}
+
 	/**
 	 * 
 	 * Renvoie les types des paramètres de la propriété
@@ -118,14 +128,20 @@ public class EntityMetadata {
 	 * @return
 	 * @return
 	 */
-	public Type[] propertyParameterTypes(String propertyName) {
+	public Class<?>[] propertyParameterClasses(String propertyName) {
 		Type type = getPropertyDescriptor(propertyName).getReadMethod()
 				.getGenericReturnType();
 		if (type instanceof ParameterizedType) {
 			ParameterizedType realType = ParameterizedType.class.cast(type);
-			return realType.getActualTypeArguments();
+			int length = realType.getActualTypeArguments().length;
+			Class<?>[] classes = new Class[length];
+			for (int i = 0; i < length; i++) {
+				classes[i] = ReflectionUtils.getClass(realType
+						.getActualTypeArguments()[i]);
+			}
+			return classes;
 		}
-		return new Type[0];
+		return new Class[0];
 	}
 
 	public PropertyDescriptor getPropertyDescriptor(String propertyName) {

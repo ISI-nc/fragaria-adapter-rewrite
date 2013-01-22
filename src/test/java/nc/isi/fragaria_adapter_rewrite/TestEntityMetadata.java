@@ -1,19 +1,17 @@
 package nc.isi.fragaria_adapter_rewrite;
 
-import java.lang.reflect.Type;
-
 import junit.framework.TestCase;
 import nc.isi.fragaria_adapter_rewrite.PersonViews.NameView;
 import nc.isi.fragaria_adapter_rewrite.services.domain.EntityMetadata;
 
 public class TestEntityMetadata extends TestCase {
 
-	public void testMetadata() {
+	public void testMetadata() throws ClassNotFoundException {
 		EntityMetadata entityMetadata = new EntityMetadata(PersonData.class);
 		for (String name : entityMetadata.propertyNames()) {
 			String message = name + " : " + entityMetadata.propertyType(name);
-			for (Type typeVariable : entityMetadata
-					.propertyParameterTypes(name)) {
+			for (Class<?> typeVariable : entityMetadata
+					.propertyParameterClasses(name)) {
 				message += " <" + typeVariable + ">";
 			}
 			System.out.println(message);

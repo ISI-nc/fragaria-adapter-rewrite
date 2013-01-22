@@ -7,6 +7,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -17,7 +18,7 @@ import org.springframework.beans.BeanUtils;
 
 public class ReflectionUtils {
 	public final static Reflections REFLECTIONS = new Reflections(
-			"nc.isi.fragaria");
+			"nc.isi.fragaria_adapter_rewrite");
 
 	public static boolean propertyExists(Class<?> clazz, String fieldName) {
 		return BeanUtils.getPropertyDescriptor(clazz, fieldName) != null;
@@ -30,6 +31,17 @@ public class ReflectionUtils {
 			return propertyDescriptor.getReadMethod().invoke(o);
 		} catch (IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static Class<?> getClass(Type type) {
+		try {
+			if (type.toString() == "?")
+				return Object.class;
+			return Class.forName(type.toString().substring(
+					type.toString().lastIndexOf(' ') + 1));
+		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 	}

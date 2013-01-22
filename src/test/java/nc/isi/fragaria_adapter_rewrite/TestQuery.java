@@ -17,6 +17,7 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.All;
 import nc.isi.fragaria_adapter_rewrite.services.domain.Session;
 import nc.isi.fragaria_adapter_rewrite.services.domain.State;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 
@@ -26,7 +27,6 @@ public class TestQuery extends TestCase {
 
 		return new Entity() {
 			private UUID id;
-			private UUID rev;
 
 			@Override
 			public void setCompletion(Completion completion) {
@@ -35,17 +35,15 @@ public class TestQuery extends TestCase {
 			}
 
 			@Override
-			public UUID getRev() {
-				if (rev == null)
-					rev = UUID.randomUUID();
-				return rev;
+			public String getRev() {
+				return null;
 			}
 
 			@Override
-			public UUID getId() {
+			public String getId() {
 				if (id == null)
 					id = UUID.randomUUID();
-				return id;
+				return id.toString();
 			}
 
 			@Override
@@ -126,6 +124,20 @@ public class TestQuery extends TestCase {
 				// TODO Auto-generated method stub
 
 			}
+
+			@Override
+			@JsonProperty("_id")
+			public void setId(String id) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			@JsonProperty("_rev")
+			public void setRev(String rev) {
+				// TODO Auto-generated method stub
+
+			}
 		};
 	}
 
@@ -139,7 +151,7 @@ public class TestQuery extends TestCase {
 
 	public void testQuery() {
 		List<Entity> entities = buildEntityCollection();
-		UUID id = entities.get(0).getId();
+		String id = entities.get(0).getId();
 		ByViewQuery<Entity> query = new ByViewQuery<>(Entity.class, All.class)
 				.where("id", id);
 		System.out.println(query.getPredicate());

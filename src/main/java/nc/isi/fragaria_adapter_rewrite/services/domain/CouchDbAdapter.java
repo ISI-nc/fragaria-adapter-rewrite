@@ -10,7 +10,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import org.ektorp.BulkDeleteDocument;
@@ -24,6 +23,7 @@ import org.ektorp.http.StdHttpClient;
 import org.ektorp.impl.StdCouchDbConnector;
 import org.ektorp.impl.StdCouchDbInstance;
 
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -38,8 +38,10 @@ public class CouchDbAdapter implements Adapter {
 	private final EntityMetadataFactory entityMetadataFactory;
 	private final CouchDbSerializer serializer;
 	private final ElasticSearchAdapter elasticSearchAdapter;
+	private final ObjectMapperProvider objectMapperProvider;
 	private final LoadingCache<URL, CouchDbInstance> instanceCache = CacheBuilder
-			.newBuilder().build(new CacheLoader<URL, CouchDbInstance>() {
+			.newBuilder().maximumSize(10)
+			.build(new CacheLoader<URL, CouchDbInstance>() {
 
 				@Override
 				public CouchDbInstance load(URL key) throws Exception {
@@ -50,31 +52,31 @@ public class CouchDbAdapter implements Adapter {
 
 			});
 	private final LoadingCache<Datasource, CouchDbConnector> connectors = CacheBuilder
-			.newBuilder().build(
-					new CacheLoader<Datasource, CouchDbConnector>() {
+			.newBuilder().maximumSize(40)
+			.build(new CacheLoader<Datasource, CouchDbConnector>() {
 
-						@Override
-						public CouchDbConnector load(Datasource key)
-								throws Exception {
-							CouchdbConnectionData couchdbConnectionData = CouchdbConnectionData.class
-									.cast(key.getDsMetadata()
-											.getConnectionData());
-							return new StdCouchDbConnector(
-									couchdbConnectionData.getDbName(),
-									instanceCache.get(couchdbConnectionData
-											.getUrl()));
-						}
-		
-	});
+				@Override
+				public CouchDbConnector load(Datasource key) throws Exception {
+					CouchdbConnectionData couchdbConnectionData = CouchdbConnectionData.class
+							.cast(key.getDsMetadata().getConnectionData());
+					return new StdCouchDbConnector(couchdbConnectionData
+							.getDbName(), instanceCache
+							.get(couchdbConnectionData.getUrl()),
+							objectMapperProvider);
+				}
+
+			});
 
 	public CouchDbAdapter(DataSourceProvider dataSourceProvider,
 			CouchDbSerializer serializer,
 			EntityMetadataFactory entityMetadataFactory,
-			ElasticSearchAdapter elasticSearchAdapter) {
+			ElasticSearchAdapter elasticSearchAdapter,
+			ObjectMapperProvider objectMapperProvider) {
 		this.serializer = serializer;
 		this.entityMetadataFactory = entityMetadataFactory;
 		this.elasticSearchAdapter = elasticSearchAdapter;
 		this.dataSourceProvider = dataSourceProvider;
+		this.objectMapperProvider = objectMapperProvider;
 	}
 
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
@@ -86,12 +88,9 @@ public class CouchDbAdapter implements Adapter {
 		if (query instanceof ByViewQuery) {
 			ByViewQuery<T> bVQuery = (ByViewQuery<T>) query;
 			CollectionQueryResponse<T> response = executeQuery(
-					new ViewQuery()
-							.designDocId(
-									bVQuery.getResultType().getSimpleName())
-							.viewName(bVQuery.getView().getSimpleName())
-							.keys(bVQuery.getFilter().values()),
-					bVQuery.getResultType());
+					buildViewQuery(bVQuery), bVQuery.getResultType());
+			if (bVQuery.getPredicate() == null)
+				return response;
 			T entity = alias(query.getResultType());
 			return new CollectionQueryResponse<>(from($(entity),
 					response.getResponse()).where(bVQuery.getPredicate()).list(
@@ -104,27 +103,43 @@ public class CouchDbAdapter implements Adapter {
 				"Type de query inconnu : %s", query.getClass()));
 	}
 
+	protected <T extends Entity> ViewQuery buildViewQuery(ByViewQuery<T> bVQuery) {
+		ViewQuery vQuery = new ViewQuery().designDocId(
+				buildDesignDocId(bVQuery)).viewName(
+				bVQuery.getView().getSimpleName().toLowerCase());
+		return bVQuery.getFilter().values().isEmpty() ? vQuery : vQuery
+				.keys(bVQuery.getFilter().values());
+	}
+
+	protected <T extends Entity> String buildDesignDocId(ByViewQuery<T> bVQuery) {
+		return "_design/" + bVQuery.getResultType().getSimpleName();
+	}
+
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 			ViewQuery viewQuery, Class<T> type) {
 		checkNotNull(viewQuery);
 		checkNotNull(type);
+		System.out.println(viewQuery.getViewName());
+		System.out.println(viewQuery.hasMultipleKeys());
 		EntityMetadata entityMetadata = entityMetadataFactory.create(type);
 		ViewResult result = getConnector(entityMetadata).queryView(viewQuery);
 		Collection<T> collection = Lists.newArrayList();
 		for (Row row : result) {
+			if (row.getValueAsNode() instanceof MissingNode)
+				continue;
 			collection.add(serializer.deSerialize(
-					ObjectNode.class.cast(row.getDocAsNode()), type));
+					ObjectNode.class.cast(row.getValueAsNode()), type));
 		}
 		return new CollectionQueryResponse<>(collection);
 	}
 
 	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
-			UUID id, Class<T> type) {
+			String id, Class<T> type) {
 		checkNotNull(id);
 		checkNotNull(type);
 		EntityMetadata entityMetadata = entityMetadataFactory.create(type);
 		return new UniqueQueryResponse<T>(getConnector(entityMetadata).get(
-				type, id.toString()));
+				type, id));
 	}
 
 	@Override
@@ -178,6 +193,9 @@ public class CouchDbAdapter implements Adapter {
 			}
 			State oldState = lookForEntityState(dispatch, entity);
 			manage(dispatch, state, oldState, entity);
+		}
+		for (State state : dispatch.keySet()) {
+			filtered.addAll(dispatch.get(state));
 		}
 		return filtered;
 	}

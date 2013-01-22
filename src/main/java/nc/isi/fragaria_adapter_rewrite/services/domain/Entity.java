@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public interface Entity extends Serializable, Partialable {
@@ -19,6 +20,7 @@ public interface Entity extends Serializable, Partialable {
 
 	public void writeProperty(String propertyName, Object value);
 
+	@JsonIgnore
 	public State getState();
 
 	public void setState(State state);
@@ -31,8 +33,10 @@ public interface Entity extends Serializable, Partialable {
 
 	public void unregisterListener(Object listener);
 
+	@JsonIgnore
 	public EntityMetadata getMetadata();
-	
+
+	@JsonIgnore
 	public Session getSession();
 
 	public void setSession(Session session);

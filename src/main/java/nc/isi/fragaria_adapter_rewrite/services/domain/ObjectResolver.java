@@ -11,7 +11,6 @@ public interface ObjectResolver {
 	public <T> Collection<T> resolveCollection(ObjectNode node,
 			Class<T> propertyType, String propertyName, Entity entity);
 
-	public void write(ObjectNode node, String propertyName, Object value,
-			Class<? extends View> view);
+	void write(ObjectNode node, String propertyName, Object value, Entity entity);
 
 }

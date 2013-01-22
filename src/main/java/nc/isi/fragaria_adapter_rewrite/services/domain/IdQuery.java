@@ -1,20 +1,20 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
-import java.util.UUID;
 
 /**
- * Utilisée pour faire une requête par ID, on peut ajouter la REV pour récupérer la valeur
- * d'une information à un instant précis
+ * Utilisée pour faire une requête par ID, on peut ajouter la REV pour récupérer
+ * la valeur d'une information à un instant précis
+ * 
  * @author jmaltat
- *
+ * 
  * @param <T>
  */
 public class IdQuery<T extends Entity> implements Query<T> {
 	private final Class<T> resultType;
-	private final UUID id;
-	private UUID rev;
-	
-	public IdQuery(Class<T> resultType, UUID id){
+	private final String id;
+	private String rev;
+
+	public IdQuery(Class<T> resultType, String id) {
 		this.id = id;
 		this.resultType = resultType;
 	}
@@ -24,15 +24,15 @@ public class IdQuery<T extends Entity> implements Query<T> {
 		return resultType;
 	}
 
-	public UUID getRev() {
+	public String getRev() {
 		return rev;
 	}
 
-	public void setRev(UUID rev) {
+	public void setRev(String rev) {
 		this.rev = rev;
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
