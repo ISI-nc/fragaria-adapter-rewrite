@@ -19,7 +19,7 @@ public interface Session {
 
 	public Session cancel();
 
-	public void register(Operation o, Object object);
+	public void register(OperationType o, Object object);
 
 	public Session createChild();
 
