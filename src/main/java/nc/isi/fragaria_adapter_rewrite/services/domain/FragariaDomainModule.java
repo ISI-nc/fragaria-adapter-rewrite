@@ -12,9 +12,7 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.jackson.JacksonModule;
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
-import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.SubModule;
-import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.google.common.collect.Maps;
@@ -40,6 +38,7 @@ public class FragariaDomainModule {
 		binder.bind(YamlDsLoader.class);
 		binder.bind(YamlSerializer.class);
 		binder.bind(DataSourceProvider.class, DataSourceProviderImpl.class);
+		binder.bind(ReflectionFactory.class);
 	}
 
 	public void contributeMasterDsLoader(
@@ -65,34 +64,17 @@ public class FragariaDomainModule {
 		Map<String, Datasource> map = masterDsLoader.getDs();
 		for (String key : map.keySet())
 			configuration.add(key, map.get(key));
-		configuration.add("test", new Datasource() {
-
-			@Override
-			public String getKey() {
-				return "test";
-			}
-
-			@Override
-			public DataSourceMetadata getDsMetadata() {
-				return new DataSourceMetadata("CouchDB",
-						new CouchdbConnectionData("http://localhost:5984",
-								"rer"), true);
-			}
-		});
 	}
 
 	public void contributeAdapterManager(
 			MappedConfiguration<String, Adapter> configuration,
-			@Inject @Symbol("${dstype.couchdb}") String dsTypeCouchdb,
 			CouchDbAdapter couchDbAdapter) {
-		configuration.add(dsTypeCouchdb, couchDbAdapter);
+		configuration.add("CouchDB", couchDbAdapter);
 	}
 
-	public static ConnectionDataBuilder buildConnectionDataBuilder(
-			@Inject @Symbol("${dstype.couchdb}") String dsTypeCouchDB,
-			@Inject @Symbol("${dstype.jdbc}") String dsTypeJdbc) {
+	public static ConnectionDataBuilder buildConnectionDataBuilder() {
 		Map<String, Class<? extends ConnectionData>> map = Maps.newHashMap();
-		map.put(dsTypeCouchDB, CouchdbConnectionData.class);
+		map.put("CouchDB", CouchdbConnectionData.class);
 		return new ConnectionDataBuilderImpl(map);
 	}
 
