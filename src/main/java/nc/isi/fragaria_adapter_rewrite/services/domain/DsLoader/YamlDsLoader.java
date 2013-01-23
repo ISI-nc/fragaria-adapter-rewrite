@@ -28,10 +28,10 @@ public class YamlDsLoader implements SpecificDsLoader {
 		this.serializer = serializer;
 		this.builder = builder;
 		for (File dsFile : finder.getResourcesMatching(YAML_REG_EXP)) {
-			String dsKey = getDsKeyFrom(dsFile.getName());
+			String dsKey = getDsKey(dsFile.getName());
 			try {
 				map.put(dsKey, new DatasourceImpl(dsKey,
-						buildDsMetadataFrom(dsFile)));
+						buildDsMetadata(dsFile)));
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}
@@ -43,14 +43,15 @@ public class YamlDsLoader implements SpecificDsLoader {
 		return map;
 	}
 
-	private String getDsKeyFrom(String fileName) {
+	private String getDsKey(String fileName) {
 		return fileName.substring(0, fileName.lastIndexOf("."));
 	}
 
-	private DataSourceMetadata buildDsMetadataFrom(File dsFile)
+	private DataSourceMetadata buildDsMetadata(File dsFile)
 			throws FileNotFoundException {
 		YamlDatasourceMetadata yamlDs = serializer.serialize(dsFile,
 				YamlDatasourceMetadata.class);
+		System.out.println(yamlDs.getConnectionData());
 		return new DataSourceMetadata(yamlDs.getType(), builder.build(
 				yamlDs.getType(), yamlDs.getConnectionData().values()),
 				yamlDs.canEmbed());

@@ -113,6 +113,11 @@ public class ObjectResolverImpl implements ObjectResolver {
 		}
 	}
 
+	/**
+	 * Ecrit la propriété en fonction de la vue définie dans embeded si vue il y
+	 * a
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void write(ObjectNode node, String propertyName, Object value,
 			Entity entity) {
@@ -160,12 +165,7 @@ public class ObjectResolverImpl implements ObjectResolver {
 					entity.getMetadata().propertyType(property), property));
 			copy.put(entity.getMetadata().getJsonPropertyName(property), value);
 		}
-		System.out.println("copy: " + copy);
 		return copy;
-	}
-
-	protected JsonNode getNodeToWrite(Object value, Class<? extends View> view) {
-		return objectMapper.valueToTree(value);
 	}
 
 	protected boolean isEntity(Object o) {

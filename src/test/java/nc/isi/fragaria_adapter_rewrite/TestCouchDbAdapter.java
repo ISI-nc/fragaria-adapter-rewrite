@@ -12,6 +12,7 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.Entity;
 import nc.isi.fragaria_adapter_rewrite.services.domain.EntityBuilder;
 import nc.isi.fragaria_adapter_rewrite.services.domain.FragariaDomainModule;
 import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.All;
+import nc.isi.fragaria_adapter_rewrite.services.domain.IdQuery;
 import nc.isi.fragaria_adapter_rewrite.services.domain.OperationType;
 import nc.isi.fragaria_adapter_rewrite.services.domain.Query;
 import nc.isi.fragaria_adapter_rewrite.services.domain.session.Session;
@@ -135,6 +136,13 @@ public class TestCouchDbAdapter extends TestCase {
 			if (temp.getAdress() != null)
 				System.out.println(temp.getAdress().getCity().getName());
 			System.out.println(temp.getCities());
+		}
+		PersonData fromDB = couchDbAdapter.executeUniqueQuery(
+				new IdQuery<>(PersonData.class, personData.getId()))
+				.getResponse();
+		fromDB.setSession(session);
+		for (City city : fromDB.getCities()) {
+			System.out.println(city.getRev());
 		}
 	}
 }

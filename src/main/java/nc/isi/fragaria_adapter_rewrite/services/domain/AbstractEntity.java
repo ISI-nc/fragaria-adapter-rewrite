@@ -50,8 +50,8 @@ public abstract class AbstractEntity implements Entity {
 	private final EntityMetadata entityMetadata;
 	private final EventBus eventBus = new EventBus();
 	private final LinkedList<String> types;
-	private State state = State.NEW;
-	private Completion completion;
+	private State state = State.COMMITED;
+	private Completion completion = Completion.PARTIAL;
 	private Session session;
 	private final String tempId = UUID.randomUUID().toString();
 
@@ -85,7 +85,10 @@ public abstract class AbstractEntity implements Entity {
 		if (!cache.keySet().contains(propertyName))
 			cache.put(propertyName, objectResolver.resolve(objectNode,
 					propertyType, propertyName, this));
-		return propertyType.cast(cache.get(propertyName));
+		T value = propertyType.cast(cache.get(propertyName));
+		if (Entity.class.isAssignableFrom(propertyType))
+			((Entity) value).setSession(session);
+		return value;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -96,7 +99,13 @@ public abstract class AbstractEntity implements Entity {
 		if (!cache.containsKey(collectionName))
 			cache.put(collectionName, objectResolver.resolveCollection(
 					objectNode, collectionGenericType, collectionName, this));
-		return (Collection<T>) cache.get(collectionName);
+		Collection<T> collection = (Collection<T>) cache.get(collectionName);
+		if (Entity.class.isAssignableFrom(collectionGenericType)) {
+			for (T o : collection) {
+				((Entity) o).setSession(session);
+			}
+		}
+		return collection;
 	}
 
 	@Override

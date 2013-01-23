@@ -1,5 +1,6 @@
 package nc.isi.fragaria_adapter_rewrite;
 
+
 public class Adress {
 	private String street;
 	private City city;

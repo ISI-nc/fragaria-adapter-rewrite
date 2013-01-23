@@ -18,16 +18,18 @@ public class ConnectionDataBuilderImpl implements ConnectionDataBuilder {
 	@Override
 	public ConnectionData build(String dsType, Collection<Object> params) {
 		Class<?>[] paramClasses = new Class<?>[params.size()];
+		Object[] paramsTable = new Object[params.size()];
 		int i = 0;
 		for (Object param : params) {
 			paramClasses[i] = param.getClass();
+			paramsTable[i] = param;
 			i++;
 		}
 
 		try {
 			Constructor<? extends ConnectionData> constructor = map.get(dsType)
 					.getConstructor(paramClasses);
-			return constructor.newInstance(params);
+			return constructor.newInstance(paramsTable);
 		} catch (NoSuchMethodException | SecurityException
 				| InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException e) {

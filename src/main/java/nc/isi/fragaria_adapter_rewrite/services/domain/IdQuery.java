@@ -1,5 +1,6 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Utilisée pour faire une requête par ID, on peut ajouter la REV pour récupérer
@@ -15,6 +16,8 @@ public class IdQuery<T extends Entity> implements Query<T> {
 	private String rev;
 
 	public IdQuery(Class<T> resultType, String id) {
+		checkNotNull(resultType);
+		checkNotNull(id);
 		this.id = id;
 		this.resultType = resultType;
 	}
