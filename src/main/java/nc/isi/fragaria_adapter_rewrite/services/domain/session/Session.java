@@ -39,15 +39,11 @@ public interface Session {
 	public Session cancel();
 
 	/**
-	 * register
-	 * 
-	 * C'est la methode principale de la session qui enregistre les entités nouvelles, modifées ou à supprimer
-	 * de sorte à pouvoir reconstituer les objets tels qu'ils sont dans la session en cours. 
-	 * Un objet ne peut se trouver que dans une seule map à la fois. 
-	 * Les opérations sont elles ajouter à une file (queue) et seront ensuite traitées par les {@link AdapterManager}
-	 * 
+	 *  
 	 * @param o
 	 * @param object
+	 * 
+	 * Ajoute les opérations à une file (queue). Ces opérations seront ensuite traitées par les {@link AdapterManager}
 	 */
 	public <T extends Entity>  void register(OperationType o, T object);
 
