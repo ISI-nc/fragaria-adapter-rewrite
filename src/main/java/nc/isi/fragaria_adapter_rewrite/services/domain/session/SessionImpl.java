@@ -49,7 +49,7 @@ public class SessionImpl implements Session {
 		CollectionQueryResponse<T> response = (CollectionQueryResponse<T>) adapterManager
 				.executeQuery(query);
 		Collection<T>  objects = (Collection<T>) response.getResponse();
-		Class<T> entityClass = (Class<T>) objects.getClass().getComponentType();
+		Class<T> entityClass = query.getResultType();
 		objects.addAll((Collection<T>) createdObjects.get(entityClass));
 		objects.removeAll(deletedObjects.get(entityClass));
 		for (T o : (Collection<T>)updatedObjects.get(entityClass)) {
@@ -77,6 +77,7 @@ public class SessionImpl implements Session {
 		T entity = entityBuilder.build(entityClass);
 		entity.setState(State.NEW);
 		entity.setCompletion(Completion.FULL);
+		createdObjects.put(entity.getClass(), entity);
 		register(OperationType.CREATE, entity);
 		return entity;
 	}
@@ -90,6 +91,14 @@ public class SessionImpl implements Session {
 	public <T extends Entity> void delete(Collection<T> entities) {
 		for (T entity : entities) {
 			entity.setState(State.DELETED);
+			if(getMapIfObjectHasBeenRegistered(entity)==null)
+				deletedObjects.put(entity.getClass(), entity);
+			else if(getMapIfObjectHasBeenRegistered(entity) == createdObjects)
+				createdObjects.remove(entity.getClass(), entity);
+			else if(getMapIfObjectHasBeenRegistered(entity) == updatedObjects) {
+				updatedObjects.remove(entity.getClass(), entity);
+				deletedObjects.put(entity.getClass(), entity);
+			}
 			register(OperationType.DELETE, entity);
 		}
 	}
@@ -109,39 +118,7 @@ public class SessionImpl implements Session {
 
 	@Override
 	public <T extends Entity> void register(OperationType o, T entity) {
-		setSessionTo(entity);
 		queue.add(entity);
-
-		switch (o) {
-		case CREATE:
-				createdObjects.put(entity.getClass(), entity);
-			break;
-		case UPDATE:
-			if(getMapIfObjectHasBeenRegistered(entity)==null)
-				updatedObjects.put(entity.getClass(), entity);
-			else if(getMapIfObjectHasBeenRegistered(entity) == createdObjects)
-				break;
-			else if(getMapIfObjectHasBeenRegistered(entity) == updatedObjects) 
-				break;
-			else if(getMapIfObjectHasBeenRegistered(entity) == deletedObjects) 
-				commitError(entity,entity.getState(),  State.DELETED);
-			break;
-		case DELETE:
-			if(getMapIfObjectHasBeenRegistered(entity)==null)
-				deletedObjects.put(entity.getClass(), entity);
-			else if(getMapIfObjectHasBeenRegistered(entity) == createdObjects)
-				createdObjects.remove(entity.getClass(), entity);
-			else if(getMapIfObjectHasBeenRegistered(entity) == updatedObjects) {
-				updatedObjects.remove(entity.getClass(), entity);
-				deletedObjects.put(entity.getClass(), entity);
-			}
-			else if(getMapIfObjectHasBeenRegistered(entity) == deletedObjects) 
-				break;
-			break;
-		default:
-			break;
-		}
-
 	}
 		
 	private void commitError(Entity entity, State oldState, State state) {
@@ -163,7 +140,12 @@ public class SessionImpl implements Session {
 	
 	
     @Subscribe void recordPropertyChange(PropertyChangeEvent e) {
-    	register(OperationType.UPDATE, (Entity) e.getSource());
+    	Entity entity = (Entity)e.getSource();
+    	if(getMapIfObjectHasBeenRegistered(entity)==null)
+			updatedObjects.put(entity.getClass(), entity);
+		else if(getMapIfObjectHasBeenRegistered(entity) == deletedObjects) 
+			commitError(entity,entity.getState(),  State.DELETED);
+    	register(OperationType.UPDATE, entity );
       }
 
     private <T extends Entity> void setSessionTo(Collection<T> entities) {
