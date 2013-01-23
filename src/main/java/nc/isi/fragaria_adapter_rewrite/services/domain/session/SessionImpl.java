@@ -78,6 +78,7 @@ public class SessionImpl implements Session {
 		entity.setState(State.NEW);
 		entity.setCompletion(Completion.FULL);
 		createdObjects.put(entity.getClass(), entity);
+		entity.setSession(this);
 		register(OperationType.CREATE, entity);
 		return entity;
 	}
@@ -139,7 +140,7 @@ public class SessionImpl implements Session {
 	}
 	
 	
-    @Subscribe void recordPropertyChange(PropertyChangeEvent e) {
+    @Subscribe public void recordPropertyChange(PropertyChangeEvent e) {
     	Entity entity = (Entity)e.getSource();
     	if(getMapIfObjectHasBeenRegistered(entity)==null)
 			updatedObjects.put(entity.getClass(), entity);
