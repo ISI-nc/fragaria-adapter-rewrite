@@ -9,6 +9,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Set;
 
+import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.All;
 import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.Id;
 
 import org.springframework.beans.BeanUtils;
@@ -50,7 +51,7 @@ public class EntityMetadata {
 
 	public Class<? extends View> getPartial(String propertyName) {
 		Partial partial = getPropertyAnnotation(propertyName, Partial.class);
-		return partial != null ? partial.value() : null;
+		return partial != null ? partial.value() : All.class;
 	}
 
 	public String getBackReference(String propertyName) {

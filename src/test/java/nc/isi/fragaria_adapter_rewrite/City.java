@@ -7,7 +7,7 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.ObjectResolver;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-@DsKey("test")
+@DsKey("rer")
 public class City extends AbstractEntity {
 	public static final String NAME = "name";
 
@@ -22,6 +22,11 @@ public class City extends AbstractEntity {
 
 	public void setName(String name) {
 		writeProperty(NAME, name);
+	}
+
+	@Override
+	public String toString() {
+		return toJSON().toString();
 	}
 
 }

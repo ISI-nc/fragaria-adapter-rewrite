@@ -27,7 +27,7 @@ public class SessionImpl implements Session {
 	private final QueryExecutorForCollection qExecutor;
 	private final UUID id = UUID.randomUUID();
 	private final EntityBuilder entityBuilder;
-	
+
 	private final LinkedList<Entity> queue = Lists.newLinkedList();
 
 	private final Multimap<Class<? extends Entity>, Entity> createdObjects = LinkedListMultimap
@@ -38,7 +38,7 @@ public class SessionImpl implements Session {
 			.create();
 
 	public SessionImpl(AdapterManager adapterManager,
-			EntityBuilder entityBuilder,QueryExecutorForCollection qExecutor) {
+			EntityBuilder entityBuilder, QueryExecutorForCollection qExecutor) {
 		this.adapterManager = adapterManager;
 		this.entityBuilder = entityBuilder;
 		this.qExecutor = qExecutor;
@@ -80,7 +80,7 @@ public class SessionImpl implements Session {
 		register(OperationType.CREATE, entity);
 		return entity;
 	}
-	
+
 	@Override
 	public void delete(Entity... entities) {
 		delete(Arrays.asList(entities));
@@ -93,7 +93,7 @@ public class SessionImpl implements Session {
 			register(OperationType.DELETE, entity);
 		}
 	}
-	
+
 	@Override
 	public Session post() {
 		adapterManager.post(queue);
@@ -106,7 +106,6 @@ public class SessionImpl implements Session {
 		flush();
 		return this;
 	}
-
 
 	@Override
 	public <T extends Entity> void register(OperationType o, T entity) {
@@ -172,17 +171,18 @@ public class SessionImpl implements Session {
 			entity.setSession(this);
 		}
 	}
-	
-	private void setSessionTo(Entity...entities) {
+
+	private void setSessionTo(Entity... entities) {
 		setSessionTo(Arrays.asList(entities));
 	}
-	
+
 	private <T extends Entity> T getObjectFromCacheFor(Query<T> query) {
 		T entity = null;
 		if(deletedObjects.size()>0)
 			if (getEntityFromColl(query,(Collection<T>)deletedObjects.get(query.getResultType())) != null)
 				throw new RuntimeException("Impossible de getter un objet déleté");
-		entity = getEntityFromColl(query, (Collection<T>)updatedObjects.get(query.getResultType()));
+		if(updatedObjects.size()>0)
+			entity = getEntityFromColl(query, (Collection<T>)updatedObjects.get(query.getResultType()));
 		if (entity == null && createdObjects.size()>0)
 			entity = getEntityFromColl(query, (Collection<T>)createdObjects.get(query.getResultType()));
 		return entity;
@@ -195,16 +195,29 @@ public class SessionImpl implements Session {
 					query,coll);
 		return entity;
 	}
-	
+
 	private void flush() {
 		createdObjects.clear();
 		updatedObjects.clear();
 		deletedObjects.clear();
 		queue.clear();
 	}
-	
+
 
 	public UUID getId() {
 		return id;
 	}
+
+	public AdapterManager getAdapterManager() {
+		return adapterManager;
+	}
+
+	public EntityBuilder getEntityBuilder() {
+		return entityBuilder;
+	}
+
+	public QueryExecutorForCollection getqExecutor() {
+		return qExecutor;
+	}
+
 }

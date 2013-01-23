@@ -10,7 +10,7 @@ public class GenericViews {
 	 * @author jmaltat
 	 * 
 	 */
-	public static final class All implements View {
+	public static final class All extends Id {
 
 	};
 

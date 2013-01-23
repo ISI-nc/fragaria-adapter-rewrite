@@ -31,6 +31,8 @@ public interface Entity extends Serializable, Partialable {
 
 	public ObjectNode toJSON();
 
+	public ObjectNode toJSON(Class<? extends View> view);
+
 	public void registerListener(Object o);
 
 	public void unregisterListener(Object listener);
