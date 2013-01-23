@@ -3,11 +3,11 @@ package nc.isi.fragaria_adapter_rewrite;
 import java.util.Arrays;
 import java.util.Collection;
 
+import nc.isi.fragaria_adapter_rewrite.CityViews.Name;
 import nc.isi.fragaria_adapter_rewrite.services.domain.AbstractEntity;
 import nc.isi.fragaria_adapter_rewrite.services.domain.DsKey;
 import nc.isi.fragaria_adapter_rewrite.services.domain.Embeded;
 import nc.isi.fragaria_adapter_rewrite.services.domain.EntityMetadataFactory;
-import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.Id;
 import nc.isi.fragaria_adapter_rewrite.services.domain.ObjectResolver;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -49,7 +49,7 @@ public class PersonData extends AbstractEntity {
 		writeProperty(ADRESS, adress);
 	}
 
-	@Embeded(Id.class)
+	@Embeded(Name.class)
 	public Collection<City> getCities() {
 		return readCollection(City.class, CITIES);
 	}
@@ -58,7 +58,7 @@ public class PersonData extends AbstractEntity {
 		writeProperty(CITIES, cities);
 	}
 
-	@Embeded(Id.class)
+	@Embeded(Name.class)
 	public City getCity() {
 		return readProperty(City.class, CITY);
 	}

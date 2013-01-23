@@ -8,6 +8,10 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.SpecificDsLoader
 import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.YamlDsLoader;
 import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.YamlSerializer;
 import nc.isi.fragaria_adapter_rewrite.services.domain.jackson.JacksonModule;
+import nc.isi.fragaria_adapter_rewrite.services.domain.session.QueryExecutorForCollection;
+import nc.isi.fragaria_adapter_rewrite.services.domain.session.QueryExecutorForCollectionImpl;
+import nc.isi.fragaria_adapter_rewrite.services.domain.session.SessionManager;
+import nc.isi.fragaria_adapter_rewrite.services.domain.session.SessionManagerImpl;
 
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
@@ -39,6 +43,9 @@ public class FragariaDomainModule {
 		binder.bind(YamlSerializer.class);
 		binder.bind(DataSourceProvider.class, DataSourceProviderImpl.class);
 		binder.bind(ReflectionFactory.class);
+		binder.bind(SessionManager.class, SessionManagerImpl.class);
+		binder.bind(QueryExecutorForCollection.class,
+				QueryExecutorForCollectionImpl.class);
 	}
 
 	public void contributeMasterDsLoader(
