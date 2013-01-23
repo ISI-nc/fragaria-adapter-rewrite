@@ -133,10 +133,8 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	private void checkChange(State oldState, State newSate) {
-		boolean error = oldState == State.DELETED;
-		if (!error)
-			error = oldState == State.MODIFIED && newSate == State.NEW;
-		if (error)
+		if (oldState == State.DELETED
+				|| (oldState == State.MODIFIED && newSate == State.NEW))
 			throw new StateChangeException(oldState, newSate);
 
 	}
