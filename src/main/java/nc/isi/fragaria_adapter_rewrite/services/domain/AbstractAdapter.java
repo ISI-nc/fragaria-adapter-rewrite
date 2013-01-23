@@ -18,4 +18,11 @@ public abstract class AbstractAdapter {
 		return new UniqueQueryResponse<T>(entity);
 	}
 
+	protected void commitError(Entity entity, State oldState, State state) {
+		throw new RuntimeException(
+				String.format(
+						"Erreur sur l'état de l'objet %s, déjà enregistré avec l'état %s et demande à passer à %s ",
+						entity, oldState, state));
+	}
+
 }

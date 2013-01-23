@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.UUID;
 
 import junit.framework.TestCase;
-import nc.isi.fragaria_adapter_rewrite.services.domain.AdapterManager;
 import nc.isi.fragaria_adapter_rewrite.services.domain.ByViewQuery;
 import nc.isi.fragaria_adapter_rewrite.services.domain.CollectionQueryResponse;
 import nc.isi.fragaria_adapter_rewrite.services.domain.CouchDbAdapter;
@@ -30,11 +29,6 @@ public class TestCouchDbAdapter extends TestCase {
 		Session session = new Session() {
 
 			@Override
-			public void register(OperationType o, Object object) {
-
-			}
-
-			@Override
 			public Session post() {
 				// TODO Auto-generated method stub
 				return null;
@@ -48,18 +42,6 @@ public class TestCouchDbAdapter extends TestCase {
 
 			@Override
 			public UUID getId() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public EntityBuilder getEntityBuilder() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public AdapterManager getAdapterManager() {
 				// TODO Auto-generated method stub
 				return null;
 			}
@@ -102,6 +84,12 @@ public class TestCouchDbAdapter extends TestCase {
 
 			@Override
 			public void addChild(Session session) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void register(OperationType o, Entity object) {
 				// TODO Auto-generated method stub
 
 			}

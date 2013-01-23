@@ -52,12 +52,8 @@ public class YamlDsLoader implements SpecificDsLoader {
 		YamlDatasourceMetadata yamlDs = serializer.serialize(dsFile,
 				YamlDatasourceMetadata.class);
 		return new DataSourceMetadata(yamlDs.getType(), builder.build(
-				yamlDs.getType(),
-				yamlDs.getConnectionData()
-						.values()
-						.toArray(
-								new Object[yamlDs.getConnectionData().values()
-										.size()])), yamlDs.canEmbed());
+				yamlDs.getType(), yamlDs.getConnectionData().values()),
+				yamlDs.canEmbed());
 	}
 
 }
