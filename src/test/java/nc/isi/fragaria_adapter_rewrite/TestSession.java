@@ -29,7 +29,6 @@ public class TestSession extends TestCase{
 	final EntityBuilder entityBuilder = REGISTRY.getService(EntityBuilder.class);
 	final Entity personData = entityBuilder.build(PersonData.class);
 	final List listOfPersons = Lists.newArrayList();
-
 	
 	public void testCreate(){
 		List ids = Lists.newArrayList();
@@ -134,7 +133,6 @@ public class TestSession extends TestCase{
 
 			@Override
 			public void post(LinkedList<Entity> entities) {
-				// TODO Auto-generated method stub
 				
 			}
 			

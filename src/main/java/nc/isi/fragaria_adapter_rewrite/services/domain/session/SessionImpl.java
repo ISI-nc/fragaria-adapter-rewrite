@@ -103,6 +103,20 @@ public class SessionImpl implements Session {
 			register(OperationType.DELETE, entity);
 		}
 	}
+	
+	/**
+	 * 
+	 * @param e
+	 */
+	@Subscribe public void recordPropertyChange(PropertyChangeEvent e) {
+    	Entity entity = (Entity)e.getSource();
+    	entity.setState(State.MODIFIED);
+    	if(getMapIfObjectHasBeenRegistered(entity)==null)
+			updatedObjects.put(entity.getClass(), entity);
+		else if(getMapIfObjectHasBeenRegistered(entity) == deletedObjects) 
+			commitError(entity,entity.getState(),  State.DELETED);
+    	register(OperationType.UPDATE, entity );
+      }
 
 	@Override
 	public Session post() {
@@ -140,14 +154,7 @@ public class SessionImpl implements Session {
 	}
 	
 	
-    @Subscribe public void recordPropertyChange(PropertyChangeEvent e) {
-    	Entity entity = (Entity)e.getSource();
-    	if(getMapIfObjectHasBeenRegistered(entity)==null)
-			updatedObjects.put(entity.getClass(), entity);
-		else if(getMapIfObjectHasBeenRegistered(entity) == deletedObjects) 
-			commitError(entity,entity.getState(),  State.DELETED);
-    	register(OperationType.UPDATE, entity );
-      }
+    
 
     private <T extends Entity> void setSessionTo(Collection<T> entities) {
 		for(T entity : entities){
