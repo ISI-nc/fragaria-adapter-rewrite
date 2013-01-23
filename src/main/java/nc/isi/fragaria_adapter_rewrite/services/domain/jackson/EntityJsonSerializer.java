@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 public class EntityJsonSerializer extends JsonSerializer<Entity> {
-
 	@Override
 	public void serialize(Entity value, JsonGenerator jgen,
 			SerializerProvider provider) throws IOException,

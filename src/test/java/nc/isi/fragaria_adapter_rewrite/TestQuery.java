@@ -16,6 +16,7 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.EntityMetadata;
 import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.All;
 import nc.isi.fragaria_adapter_rewrite.services.domain.Session;
 import nc.isi.fragaria_adapter_rewrite.services.domain.State;
+import nc.isi.fragaria_adapter_rewrite.services.domain.View;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -137,6 +138,12 @@ public class TestQuery extends TestCase {
 			public void setRev(String rev) {
 				// TODO Auto-generated method stub
 
+			}
+
+			@Override
+			public ObjectNode toJSON(Class<? extends View> view) {
+				// TODO Auto-generated method stub
+				return null;
 			}
 		};
 	}

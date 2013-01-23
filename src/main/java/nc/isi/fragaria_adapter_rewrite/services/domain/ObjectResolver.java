@@ -13,4 +13,7 @@ public interface ObjectResolver {
 
 	void write(ObjectNode node, String propertyName, Object value, Entity entity);
 
+	public ObjectNode clone(ObjectNode node, Class<? extends View> view,
+			Entity entity);
+
 }

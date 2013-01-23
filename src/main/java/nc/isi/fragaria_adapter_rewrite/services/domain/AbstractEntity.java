@@ -52,14 +52,15 @@ public abstract class AbstractEntity implements Entity {
 	private State state = State.NEW;
 	private Completion completion;
 	private Session session;
+	private final String tempId = UUID.randomUUID().toString();
 
 	public AbstractEntity(ObjectNode objectNode, ObjectResolver objectResolver,
 			EntityMetadataFactory entityMetadataFactory) {
 		this.objectNode = checkNotNull(objectNode);
 		this.objectResolver = objectResolver;
 		this.entityMetadata = entityMetadataFactory.create(getClass());
-		setId(UUID.randomUUID().toString());
 		this.types = initTypes();
+		setId(tempId);
 	}
 
 	private LinkedList<String> initTypes() {
@@ -176,7 +177,6 @@ public abstract class AbstractEntity implements Entity {
 		writeProperty(ID, id);
 	}
 
-	@JsonView(Id.class)
 	@JsonProperty("_rev")
 	public String getRev() {
 		return readProperty(String.class, REV);
@@ -207,6 +207,11 @@ public abstract class AbstractEntity implements Entity {
 			unregisterListener(this.session);
 		this.session = session;
 		registerListener(session);
+	}
+
+	@Override
+	public ObjectNode toJSON(Class<? extends View> view) {
+		return objectResolver.clone(objectNode, view, this);
 	}
 
 }

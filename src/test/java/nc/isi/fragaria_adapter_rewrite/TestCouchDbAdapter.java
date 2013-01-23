@@ -1,5 +1,6 @@
 package nc.isi.fragaria_adapter_rewrite;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ public class TestCouchDbAdapter extends TestCase {
 	public void testCreate() {
 		EntityBuilder entityBuilder = REGISTRY.getService(EntityBuilder.class);
 		PersonData personData = entityBuilder.build(PersonData.class);
-		personData.setSession(new Session() {
+		Session session = new Session() {
 
 			@Override
 			public void register(OperationType o, Object object) {
@@ -104,28 +105,48 @@ public class TestCouchDbAdapter extends TestCase {
 				// TODO Auto-generated method stub
 
 			}
-		});
+		};
+		personData.setSession(session);
 		personData.setName("Maltat");
 		personData.setFirstName("Justin", "Pierre");
 		Adress adress = new Adress();
-		City city = entityBuilder.build(City.class);
-		city.setName("Paris");
-		adress.setCity(city);
-		adress.setStreet("Champs Elysée");
-		personData.setAdress(adress);
+		City paris = entityBuilder.build(City.class);
+		paris.setName("Paris");
+		paris.setSession(session);
+		System.out.println("paris created : " + paris);
+		City londres = entityBuilder.build(City.class);
+		londres.setName("Londres");
+		londres.setSession(session);
+		System.out.println("londres created : " + londres);
 		CouchDbAdapter couchDbAdapter = REGISTRY
 				.getService(CouchDbAdapter.class);
-		System.out.println(personData.toJSON());
-		couchDbAdapter.post(city, personData);
+		couchDbAdapter.post(londres, paris);
+		System.out.println("londres id : " + londres.getId());
+		System.out.println("paris id : " + paris.getId());
+		adress.setCity(paris);
+		adress.setStreet("Champs Elysée");
+		System.out.println("adress paris id : " + adress.getCity().getId());
+		personData.setAdress(adress);
+		System.out.println("address associated");
+		personData.setCity(londres);
+		System.out.println("londres associated : "
+				+ personData.getCity().getId());
+		City[] cities = { londres, paris };
+		personData.setCities(Arrays.asList(cities));
+		System.out.println("cities associated");
+		System.out.println("person : " + personData.toJSON());
+		couchDbAdapter.post(londres, paris, personData);
 		CollectionQueryResponse<PersonData> personDatas = couchDbAdapter
 				.executeQuery(new ByViewQuery<>(PersonData.class, All.class));
 		System.out.println(personDatas.getResponse().size());
 		for (PersonData temp : personDatas) {
+			temp.setSession(session);
 			System.out.println(temp.getName());
 			System.out.println(temp.getFirstName());
 			System.out.println(temp.getAdress());
 			if (temp.getAdress() != null)
 				System.out.println(temp.getAdress().getCity().getName());
+			System.out.println(temp.getCities());
 		}
 	}
 }

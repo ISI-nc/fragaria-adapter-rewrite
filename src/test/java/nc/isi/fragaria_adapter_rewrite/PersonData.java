@@ -5,16 +5,20 @@ import java.util.Collection;
 
 import nc.isi.fragaria_adapter_rewrite.services.domain.AbstractEntity;
 import nc.isi.fragaria_adapter_rewrite.services.domain.DsKey;
+import nc.isi.fragaria_adapter_rewrite.services.domain.Embeded;
 import nc.isi.fragaria_adapter_rewrite.services.domain.EntityMetadataFactory;
+import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.Id;
 import nc.isi.fragaria_adapter_rewrite.services.domain.ObjectResolver;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-@DsKey("test")
+@DsKey("rer")
 public class PersonData extends AbstractEntity {
 	public static final String NAME = "name";
 	public static final String FIRST_NAME = "firstName";
 	public static final String ADRESS = "adress";
+	public static final String CITIES = "cities";
+	public static final String CITY = "city";
 
 	public PersonData(ObjectNode objectNode, ObjectResolver objectResolver,
 			EntityMetadataFactory entityMetadataFactory) {
@@ -43,6 +47,24 @@ public class PersonData extends AbstractEntity {
 
 	public void setAdress(Adress adress) {
 		writeProperty(ADRESS, adress);
+	}
+
+	@Embeded(Id.class)
+	public Collection<City> getCities() {
+		return readCollection(City.class, CITIES);
+	}
+
+	public void setCities(Collection<City> cities) {
+		writeProperty(CITIES, cities);
+	}
+
+	@Embeded(Id.class)
+	public City getCity() {
+		return readProperty(City.class, CITY);
+	}
+
+	public void setCity(City city) {
+		writeProperty(CITY, city);
 	}
 
 }

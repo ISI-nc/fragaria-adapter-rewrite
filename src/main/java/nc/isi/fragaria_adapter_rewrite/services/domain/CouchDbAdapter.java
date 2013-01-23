@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
-public class CouchDbAdapter implements Adapter {
+public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 	private final DataSourceProvider dataSourceProvider;
 	private final EntityMetadataFactory entityMetadataFactory;
 	private final CouchDbSerializer serializer;
@@ -92,9 +92,8 @@ public class CouchDbAdapter implements Adapter {
 			if (bVQuery.getPredicate() == null)
 				return response;
 			T entity = alias(query.getResultType());
-			return new CollectionQueryResponse<>(from($(entity),
-					response.getResponse()).where(bVQuery.getPredicate()).list(
-					$(entity)));
+			return buildQueryResponse(from($(entity), response.getResponse())
+					.where(bVQuery.getPredicate()).list($(entity)));
 		}
 		if (query instanceof SearchQuery) {
 			return elasticSearchAdapter.executeQuery((SearchQuery<T>) query);
@@ -119,8 +118,6 @@ public class CouchDbAdapter implements Adapter {
 			ViewQuery viewQuery, Class<T> type) {
 		checkNotNull(viewQuery);
 		checkNotNull(type);
-		System.out.println(viewQuery.getViewName());
-		System.out.println(viewQuery.hasMultipleKeys());
 		EntityMetadata entityMetadata = entityMetadataFactory.create(type);
 		ViewResult result = getConnector(entityMetadata).queryView(viewQuery);
 		Collection<T> collection = Lists.newArrayList();
@@ -130,7 +127,7 @@ public class CouchDbAdapter implements Adapter {
 			collection.add(serializer.deSerialize(
 					ObjectNode.class.cast(row.getValueAsNode()), type));
 		}
-		return new CollectionQueryResponse<>(collection);
+		return buildQueryResponse(collection);
 	}
 
 	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
@@ -138,8 +135,7 @@ public class CouchDbAdapter implements Adapter {
 		checkNotNull(id);
 		checkNotNull(type);
 		EntityMetadata entityMetadata = entityMetadataFactory.create(type);
-		return new UniqueQueryResponse<T>(getConnector(entityMetadata).get(
-				type, id));
+		return buildQueryResponse(getConnector(entityMetadata).get(type, id));
 	}
 
 	@Override
@@ -153,8 +149,7 @@ public class CouchDbAdapter implements Adapter {
 		CollectionQueryResponse<T> response = executeQuery(query);
 		checkState(response.getResponse().size() == 1,
 				"La requête a renvoyé trop de résultat");
-		return new UniqueQueryResponse<>(response.getResponse().iterator()
-				.next());
+		return buildQueryResponse(response.getResponse().iterator().next());
 	}
 
 	@Override
@@ -179,6 +174,9 @@ public class CouchDbAdapter implements Adapter {
 		}
 		for (CouchDbConnector connector : connectorsToFlush) {
 			connector.flushBulkBuffer();
+		}
+		for (Entity entity : filtered) {
+			entity.setState(State.COMMITED);
 		}
 	}
 
