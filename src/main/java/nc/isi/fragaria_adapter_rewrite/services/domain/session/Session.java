@@ -9,22 +9,24 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.Query;
 
 /**
  * 
- * @author bjonathas
- * Classe permettant de récupérer une ou des entities via les méthodes get et d'en créer de nouvelles via la méthode create.
- * Les modifications sont enregistrés via void register(OperationType o, Entity object) qui écoute les entités  appartenant 
- * à la session et qui est appelé à chaque création/délétion. C'est le point central de la gestion des opérations.
- * La méthode post permet d'appliquer toutes les opérations sur les datasources via les adapters.
- * Logique Parent child pas réellement implémentée.
+ * @author bjonathas Classe permettant de récupérer une ou des entities via les
+ *         méthodes get et d'en créer de nouvelles via la méthode create. Les
+ *         modifications sont enregistrés via void register(OperationType o,
+ *         Entity object) qui écoute les entités appartenant à la session et qui
+ *         est appelé à chaque création/délétion. C'est le point central de la
+ *         gestion des opérations. La méthode post permet d'appliquer toutes les
+ *         opérations sur les datasources via les adapters. Logique Parent child
+ *         pas réellement implémentée.
  * 
  */
 
 public interface Session {
 
-	public Collection<Entity> get(Query<Entity> query);
+	public <T extends Entity> Collection<T> get(Query<T> query);
 
-	public Entity getUnique(Query<Entity> query);
+	public <T extends Entity> T getUnique(Query<T> query);
 
-	public Entity create(Class<Entity> entityClass);
+	public <T extends Entity> T create(Class<T> entityClass);
 
 	public void delete(Entity... entity);
 
