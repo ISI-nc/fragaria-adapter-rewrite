@@ -20,26 +20,23 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.Query;
 
 public interface Session {
 
-	public Collection<Entity> get(Query<Entity> query);
+	public <T extends Entity> Collection<T> get(Query<T> query);
 
-	public Entity getUnique(Query<Entity> query);
+	public <T extends Entity>  T getUnique(Query<T> query);
 
-	public Entity create(Class<Entity> entityClass);
+	public <T extends Entity>  T create(Class<T> entityClass);
 
 	public void delete(Entity... entity);
 
-	public void delete(Collection<Entity> entity);
+	public <T extends Entity> void delete(Collection<T> entity);
 
 	public Session post();
 
 	public Session cancel();
 
-	public void register(OperationType o, Entity object);
-
-	public Session createChild();
+	public <T extends Entity>  void register(OperationType o, T object);
 
 	public UUID getId();
 
-	public void addChild(Session session);
 
 }
