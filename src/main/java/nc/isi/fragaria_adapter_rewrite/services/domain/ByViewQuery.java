@@ -8,13 +8,9 @@ import java.util.Map.Entry;
 import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.All;
 
 import com.beust.jcommander.internal.Maps;
-import com.google.common.base.CaseFormat;
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.alias.Alias;
-import com.mysema.query.support.Expressions;
-import com.mysema.query.types.Ops;
 import com.mysema.query.types.Predicate;
-import com.mysema.query.types.path.PathBuilder;
 
 /**
  * ViewQueryImpl predicate est prévu pour être utilisé via un {@link Alias} sans
@@ -32,24 +28,13 @@ import com.mysema.query.types.path.PathBuilder;
  * 
  * @param <T>
  */
-public class ByViewQuery<T extends Entity> implements Query<T> {
-	private final Class<T> resultType;
+public class ByViewQuery<T extends Entity> extends AbstractQuery<T> implements Query<T> {
 	private final Class<? extends View> view;
-	private final PathBuilder<T> entityPath;
-	private BooleanBuilder builder;
 	private final Map<String, Object> params = Maps.newHashMap();
 
 	public ByViewQuery(Class<T> resultType, Class<? extends View> view) {
-		this.view = view != null ? view : All.class;
-		this.resultType = resultType;
-		this.entityPath = new PathBuilder<>(resultType,
-				CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL,
-						resultType.getSimpleName()));
-	}
-
-	@Override
-	public Class<T> getResultType() {
-		return resultType;
+		super(resultType);
+		this.view = view != null ? view : All.class;		
 	}
 
 	public Class<? extends View> getView() {
@@ -102,15 +87,5 @@ public class ByViewQuery<T extends Entity> implements Query<T> {
 
 	}
 
-	public Predicate getPredicate() {
-		if (builder == null)
-			return null;
-		return builder.getValue();
-	}
-
-	private Predicate createPredicate(String key, Object value) {
-		return Expressions.predicate(Ops.EQ, entityPath.get(key),
-				Expressions.constant(value));
-	}
 
 }

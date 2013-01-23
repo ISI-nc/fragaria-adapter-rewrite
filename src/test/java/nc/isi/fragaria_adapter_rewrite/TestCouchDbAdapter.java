@@ -54,18 +54,11 @@ public class TestCouchDbAdapter extends TestCase {
 			}
 
 			@Override
-			public void delete(Collection<Entity> entity) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
 			public void delete(Entity... entity) {
 				// TODO Auto-generated method stub
 
 			}
 
-			@Override
 			public Session createChild() {
 				// TODO Auto-generated method stub
 				return null;
@@ -83,16 +76,22 @@ public class TestCouchDbAdapter extends TestCase {
 				return null;
 			}
 
-			@Override
 			public void addChild(Session session) {
 				// TODO Auto-generated method stub
 
 			}
 
-			@Override
-			public void register(OperationType o, Entity object) {
-				// TODO Auto-generated method stub
 
+			@Override
+			public <T extends Entity> void register(OperationType o, T object) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public <T extends Entity> void delete(Collection<T> entity) {
+				// TODO Auto-generated method stub
+				
 			}
 		};
 		personData.setSession(session);
