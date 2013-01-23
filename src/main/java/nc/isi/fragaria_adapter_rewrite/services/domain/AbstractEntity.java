@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.Id;
+import nc.isi.fragaria_adapter_rewrite.services.domain.session.Session;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

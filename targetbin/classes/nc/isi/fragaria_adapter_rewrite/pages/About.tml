@@ -1,7 +1,0 @@
-<html t:type="layout" title="About fragaria-adapter-rewrite"
-      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd"
-      xmlns:p="tapestry:parameter">
-
-    <p>About fragaria-adapter-rewrite application ...</p>
-
-</html>
