@@ -26,9 +26,10 @@ import com.beust.jcommander.internal.Lists;
 public class TestSession extends TestCase{
 	private static final Registry REGISTRY = RegistryBuilder
 			.buildAndStartupRegistry(FragariaDomainModule.class);
-	final Entity personData = REGISTRY.getService(EntityBuilder.class).build(PersonData.class);
-	final List listOfPersons = Lists.newArrayList();
 	final EntityBuilder entityBuilder = REGISTRY.getService(EntityBuilder.class);
+	final Entity personData = entityBuilder.build(PersonData.class);
+	final List listOfPersons = Lists.newArrayList();
+
 	
 	public void testCreate(){
 		List ids = Lists.newArrayList();
@@ -65,6 +66,7 @@ public class TestSession extends TestCase{
 		listGet = new ArrayList(session.get(new ByViewQuery<>(PersonData.class, null)));
 		assertTrue(listGet.size()==1);
 	}
+	
 	public void testUpdateCollection(){
 		List ids = Lists.newArrayList();
 		for(int i = 0;i<10;i++){
