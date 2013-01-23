@@ -215,6 +215,7 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 			default:
 				commitError(entity, oldState, state);
 			}
+			break;
 		case DELETED:
 			switch (oldState) {
 			case NEW:
@@ -227,6 +228,7 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 			default:
 				commitError(entity, oldState, state);
 			}
+			break;
 		default:
 			commitError(entity, oldState, state);
 		}
