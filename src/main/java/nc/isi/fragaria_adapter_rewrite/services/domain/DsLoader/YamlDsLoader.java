@@ -51,7 +51,6 @@ public class YamlDsLoader implements SpecificDsLoader {
 			throws FileNotFoundException {
 		YamlDatasourceMetadata yamlDs = serializer.serialize(dsFile,
 				YamlDatasourceMetadata.class);
-		System.out.println(yamlDs.getConnectionData());
 		return new DataSourceMetadata(yamlDs.getType(), builder.build(
 				yamlDs.getType(), yamlDs.getConnectionData().values()),
 				yamlDs.canEmbed());

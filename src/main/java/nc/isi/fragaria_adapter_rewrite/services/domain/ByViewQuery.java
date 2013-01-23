@@ -1,5 +1,6 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.util.Map;
@@ -28,13 +29,13 @@ import com.mysema.query.types.Predicate;
  * 
  * @param <T>
  */
-public class ByViewQuery<T extends Entity> extends AbstractQuery<T> implements Query<T> {
+public class ByViewQuery<T extends Entity> extends AbstractQuery<T> {
 	private final Class<? extends View> view;
 	private final Map<String, Object> params = Maps.newHashMap();
 
 	public ByViewQuery(Class<T> resultType, Class<? extends View> view) {
 		super(resultType);
-		this.view = view != null ? view : All.class;		
+		this.view = view != null ? view : All.class;
 	}
 
 	public Class<? extends View> getView() {
@@ -62,6 +63,7 @@ public class ByViewQuery<T extends Entity> extends AbstractQuery<T> implements Q
 	public ByViewQuery<T> where(Predicate predicate) {
 		checkState(builder == null,
 				"where a déjà été appelé veuillez préciser l'association via or | and");
+		checkNotNull(predicate);
 		builder = new BooleanBuilder(predicate);
 		return this;
 	}
@@ -71,7 +73,7 @@ public class ByViewQuery<T extends Entity> extends AbstractQuery<T> implements Q
 	}
 
 	public ByViewQuery<T> and(Predicate predicate) {
-		checkState(builder != null, "Appelez where en premier");
+		checkAddPredicate(predicate);
 		builder.and(predicate);
 		return this;
 	}
@@ -81,11 +83,15 @@ public class ByViewQuery<T extends Entity> extends AbstractQuery<T> implements Q
 	}
 
 	public ByViewQuery<T> or(Predicate predicate) {
-		checkState(builder != null, "Appelez where en premier");
+		checkAddPredicate(predicate);
 		builder.or(predicate);
 		return this;
 
 	}
 
+	protected void checkAddPredicate(Predicate predicate) {
+		checkState(builder != null, "Appelez where en premier");
+		checkNotNull(predicate);
+	}
 
 }

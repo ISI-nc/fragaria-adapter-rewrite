@@ -103,6 +103,7 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 	}
 
 	protected <T extends Entity> ViewQuery buildViewQuery(ByViewQuery<T> bVQuery) {
+		checkNotNull(bVQuery);
 		ViewQuery vQuery = new ViewQuery().designDocId(
 				buildDesignDocId(bVQuery)).viewName(
 				bVQuery.getView().getSimpleName().toLowerCase());
@@ -111,6 +112,7 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 	}
 
 	protected <T extends Entity> String buildDesignDocId(ByViewQuery<T> bVQuery) {
+		checkNotNull(bVQuery);
 		return "_design/" + bVQuery.getResultType().getSimpleName();
 	}
 
@@ -156,13 +158,14 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 	public void post(Entity... entities) {
 		LinkedList<Entity> list = new LinkedList<>();
 		for (Entity entity : entities) {
-			list.addLast(entity);
+			list.addLast(checkNotNull(entity));
 		}
 		post(list);
 	}
 
 	@Override
 	public void post(LinkedList<Entity> entities) {
+		checkNotNull(entities);
 		LinkedList<Entity> filtered = cleanMultipleEntries(entities);
 		Set<CouchDbConnector> connectorsToFlush = Sets.newHashSet();
 		for (Entity entity : filtered) {
@@ -240,6 +243,7 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 	}
 
 	protected CouchDbConnector getConnector(EntityMetadata entityMetadata) {
+		checkNotNull(entityMetadata);
 		Datasource ds = dataSourceProvider.provide(entityMetadata.getDsKey());
 		CouchDbConnector couchDbConnector;
 		try {
@@ -251,6 +255,7 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 	}
 
 	private Object deleteIfNeeded(Entity entity) {
+		checkNotNull(entity);
 		if (entity.getState() == State.DELETED)
 			return new BulkDeleteDocument(entity.getId().toString(), entity
 					.getRev().toString());

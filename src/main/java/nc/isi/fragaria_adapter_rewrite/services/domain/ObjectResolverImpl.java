@@ -1,5 +1,7 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 import java.util.Collection;
 
@@ -23,6 +25,10 @@ public class ObjectResolverImpl implements ObjectResolver {
 	@Override
 	public <T> T resolve(ObjectNode node, Class<T> propertyType,
 			String propertyName, Entity entity) {
+		checkNotNull(node);
+		checkNotNull(propertyType);
+		checkNotNull(propertyName);
+		checkNotNull(entity);
 		T result = null;
 		if (node.has(entity.getMetadata().getJsonPropertyName(propertyName))) {
 			try {
@@ -76,6 +82,7 @@ public class ObjectResolverImpl implements ObjectResolver {
 	@Override
 	public <T> Collection<T> resolveCollection(ObjectNode node,
 			Class<T> propertyType, String propertyName, Entity entity) {
+		checkParametersNotNull(node, propertyType, propertyName, entity);
 		Collection<T> result = null;
 		if (node.has(entity.getMetadata().getJsonPropertyName(propertyName))) {
 			result = Lists.newArrayList();
@@ -113,6 +120,12 @@ public class ObjectResolverImpl implements ObjectResolver {
 		}
 	}
 
+	protected void checkParametersNotNull(Object... objects) {
+		for (Object o : objects) {
+			checkNotNull(o);
+		}
+	}
+
 	/**
 	 * Ecrit la propriété en fonction de la vue définie dans embeded si vue il y
 	 * a
@@ -121,6 +134,7 @@ public class ObjectResolverImpl implements ObjectResolver {
 	@Override
 	public void write(ObjectNode node, String propertyName, Object value,
 			Entity entity) {
+		checkParametersNotNull(node, value, propertyName, entity);
 		if (value != null) {
 			if (isEntity(value)) {
 				Class<? extends View> view = entity.getMetadata().getEmbeded(
@@ -159,6 +173,7 @@ public class ObjectResolverImpl implements ObjectResolver {
 
 	public ObjectNode clone(ObjectNode node, Class<? extends View> view,
 			Entity entity) {
+		checkParametersNotNull(node, view, entity);
 		ObjectNode copy = objectMapper.createObjectNode();
 		for (String property : entity.getMetadata().propertyNames(view)) {
 			JsonNode value = objectMapper.valueToTree(entity.readProperty(
@@ -169,11 +184,11 @@ public class ObjectResolverImpl implements ObjectResolver {
 	}
 
 	protected boolean isEntity(Object o) {
-		return isEntity(o.getClass());
+		return o != null && isEntity(o.getClass());
 	}
 
 	protected boolean isEntity(Class<?> cl) {
-		return Entity.class.isAssignableFrom(cl);
+		return cl != null && Entity.class.isAssignableFrom(cl);
 	}
 
 }

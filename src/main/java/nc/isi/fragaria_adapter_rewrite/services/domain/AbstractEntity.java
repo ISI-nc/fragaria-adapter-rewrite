@@ -46,7 +46,7 @@ public abstract class AbstractEntity implements Entity {
 
 	private final ObjectNode objectNode;
 	private final ObjectResolver objectResolver;
-	private final Map<String, Object> cache = Maps.newHashMap();
+	private final Map<String, Object> cache = Maps.newConcurrentMap();
 	private final EntityMetadata entityMetadata;
 	private final EventBus eventBus = new EventBus();
 	private final LinkedList<String> types;
@@ -216,7 +216,8 @@ public abstract class AbstractEntity implements Entity {
 		if (this.session != null)
 			unregisterListener(this.session);
 		this.session = session;
-		registerListener(session);
+		if (session != null)
+			registerListener(session);
 	}
 
 	@Override

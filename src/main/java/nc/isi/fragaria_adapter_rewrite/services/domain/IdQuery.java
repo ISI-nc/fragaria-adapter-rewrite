@@ -1,6 +1,7 @@
 package nc.isi.fragaria_adapter_rewrite.services.domain;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.mysema.query.BooleanBuilder;
 
@@ -12,25 +13,31 @@ import com.mysema.query.BooleanBuilder;
  * 
  * @param <T>
  */
-public class IdQuery<T extends Entity> extends AbstractQuery<T> implements
-		Query<T> {
+public class IdQuery<T extends Entity> extends AbstractQuery<T> {
 	private final String id;
 	private String rev;
 
 	public IdQuery(Class<T> resultType, String id) {
-		checkNotNull(resultType);
-		checkNotNull(id);
 		super(resultType);
+		checkNotNull(id);
 		this.id = id;
-		builder = new BooleanBuilder(createPredicate("id", id));
+		builder = initBuilder(id);
+	}
+
+	protected BooleanBuilder initBuilder(String id) {
+		return new BooleanBuilder(createPredicate(Entity.ID, id));
 	}
 
 	public String getRev() {
 		return rev;
 	}
 
-	public void setRev(String rev) {
+	public IdQuery<T> addRev(String rev) {
+		checkState(this.rev == null);
+		checkNotNull(rev);
+		builder.and(createPredicate(Entity.REV, rev));
 		this.rev = rev;
+		return this;
 	}
 
 	public String getId() {
