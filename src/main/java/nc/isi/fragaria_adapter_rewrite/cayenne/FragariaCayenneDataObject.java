@@ -17,8 +17,6 @@ public class FragariaCayenneDataObject extends CayenneDataObject implements Data
 
 	@Override
 	public Object readProperty(String propName) {
-		//TODO
-		return null;
+		return entity.getMetadata().read(entity, propName);
 	}
-
 }
