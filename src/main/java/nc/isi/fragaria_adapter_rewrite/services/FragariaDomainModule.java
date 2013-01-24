@@ -1,6 +1,5 @@
 package nc.isi.fragaria_adapter_rewrite.services;
 
-import java.util.Map;
 import java.util.Map.Entry;
 
 import nc.isi.fragaria_adapter_rewrite.couchdb.CouchDbAdapter;
@@ -20,7 +19,6 @@ import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactory;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactoryImpl;
 import nc.isi.fragaria_adapter_rewrite.entities.ObjectResolver;
 import nc.isi.fragaria_adapter_rewrite.entities.ObjectResolverImpl;
-import nc.isi.fragaria_adapter_rewrite.resources.ConnectionData;
 import nc.isi.fragaria_adapter_rewrite.resources.ConnectionDataBuilder;
 import nc.isi.fragaria_adapter_rewrite.resources.ConnectionDataBuilderImpl;
 import nc.isi.fragaria_adapter_rewrite.resources.DataSourceProvider;
@@ -40,8 +38,6 @@ import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.SubModule;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-
-import com.google.common.collect.Maps;
 
 @SubModule(JacksonModule.class)
 public class FragariaDomainModule {
@@ -68,6 +64,8 @@ public class FragariaDomainModule {
 		binder.bind(SessionManager.class, SessionManagerImpl.class);
 		binder.bind(QueryExecutorForCollection.class,
 				QueryExecutorForCollectionImpl.class);
+		binder.bind(ConnectionDataBuilder.class,
+				ConnectionDataBuilderImpl.class);
 	}
 
 	public void contributeMasterDsLoader(
@@ -80,18 +78,11 @@ public class FragariaDomainModule {
 		configuration.add("nc.isi.fragaria_adapter_rewrite");
 	}
 
-	public void contributeApplicationDefaults(
-			MappedConfiguration<String, String> configuration) {
-		configuration.add("elasticsearch.cluster", "test");
-		configuration.add("dstype.couchdb", "CouchDB");
-		configuration.add("dstype.jdbc", "jdbc");
-	}
-
 	public void contributeDataSourceProvider(
 			MappedConfiguration<String, Datasource> configuration,
 			MasterDsLoader masterDsLoader) {
-		Map<String, Datasource> map = masterDsLoader.getDs();
-		for (Entry<String, Datasource> entry : map.entrySet())
+		for (Entry<String, Datasource> entry : masterDsLoader.getDs()
+				.entrySet())
 			configuration.add(entry.getKey(), entry.getValue());
 	}
 
@@ -101,10 +92,9 @@ public class FragariaDomainModule {
 		configuration.add("CouchDB", couchDbAdapter);
 	}
 
-	public static ConnectionDataBuilder buildConnectionDataBuilder() {
-		Map<String, Class<? extends ConnectionData>> map = Maps.newHashMap();
-		map.put("CouchDB", CouchdbConnectionData.class);
-		return new ConnectionDataBuilderImpl(map);
+	public void contributeConnectionDataBuilder(
+			MappedConfiguration<String, String> configuration) {
+		configuration.add("CouchDB", CouchdbConnectionData.class.getName());
 	}
 
 }
