@@ -8,9 +8,9 @@ import org.apache.cayenne.ObjectId;
 
 public class FragariaCayenneDataObject extends CayenneDataObject implements DataObject{
 	private final AbstractEntity entity;
-	private final  ObjectId objectId;
 	
 	public FragariaCayenneDataObject(AbstractEntity entity) {
+		super();
 		this.entity = entity;
 		this.objectId = new ObjectId(entity.getClass().getSimpleName(), "id", entity.getId());
 	}
