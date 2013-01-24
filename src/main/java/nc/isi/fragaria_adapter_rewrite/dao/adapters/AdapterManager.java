@@ -1,6 +1,6 @@
 package nc.isi.fragaria_adapter_rewrite.dao.adapters;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
 import nc.isi.fragaria_adapter_rewrite.dao.Query;
@@ -26,6 +26,6 @@ public interface AdapterManager {
 
 	public void post(Entity... entities);
 
-	public void post(LinkedList<Entity> entities);
+	public void post(List<Entity> entities);
 
 }

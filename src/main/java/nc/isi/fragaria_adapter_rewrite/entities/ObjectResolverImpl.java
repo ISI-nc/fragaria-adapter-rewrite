@@ -3,8 +3,6 @@ package nc.isi.fragaria_adapter_rewrite.entities;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Collection;
 
 import nc.isi.fragaria_adapter_rewrite.dao.ByViewQuery;
@@ -78,7 +76,9 @@ public class ObjectResolverImpl implements ObjectResolver {
 		for (String propertyName : entityMetadata.propertyNames()) {
 			if (node.has(entityMetadata.getJsonPropertyName(propertyName)))
 				continue;
-			write(entity, propertyName, read(fromDB, propertyName));
+			if (entity.getMetadata().canWrite(propertyName))
+				entity.getMetadata().write(entity, propertyName,
+						entity.getMetadata().read(fromDB, propertyName));
 		}
 	}
 
@@ -106,10 +106,12 @@ public class ObjectResolverImpl implements ObjectResolver {
 					return result;
 				Class<? extends Entity> propertyEntity = propertyType
 						.asSubclass(Entity.class);
-				write(entity,
-						propertyName,
-						getListByBackReference(propertyName, entity,
-								propertyEntity));
+				if (entity.getMetadata().canWrite(propertyName))
+					entity.getMetadata().write(
+							entity,
+							propertyName,
+							getListByBackReference(propertyName, entity,
+									propertyEntity));
 			} else {
 				if (entity.getCompletion() == Completion.FULL)
 					return result;
@@ -185,32 +187,11 @@ public class ObjectResolverImpl implements ObjectResolver {
 		checkParametersNotNull(node, view, entity);
 		ObjectNode copy = objectMapper.createObjectNode();
 		for (String property : entity.getMetadata().propertyNames(view)) {
-			JsonNode value = objectMapper.valueToTree(read(entity, property));
+			JsonNode value = objectMapper.valueToTree(entity.getMetadata()
+					.read(entity, property));
 			copy.put(entity.getMetadata().getJsonPropertyName(property), value);
 		}
 		return copy;
-	}
-
-	private Object read(Entity entity, String propertyName) {
-		try {
-			return entity.getMetadata().getPropertyDescriptor(propertyName)
-					.getReadMethod().invoke(entity, (Object[]) null);
-		} catch (IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private void write(Entity entity, String propertyName, Object value) {
-		try {
-			Method method = entity.getMetadata()
-					.getPropertyDescriptor(propertyName).getWriteMethod();
-			if (method != null)
-				method.invoke(entity, value);
-		} catch (IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	protected boolean isEntity(Object o) {

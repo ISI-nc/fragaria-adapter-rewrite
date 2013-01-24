@@ -2,7 +2,6 @@ package nc.isi.fragaria_adapter_rewrite;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -143,7 +142,7 @@ public class TestSession extends TestCase {
 		SessionImpl session = new SessionImpl(new AdapterManager() {
 
 			@Override
-			public void post(LinkedList<Entity> entities) {
+			public void post(List<Entity> entities) {
 
 			}
 

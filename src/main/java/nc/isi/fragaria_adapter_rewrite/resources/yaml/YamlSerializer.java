@@ -1,4 +1,4 @@
-package nc.isi.fragaria_adapter_rewrite.resources;
+package nc.isi.fragaria_adapter_rewrite.resources.yaml;
 
 import java.io.File;
 import java.io.FileInputStream;

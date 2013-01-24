@@ -2,6 +2,7 @@ package nc.isi.fragaria_adapter_rewrite.entities;
 
 import java.lang.reflect.InvocationTargetException;
 
+import nc.isi.fragaria_adapter_rewrite.enums.State;
 import nc.isi.fragaria_adapter_rewrite.services.ObjectMapperProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,7 +38,9 @@ public class EntityBuilderImpl implements EntityBuilder {
 
 	@Override
 	public <E extends Entity> E build(Class<E> entityClass) {
-		return build(objectMapper.createObjectNode(), entityClass);
+		E entity = build(objectMapper.createObjectNode(), entityClass);
+		entity.setState(State.NEW);
+		return entity;
 	}
 
 }

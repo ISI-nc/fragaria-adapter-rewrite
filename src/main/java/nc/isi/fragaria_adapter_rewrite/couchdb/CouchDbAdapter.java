@@ -9,6 +9,7 @@ import static com.mysema.query.collections.MiniApi.from;
 import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -181,9 +182,9 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 	}
 
 	@Override
-	public void post(LinkedList<Entity> entities) {
+	public void post(List<Entity> entities) {
 		checkNotNull(entities);
-		LinkedList<Entity> filtered = cleanMultipleEntries(entities);
+		List<Entity> filtered = cleanMultipleEntries(entities);
 		Set<CouchDbConnector> connectorsToFlush = Sets.newHashSet();
 		for (Entity entity : filtered) {
 			CouchDbConnector couchDbConnector = getConnector(entity
@@ -200,8 +201,8 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 		}
 	}
 
-	private LinkedList<Entity> cleanMultipleEntries(LinkedList<Entity> entities) {
-		LinkedList<Entity> filtered = new LinkedList<>();
+	private List<Entity> cleanMultipleEntries(List<Entity> entities) {
+		List<Entity> filtered = new LinkedList<>();
 		Multimap<State, Entity> dispatch = LinkedListMultimap.create();
 		for (Entity entity : entities) {
 			State state = entity.getState();

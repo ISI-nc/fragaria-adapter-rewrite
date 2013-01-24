@@ -31,8 +31,8 @@ import nc.isi.fragaria_adapter_rewrite.resources.MasterDsLoaderImpl;
 import nc.isi.fragaria_adapter_rewrite.resources.ResourceFinder;
 import nc.isi.fragaria_adapter_rewrite.resources.ResourceFinderImpl;
 import nc.isi.fragaria_adapter_rewrite.resources.SpecificDsLoader;
-import nc.isi.fragaria_adapter_rewrite.resources.YamlDsLoader;
-import nc.isi.fragaria_adapter_rewrite.resources.YamlSerializer;
+import nc.isi.fragaria_adapter_rewrite.resources.yaml.YamlDsLoader;
+import nc.isi.fragaria_adapter_rewrite.resources.yaml.YamlSerializer;
 import nc.isi.fragaria_adapter_rewrite.utils.jackson.JacksonModule;
 
 import org.apache.tapestry5.ioc.Configuration;

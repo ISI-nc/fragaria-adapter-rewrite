@@ -1,10 +1,17 @@
-package nc.isi.fragaria_adapter_rewrite.resources;
+package nc.isi.fragaria_adapter_rewrite.resources.yaml;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import com.beust.jcommander.internal.Maps;
+import nc.isi.fragaria_adapter_rewrite.resources.ConnectionDataBuilder;
+import nc.isi.fragaria_adapter_rewrite.resources.DataSourceMetadata;
+import nc.isi.fragaria_adapter_rewrite.resources.Datasource;
+import nc.isi.fragaria_adapter_rewrite.resources.DatasourceImpl;
+import nc.isi.fragaria_adapter_rewrite.resources.ResourceFinder;
+import nc.isi.fragaria_adapter_rewrite.resources.SpecificDsLoader;
+
+import com.google.common.collect.Maps;
 
 /**
  * 

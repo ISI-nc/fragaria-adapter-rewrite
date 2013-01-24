@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -13,10 +14,9 @@ import nc.isi.fragaria_adapter_rewrite.annotations.BackReference;
 import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
 import nc.isi.fragaria_adapter_rewrite.annotations.Embeded;
 import nc.isi.fragaria_adapter_rewrite.annotations.Partial;
-import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews;
-import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews.All;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews.Id;
+import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 import nc.isi.fragaria_adapter_rewrite.utils.ReflectionUtils;
 
 import org.springframework.beans.BeanUtils;
@@ -158,6 +158,31 @@ public class EntityMetadata {
 					.getPropertyDescriptor(entityClass, propertyName)));
 		}
 		return cache.get(propertyName);
+	}
+
+	public Object read(Entity entity, String propertyName) {
+		try {
+			return getPropertyDescriptor(propertyName).getReadMethod().invoke(
+					entity, (Object[]) null);
+		} catch (IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+
+	public Boolean canWrite(String propertyName) {
+		return getPropertyDescriptor(propertyName).getWriteMethod() != null;
+	}
+
+	public void write(Entity entity, String propertyName, Object value) {
+		try {
+			checkNotNull(getPropertyDescriptor(propertyName).getWriteMethod())
+					.invoke(entity, value);
+		} catch (IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

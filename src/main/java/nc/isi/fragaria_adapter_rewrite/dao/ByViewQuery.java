@@ -7,11 +7,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
-import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews;
-import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews.All;
+import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 
-import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Maps;
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.alias.Alias;
 import com.mysema.query.types.Predicate;
