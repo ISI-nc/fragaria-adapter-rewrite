@@ -6,23 +6,22 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.EntityBuilder;
 /**
  * 
  * @author bjonathas
- *
- *Classe permettant la création de session.
+ * 
+ *         Classe permettant la création de session.
  */
 public class SessionManagerImpl implements SessionManager {
 	private final AdapterManager adapterManager;
 	private final EntityBuilder entityBuilder;
-	private final QueryExecutorForCollection qExecutor;
-		
-	public SessionManagerImpl(AdapterManager adapterManager,EntityBuilder entityBuilder,QueryExecutorForCollection qExecutor) {
+
+	public SessionManagerImpl(AdapterManager adapterManager,
+			EntityBuilder entityBuilder) {
 		this.adapterManager = adapterManager;
 		this.entityBuilder = entityBuilder;
-		this.qExecutor = qExecutor;
 	}
 
 	@Override
-	public Session createSession() {
-		return new SessionImpl(adapterManager,entityBuilder,qExecutor);
+	public Session create() {
+		return new SessionImpl(adapterManager, entityBuilder);
 	}
 
 }

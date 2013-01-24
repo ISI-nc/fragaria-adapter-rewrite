@@ -18,6 +18,10 @@ public class City extends AbstractEntity {
 		super(objectNode, objectResolver, entityMetadataFactory);
 	}
 
+	public City() {
+		super();
+	}
+
 	@JsonView(Name.class)
 	public String getName() {
 		return readProperty(String.class, NAME);

@@ -21,7 +21,7 @@ public class TestCouchDbAdapter extends TestCase {
 	public void testCreate() {
 		SessionManager sessionManager = REGISTRY
 				.getService(SessionManager.class);
-		Session session = sessionManager.createSession();
+		Session session = sessionManager.create();
 		PersonData personData = session.create(PersonData.class);
 		personData.setSession(session);
 		personData.setName("Maltat");

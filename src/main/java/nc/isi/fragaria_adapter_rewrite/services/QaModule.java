@@ -14,7 +14,7 @@ import org.apache.tapestry5.services.Response;
 import org.slf4j.Logger;
 
 /**
- * This module is automatically included as part of the Tapestry IoC Registry if <em>tapestry.execution-mode</em>
+ * This module is automatically included as part of the Tapestry IoC TapestryRegistry if <em>tapestry.execution-mode</em>
  * includes <code>qa</code> ("quality assurance").
  */
 public class QaModule

@@ -1,6 +1,5 @@
 package nc.isi.fragaria_adapter_rewrite;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 
-public class TestQueryExecutorForCollection extends TestCase{
+public class TestQueryExecutorForCollection extends TestCase {
 
 	private Entity buildEntity() {
 
@@ -52,12 +51,6 @@ public class TestQueryExecutorForCollection extends TestCase{
 			}
 
 			@Override
-			public void writeProperty(String propertyName, Object value) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
 			public ObjectNode toJSON() {
 				// TODO Auto-generated method stub
 				return null;
@@ -73,19 +66,6 @@ public class TestQueryExecutorForCollection extends TestCase{
 			public void registerListener(Object o) {
 				// TODO Auto-generated method stub
 
-			}
-
-			@Override
-			public <T> T readProperty(Class<T> propertyType, String propertyName) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public <T> Collection<T> readCollection(
-					Class<T> collectionGenericType, String collectionName) {
-				// TODO Auto-generated method stub
-				return null;
 			}
 
 			@Override
@@ -162,7 +142,8 @@ public class TestQueryExecutorForCollection extends TestCase{
 		System.out.println(query.getPredicate());
 		System.out.println(id);
 		QueryExecutorForCollection qExecutor = new QueryExecutorForCollectionImpl();
-		System.out.println(qExecutor.getUniqueObjectFromEntityCollFor(query, entities).getId());
+		System.out.println(qExecutor.getUnique(query,
+				entities).getId());
 	}
-	
+
 }

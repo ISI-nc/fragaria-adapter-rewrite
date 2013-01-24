@@ -3,6 +3,8 @@ package nc.isi.fragaria_adapter_rewrite.services.domain;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
@@ -50,7 +52,7 @@ public class ObjectResolverImpl implements ObjectResolver {
 			if (entity.getCompletion() == Completion.FULL)
 				return result;
 			complete(node, entity);
-			return entity.readProperty(propertyType, propertyName);
+			return resolve(node, propertyType, propertyName, entity);
 		}
 	}
 
@@ -69,13 +71,7 @@ public class ObjectResolverImpl implements ObjectResolver {
 		for (String propertyName : entityMetadata.propertyNames()) {
 			if (node.has(entityMetadata.getJsonPropertyName(propertyName)))
 				continue;
-			Class<?> propertyType = entityMetadata.propertyType(propertyName);
-			Object propertyValue = (Collection.class
-					.isAssignableFrom(propertyType)) ? fromDB.readCollection(
-					entityMetadata.propertyParameterClasses(propertyName)[0],
-					propertyName) : fromDB.readProperty(propertyType,
-					propertyName);
-			entity.writeProperty(propertyName, propertyValue);
+			write(entity, propertyName, read(fromDB, propertyName));
 		}
 	}
 
@@ -103,21 +99,27 @@ public class ObjectResolverImpl implements ObjectResolver {
 					return result;
 				Class<? extends Entity> propertyEntity = propertyType
 						.asSubclass(Entity.class);
-				entity.writeProperty(
+				write(entity,
 						propertyName,
-						entity.getSession()
-								.get(new ByViewQuery<>(propertyEntity, entity
-										.getMetadata().getPartial(propertyName))
-										.filterBy(
-												entity.getMetadata()
-														.getBackReference(
-																propertyName),
-												entity.getId())));
+						getListByBackReference(propertyName, entity,
+								propertyEntity));
 			} else {
+				if (entity.getCompletion() == Completion.FULL)
+					return result;
 				complete(node, entity);
 			}
-			return entity.readCollection(propertyType, propertyName);
+			return resolveCollection(node, propertyType, propertyName, entity);
 		}
+	}
+
+	protected Collection<? extends Entity> getListByBackReference(
+			String propertyName, Entity entity,
+			Class<? extends Entity> propertyEntity) {
+		return entity.getSession().get(
+				new ByViewQuery<>(propertyEntity, entity.getMetadata()
+						.getPartial(propertyName)).filterBy(entity
+						.getMetadata().getBackReference(propertyName), entity
+						.getId()));
 	}
 
 	protected void checkParametersNotNull(Object... objects) {
@@ -176,11 +178,32 @@ public class ObjectResolverImpl implements ObjectResolver {
 		checkParametersNotNull(node, view, entity);
 		ObjectNode copy = objectMapper.createObjectNode();
 		for (String property : entity.getMetadata().propertyNames(view)) {
-			JsonNode value = objectMapper.valueToTree(entity.readProperty(
-					entity.getMetadata().propertyType(property), property));
+			JsonNode value = objectMapper.valueToTree(read(entity, property));
 			copy.put(entity.getMetadata().getJsonPropertyName(property), value);
 		}
 		return copy;
+	}
+
+	private Object read(Entity entity, String propertyName) {
+		try {
+			return entity.getMetadata().getPropertyDescriptor(propertyName)
+					.getReadMethod().invoke(entity, (Object[]) null);
+		} catch (IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void write(Entity entity, String propertyName, Object value) {
+		try {
+			Method method = entity.getMetadata()
+					.getPropertyDescriptor(propertyName).getWriteMethod();
+			if (method != null)
+				method.invoke(entity, value);
+		} catch (IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected boolean isEntity(Object o) {

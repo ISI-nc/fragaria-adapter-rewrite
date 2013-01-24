@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 
@@ -29,6 +30,7 @@ import com.google.common.eventbus.EventBus;
  * 
  */
 public abstract class AbstractEntity implements Entity {
+
 	private enum Action {
 		READ("lire"), WRITE("écrire");
 
@@ -55,13 +57,20 @@ public abstract class AbstractEntity implements Entity {
 	private Session session;
 	private final String tempId = UUID.randomUUID().toString();
 
+	public AbstractEntity() {
+		this(TapestryRegistry.INSTANCE.getRegistry()
+				.getService(ObjectMapperProvider.class).provide()
+				.createObjectNode(), TapestryRegistry.INSTANCE.getRegistry()
+				.getService(ObjectResolver.class), TapestryRegistry.INSTANCE
+				.getRegistry().getService(EntityMetadataFactory.class));
+	}
+
 	public AbstractEntity(ObjectNode objectNode, ObjectResolver objectResolver,
 			EntityMetadataFactory entityMetadataFactory) {
 		this.objectNode = checkNotNull(objectNode);
 		this.objectResolver = objectResolver;
 		this.entityMetadata = entityMetadataFactory.create(getClass());
 		this.types = initTypes();
-		setId(tempId);
 	}
 
 	private LinkedList<String> initTypes() {
@@ -70,7 +79,7 @@ public abstract class AbstractEntity implements Entity {
 				.getSuperclass()) {
 			types.addLast(type.getName());
 		}
-		writeProperty(TYPES, types);
+		objectResolver.write(objectNode, TYPES, types, this);
 		return types;
 	}
 
@@ -79,8 +88,7 @@ public abstract class AbstractEntity implements Entity {
 		return objectNode.deepCopy();
 	}
 
-	@Override
-	public <T> T readProperty(Class<T> propertyType, String propertyName) {
+	protected <T> T readProperty(Class<T> propertyType, String propertyName) {
 		checkGlobalSanity(propertyName, Action.READ);
 		if (!cache.keySet().contains(propertyName))
 			cache.put(propertyName, objectResolver.resolve(objectNode,
@@ -92,8 +100,7 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
-	public <T> Collection<T> readCollection(Class<T> collectionGenericType,
+	protected <T> Collection<T> readCollection(Class<T> collectionGenericType,
 			String collectionName) {
 		checkGlobalSanity(collectionName, Action.READ);
 		if (!cache.containsKey(collectionName))
@@ -108,8 +115,7 @@ public abstract class AbstractEntity implements Entity {
 		return collection;
 	}
 
-	@Override
-	public void writeProperty(String propertyName, Object value) {
+	protected void writeProperty(String propertyName, Object value) {
 		checkGlobalSanity(propertyName, Action.WRITE);
 		Object oldValue = cache.get(propertyName);
 		objectResolver.write(objectNode, propertyName, value, this);
@@ -129,6 +135,8 @@ public abstract class AbstractEntity implements Entity {
 	@Override
 	public void setState(State state) {
 		checkChange(this.state, state);
+		if (state == State.NEW)
+			setId(tempId);
 		this.state = state;
 	}
 
@@ -221,6 +229,26 @@ public abstract class AbstractEntity implements Entity {
 	@Override
 	public ObjectNode toJSON(Class<? extends View> view) {
 		return objectResolver.clone(objectNode, view, this);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!getClass().isAssignableFrom(obj.getClass()))
+			return false;
+		AbstractEntity entity = AbstractEntity.class.cast(obj);
+		return Objects.equal(this.getId(), entity.getId());
 	}
 
 }

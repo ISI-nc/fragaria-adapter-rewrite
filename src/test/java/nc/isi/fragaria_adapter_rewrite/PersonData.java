@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @DsKey("rer")
 public class PersonData extends AbstractEntity {
+
 	public static final String NAME = "name";
 	public static final String FIRST_NAME = "firstName";
 	public static final String ADRESS = "adress";
@@ -23,6 +24,10 @@ public class PersonData extends AbstractEntity {
 	public PersonData(ObjectNode objectNode, ObjectResolver objectResolver,
 			EntityMetadataFactory entityMetadataFactory) {
 		super(objectNode, objectResolver, entityMetadataFactory);
+	}
+
+	public PersonData() {
+		super();
 	}
 
 	public String getName() {

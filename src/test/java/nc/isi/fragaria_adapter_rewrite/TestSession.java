@@ -14,7 +14,6 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.EntityBuilder;
 import nc.isi.fragaria_adapter_rewrite.services.domain.FragariaDomainModule;
 import nc.isi.fragaria_adapter_rewrite.services.domain.Query;
 import nc.isi.fragaria_adapter_rewrite.services.domain.UniqueQueryResponse;
-import nc.isi.fragaria_adapter_rewrite.services.domain.session.QueryExecutorForCollectionImpl;
 import nc.isi.fragaria_adapter_rewrite.services.domain.session.Session;
 import nc.isi.fragaria_adapter_rewrite.services.domain.session.SessionImpl;
 
@@ -167,9 +166,8 @@ public class TestSession extends TestCase {
 				return new CollectionQueryResponse<T>(
 						(Collection<T>) listOfPersons);
 			}
-		}, entityBuilder, new QueryExecutorForCollectionImpl());
+		}, entityBuilder);
 
 		return (Session) session;
 	}
-
 }

@@ -147,8 +147,8 @@ public class EntityMetadata {
 
 	public PropertyDescriptor getPropertyDescriptor(String propertyName) {
 		if (!cache.containsKey(propertyName)) {
-			cache.put(propertyName,
-					BeanUtils.getPropertyDescriptor(entityClass, propertyName));
+			cache.put(propertyName, checkNotNull(BeanUtils
+					.getPropertyDescriptor(entityClass, propertyName)));
 		}
 		return cache.get(propertyName);
 	}

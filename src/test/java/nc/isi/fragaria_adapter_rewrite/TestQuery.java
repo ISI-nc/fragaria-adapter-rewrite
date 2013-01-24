@@ -4,7 +4,6 @@ import static com.mysema.query.alias.Alias.$;
 import static com.mysema.query.alias.Alias.alias;
 import static com.mysema.query.collections.MiniApi.from;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,9 +13,9 @@ import nc.isi.fragaria_adapter_rewrite.services.domain.Completion;
 import nc.isi.fragaria_adapter_rewrite.services.domain.Entity;
 import nc.isi.fragaria_adapter_rewrite.services.domain.EntityMetadata;
 import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.All;
-import nc.isi.fragaria_adapter_rewrite.services.domain.session.Session;
 import nc.isi.fragaria_adapter_rewrite.services.domain.State;
 import nc.isi.fragaria_adapter_rewrite.services.domain.View;
+import nc.isi.fragaria_adapter_rewrite.services.domain.session.Session;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -54,12 +53,6 @@ public class TestQuery extends TestCase {
 			}
 
 			@Override
-			public void writeProperty(String propertyName, Object value) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
 			public ObjectNode toJSON() {
 				// TODO Auto-generated method stub
 				return null;
@@ -75,19 +68,6 @@ public class TestQuery extends TestCase {
 			public void registerListener(Object o) {
 				// TODO Auto-generated method stub
 
-			}
-
-			@Override
-			public <T> T readProperty(Class<T> propertyType, String propertyName) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public <T> Collection<T> readCollection(
-					Class<T> collectionGenericType, String collectionName) {
-				// TODO Auto-generated method stub
-				return null;
 			}
 
 			@Override
