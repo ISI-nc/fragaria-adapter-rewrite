@@ -79,7 +79,7 @@ public abstract class AbstractEntity implements Entity {
 		this.types = initTypes();
 	}
 
-	private LinkedList<String> initTypes() {
+	private List<String> initTypes() {
 		LinkedList<String> tempTypes = new LinkedList<>();
 		for (Class<?> type = getClass(); Entity.class.isAssignableFrom(type); type = type
 				.getSuperclass()) {
@@ -145,15 +145,17 @@ public abstract class AbstractEntity implements Entity {
 	@Override
 	public void setState(State state) {
 		checkChange(this.state, state);
-		if (state == State.NEW)
+		if (state == State.NEW) {
 			setId(tempId);
+		}
 		this.state = state;
 	}
 
 	private void checkChange(State oldState, State newSate) {
 		if (oldState == State.DELETED
-				|| (oldState == State.MODIFIED && newSate == State.NEW))
+				|| (oldState == State.MODIFIED && newSate == State.NEW)) {
 			throw new StateChangeException(oldState, newSate);
+		}
 
 	}
 
@@ -231,11 +233,13 @@ public abstract class AbstractEntity implements Entity {
 	 */
 	@Override
 	public void setSession(Session session) {
-		if (this.session != null)
+		if (this.session != null) {
 			unregisterListener(this.session);
+		}
 		this.session = session;
-		if (session != null)
+		if (session != null) {
 			registerListener(session);
+		}
 	}
 
 	@Override

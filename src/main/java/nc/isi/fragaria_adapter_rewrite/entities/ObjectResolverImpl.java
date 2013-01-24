@@ -12,8 +12,6 @@ import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 import nc.isi.fragaria_adapter_rewrite.services.ObjectMapperProvider;
 
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -22,8 +20,6 @@ import com.google.common.collect.Lists;
 
 public class ObjectResolverImpl implements ObjectResolver {
 	private final ObjectMapper objectMapper;
-	private static final Logger LOGGER = Logger
-			.getLogger(ObjectResolverImpl.class);
 
 	public ObjectResolverImpl(ObjectMapperProvider objectMapperProvider) {
 		this.objectMapper = objectMapperProvider.provide();

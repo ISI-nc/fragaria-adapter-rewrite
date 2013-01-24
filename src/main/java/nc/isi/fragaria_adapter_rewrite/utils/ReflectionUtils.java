@@ -9,7 +9,7 @@ import java.lang.reflect.Type;
 
 import org.springframework.beans.BeanUtils;
 
-public class ReflectionUtils {
+public final class ReflectionUtils {
 	private ReflectionUtils() {
 
 	}

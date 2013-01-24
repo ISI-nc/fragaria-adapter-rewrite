@@ -1,6 +1,6 @@
 package nc.isi.fragaria_adapter_rewrite.utils;
 
-public class FileUtils {
+public final class FileUtils {
 	private FileUtils() {
 	}
 

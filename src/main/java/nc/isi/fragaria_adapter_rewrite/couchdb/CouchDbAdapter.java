@@ -113,8 +113,9 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 			ByViewQuery<T> bVQuery = (ByViewQuery<T>) query;
 			CollectionQueryResponse<T> response = executeQuery(
 					buildViewQuery(bVQuery), bVQuery.getResultType());
-			if (bVQuery.getPredicate() == null)
+			if (bVQuery.getPredicate() == null) {
 				return response;
+			}
 			T entity = alias(query.getResultType());
 			return buildQueryResponse(from($(entity), response.getResponse())
 					.where(bVQuery.getPredicate()).list($(entity)));

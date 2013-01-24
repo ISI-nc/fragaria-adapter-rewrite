@@ -21,7 +21,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Sets;
 
 public class ResourceFinderImpl implements ResourceFinder {
-	private final static long MAX_FILES_TIME = 10L;
+	private static final long MAX_FILES_TIME = 10L;
 	private final Reflections reflections;
 	private final LoadingCache<String, Set<File>> cache = CacheBuilder
 			.newBuilder().expireAfterAccess(MAX_FILES_TIME, TimeUnit.MINUTES)

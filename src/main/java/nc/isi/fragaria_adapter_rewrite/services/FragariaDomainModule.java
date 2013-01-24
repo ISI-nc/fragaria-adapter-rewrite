@@ -2,6 +2,7 @@ package nc.isi.fragaria_adapter_rewrite.services;
 
 import java.util.Map.Entry;
 
+import nc.isi.fragaria_adapter_rewrite.cayenne.CayenneConnectionData;
 import nc.isi.fragaria_adapter_rewrite.couchdb.CouchDbAdapter;
 import nc.isi.fragaria_adapter_rewrite.couchdb.CouchDbSerializer;
 import nc.isi.fragaria_adapter_rewrite.couchdb.CouchdbConnectionData;
@@ -68,6 +69,12 @@ public class FragariaDomainModule {
 				ConnectionDataBuilderImpl.class);
 	}
 
+	public void contributeConnectionDataBuilder(
+			MappedConfiguration<String, String> configuration) {
+		configuration.add("CouchDB", CouchdbConnectionData.class.getName());
+		configuration.add("Cayenne", CayenneConnectionData.class.getName());
+	}
+
 	public void contributeMasterDsLoader(
 			Configuration<SpecificDsLoader> configuration,
 			YamlDsLoader yamlDsLoader) {
@@ -82,19 +89,15 @@ public class FragariaDomainModule {
 			MappedConfiguration<String, Datasource> configuration,
 			MasterDsLoader masterDsLoader) {
 		for (Entry<String, Datasource> entry : masterDsLoader.getDs()
-				.entrySet())
+				.entrySet()) {
 			configuration.add(entry.getKey(), entry.getValue());
+		}
 	}
 
 	public void contributeAdapterManager(
 			MappedConfiguration<String, Adapter> configuration,
 			CouchDbAdapter couchDbAdapter) {
 		configuration.add("CouchDB", couchDbAdapter);
-	}
-
-	public void contributeConnectionDataBuilder(
-			MappedConfiguration<String, String> configuration) {
-		configuration.add("CouchDB", CouchdbConnectionData.class.getName());
 	}
 
 }

@@ -18,7 +18,7 @@ public class ObjectMapperProviderImpl implements ObjectMapperProvider {
 		init(objectMapper);
 	}
 
-	protected void init(ObjectMapper objectMapper) {
+	private void init(ObjectMapper objectMapper) {
 		objectMapper.registerModule(new JodaModule());
 		objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
 		objectMapper.registerModule(entityJacksonModule);
