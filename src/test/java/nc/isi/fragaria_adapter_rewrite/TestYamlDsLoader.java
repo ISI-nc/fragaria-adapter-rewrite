@@ -7,7 +7,7 @@ import nc.isi.fragaria_adapter_rewrite.couchdb.CouchdbConnectionData;
 import nc.isi.fragaria_adapter_rewrite.resources.DataSourceMetadata;
 import nc.isi.fragaria_adapter_rewrite.resources.Datasource;
 import nc.isi.fragaria_adapter_rewrite.resources.DatasourceImpl;
-import nc.isi.fragaria_adapter_rewrite.resources.YamlDsLoader;
+import nc.isi.fragaria_adapter_rewrite.resources.yaml.YamlDsLoader;
 import nc.isi.fragaria_adapter_rewrite.services.TapestryRegistry;
 
 import com.google.common.collect.Lists;

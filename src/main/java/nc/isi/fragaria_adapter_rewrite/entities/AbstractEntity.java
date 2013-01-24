@@ -57,7 +57,7 @@ public abstract class AbstractEntity implements Entity {
 	private final Map<String, Object> cache = Maps.newConcurrentMap();
 	private final EntityMetadata entityMetadata;
 	private final EventBus eventBus = new EventBus();
-	private final LinkedList<String> types;
+	private final List<String> types;
 	private State state = State.COMMITED;
 	private Completion completion = Completion.PARTIAL;
 	private Session session;
