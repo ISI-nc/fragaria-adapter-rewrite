@@ -4,16 +4,16 @@ import java.util.List;
 import java.util.UUID;
 
 import junit.framework.TestCase;
-import nc.isi.fragaria_adapter_rewrite.services.domain.ByViewQuery;
-import nc.isi.fragaria_adapter_rewrite.services.domain.Completion;
-import nc.isi.fragaria_adapter_rewrite.services.domain.Entity;
-import nc.isi.fragaria_adapter_rewrite.services.domain.EntityMetadata;
-import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.All;
-import nc.isi.fragaria_adapter_rewrite.services.domain.State;
-import nc.isi.fragaria_adapter_rewrite.services.domain.View;
-import nc.isi.fragaria_adapter_rewrite.services.domain.session.QueryExecutorForCollection;
-import nc.isi.fragaria_adapter_rewrite.services.domain.session.QueryExecutorForCollectionImpl;
-import nc.isi.fragaria_adapter_rewrite.services.domain.session.Session;
+import nc.isi.fragaria_adapter_rewrite.dao.ByViewQuery;
+import nc.isi.fragaria_adapter_rewrite.dao.QueryExecutorForCollection;
+import nc.isi.fragaria_adapter_rewrite.dao.QueryExecutorForCollectionImpl;
+import nc.isi.fragaria_adapter_rewrite.dao.Session;
+import nc.isi.fragaria_adapter_rewrite.entities.Entity;
+import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
+import nc.isi.fragaria_adapter_rewrite.entities.views.View;
+import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews.All;
+import nc.isi.fragaria_adapter_rewrite.enums.Completion;
+import nc.isi.fragaria_adapter_rewrite.enums.State;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;

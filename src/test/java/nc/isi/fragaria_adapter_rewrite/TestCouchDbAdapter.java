@@ -4,22 +4,20 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import junit.framework.TestCase;
-import nc.isi.fragaria_adapter_rewrite.services.domain.ByViewQuery;
-import nc.isi.fragaria_adapter_rewrite.services.domain.FragariaDomainModule;
-import nc.isi.fragaria_adapter_rewrite.services.domain.GenericViews.All;
-import nc.isi.fragaria_adapter_rewrite.services.domain.IdQuery;
-import nc.isi.fragaria_adapter_rewrite.services.domain.session.Session;
-import nc.isi.fragaria_adapter_rewrite.services.domain.session.SessionManager;
-
-import org.apache.tapestry5.ioc.Registry;
-import org.apache.tapestry5.ioc.RegistryBuilder;
+import nc.isi.fragaria_adapter_rewrite.dao.ByViewQuery;
+import nc.isi.fragaria_adapter_rewrite.dao.IdQuery;
+import nc.isi.fragaria_adapter_rewrite.dao.Session;
+import nc.isi.fragaria_adapter_rewrite.dao.SessionManager;
+import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews.All;
+import nc.isi.fragaria_adapter_rewrite.model.Adress;
+import nc.isi.fragaria_adapter_rewrite.model.City;
+import nc.isi.fragaria_adapter_rewrite.model.PersonData;
+import nc.isi.fragaria_adapter_rewrite.services.TapestryRegistry;
 
 public class TestCouchDbAdapter extends TestCase {
-	private static final Registry REGISTRY = RegistryBuilder
-			.buildAndStartupRegistry(FragariaDomainModule.class);
 
 	public void testCreate() {
-		SessionManager sessionManager = REGISTRY
+		SessionManager sessionManager = TapestryRegistry.INSTANCE.getRegistry()
 				.getService(SessionManager.class);
 		Session session = sessionManager.create();
 		PersonData personData = session.create(PersonData.class);

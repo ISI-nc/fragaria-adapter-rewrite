@@ -3,26 +3,22 @@ package nc.isi.fragaria_adapter_rewrite;
 import java.util.List;
 
 import junit.framework.TestCase;
-import nc.isi.fragaria_adapter_rewrite.services.domain.CouchdbConnectionData;
-import nc.isi.fragaria_adapter_rewrite.services.domain.DataSourceMetadata;
-import nc.isi.fragaria_adapter_rewrite.services.domain.Datasource;
-import nc.isi.fragaria_adapter_rewrite.services.domain.DatasourceImpl;
-import nc.isi.fragaria_adapter_rewrite.services.domain.FragariaDomainModule;
-import nc.isi.fragaria_adapter_rewrite.services.domain.DsLoader.YamlDsLoader;
-
-import org.apache.tapestry5.ioc.Registry;
-import org.apache.tapestry5.ioc.RegistryBuilder;
+import nc.isi.fragaria_adapter_rewrite.couchdb.CouchdbConnectionData;
+import nc.isi.fragaria_adapter_rewrite.ressources.DataSourceMetadata;
+import nc.isi.fragaria_adapter_rewrite.ressources.Datasource;
+import nc.isi.fragaria_adapter_rewrite.ressources.DatasourceImpl;
+import nc.isi.fragaria_adapter_rewrite.ressources.YamlDsLoader;
+import nc.isi.fragaria_adapter_rewrite.services.TapestryRegistry;
 
 import com.google.common.collect.Lists;
 
 public class TestYamlDsLoader extends TestCase {
-	private static final Registry REGISTRY = RegistryBuilder
-			.buildAndStartupRegistry(FragariaDomainModule.class);
 
 	public void testYamlDsLoader() {
 		List<String> pack = Lists.newArrayList();
 		pack.add("nc.isi.fragaria_adapter_rewrite");
-		YamlDsLoader loader = REGISTRY.getService(YamlDsLoader.class);
+		YamlDsLoader loader = TapestryRegistry.INSTANCE.getRegistry()
+				.getService(YamlDsLoader.class);
 		Datasource dsFragaria = new DatasourceImpl("rer-test",
 				new DataSourceMetadata("CouchDB", new CouchdbConnectionData(
 						"http://localhost:5984/", "rer"), true));

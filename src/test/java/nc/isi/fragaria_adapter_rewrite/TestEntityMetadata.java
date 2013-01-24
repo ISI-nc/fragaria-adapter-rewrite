@@ -1,8 +1,9 @@
 package nc.isi.fragaria_adapter_rewrite;
 
 import junit.framework.TestCase;
-import nc.isi.fragaria_adapter_rewrite.PersonViews.NameView;
-import nc.isi.fragaria_adapter_rewrite.services.domain.EntityMetadata;
+import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
+import nc.isi.fragaria_adapter_rewrite.model.PersonData;
+import nc.isi.fragaria_adapter_rewrite.model.PersonViews.NameView;
 
 public class TestEntityMetadata extends TestCase {
 

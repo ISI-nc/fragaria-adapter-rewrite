@@ -6,16 +6,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.TestCase;
-import nc.isi.fragaria_adapter_rewrite.services.domain.AdapterManager;
-import nc.isi.fragaria_adapter_rewrite.services.domain.ByViewQuery;
-import nc.isi.fragaria_adapter_rewrite.services.domain.CollectionQueryResponse;
-import nc.isi.fragaria_adapter_rewrite.services.domain.Entity;
-import nc.isi.fragaria_adapter_rewrite.services.domain.EntityBuilder;
-import nc.isi.fragaria_adapter_rewrite.services.domain.FragariaDomainModule;
-import nc.isi.fragaria_adapter_rewrite.services.domain.Query;
-import nc.isi.fragaria_adapter_rewrite.services.domain.UniqueQueryResponse;
-import nc.isi.fragaria_adapter_rewrite.services.domain.session.Session;
-import nc.isi.fragaria_adapter_rewrite.services.domain.session.SessionImpl;
+import nc.isi.fragaria_adapter_rewrite.dao.ByViewQuery;
+import nc.isi.fragaria_adapter_rewrite.dao.CollectionQueryResponse;
+import nc.isi.fragaria_adapter_rewrite.dao.Query;
+import nc.isi.fragaria_adapter_rewrite.dao.Session;
+import nc.isi.fragaria_adapter_rewrite.dao.SessionImpl;
+import nc.isi.fragaria_adapter_rewrite.dao.UniqueQueryResponse;
+import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManager;
+import nc.isi.fragaria_adapter_rewrite.entities.Entity;
+import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
+import nc.isi.fragaria_adapter_rewrite.model.PersonData;
+import nc.isi.fragaria_adapter_rewrite.services.FragariaDomainModule;
 
 import org.apache.tapestry5.ioc.Registry;
 import org.apache.tapestry5.ioc.RegistryBuilder;
