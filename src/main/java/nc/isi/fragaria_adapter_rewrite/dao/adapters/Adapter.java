@@ -7,7 +7,7 @@ import nc.isi.fragaria_adapter_rewrite.dao.Query;
 import nc.isi.fragaria_adapter_rewrite.dao.UniqueQueryResponse;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
-import nc.isi.fragaria_adapter_rewrite.ressources.Datasource;
+import nc.isi.fragaria_adapter_rewrite.resources.Datasource;
 
 /**
  * Inteface pour définir un adapter qui sera utilisé par l'

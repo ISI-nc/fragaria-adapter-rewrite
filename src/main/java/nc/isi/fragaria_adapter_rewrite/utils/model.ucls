@@ -60,8 +60,8 @@
     </display>  
   </interface>  
   <interface id="7" corner="BOTTOM_RIGHT" language="java" 
-    name="nc.isi.fragaria_adapter_rewrite.ressources.DataSourceProvider" project="fragaria-adapter-rewrite" 
-    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/ressources/DataSourceProvider.java" 
+    name="nc.isi.fragaria_adapter_rewrite.resources.DataSourceProvider" project="fragaria-adapter-rewrite" 
+    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/resources/DataSourceProvider.java" 
     binary="false">    
     <position height="76" width="204" x="5113" y="510"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -80,8 +80,8 @@
     </display>  
   </interface>  
   <class id="9" corner="BOTTOM_RIGHT" language="java" 
-    name="nc.isi.fragaria_adapter_rewrite.ressources.ConnectionDataBuilderImpl" project="fragaria-adapter-rewrite" 
-    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/ressources/ConnectionDataBuilderImpl.java" 
+    name="nc.isi.fragaria_adapter_rewrite.resources.ConnectionDataBuilderImpl" project="fragaria-adapter-rewrite" 
+    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/resources/ConnectionDataBuilderImpl.java" 
     binary="false">    
     <position height="110" width="341" x="773" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -90,8 +90,8 @@
     </display>  
   </class>  
   <interface id="10" corner="BOTTOM_RIGHT" language="java" 
-    name="nc.isi.fragaria_adapter_rewrite.ressources.ConnectionDataBuilder" project="fragaria-adapter-rewrite" 
-    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/ressources/ConnectionDataBuilder.java" 
+    name="nc.isi.fragaria_adapter_rewrite.resources.ConnectionDataBuilder" project="fragaria-adapter-rewrite" 
+    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/resources/ConnectionDataBuilder.java" 
     binary="false">    
     <position height="76" width="204" x="773" y="510"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -267,8 +267,8 @@
     </display>  
   </interface>  
   <interface id="28" corner="BOTTOM_RIGHT" language="java" 
-    name="nc.isi.fragaria_adapter_rewrite.ressources.ConnectionData" project="fragaria-adapter-rewrite" 
-    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/ressources/ConnectionData.java" 
+    name="nc.isi.fragaria_adapter_rewrite.resources.ConnectionData" project="fragaria-adapter-rewrite" 
+    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/resources/ConnectionData.java" 
     binary="false">    
     <position height="59" width="204" x="5656" y="510"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -277,8 +277,8 @@
     </display>  
   </interface>  
   <class id="29" corner="BOTTOM_RIGHT" language="java" 
-    name="nc.isi.fragaria_adapter_rewrite.ressources.DataSourceProviderImpl" project="fragaria-adapter-rewrite" 
-    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/ressources/DataSourceProviderImpl.java" 
+    name="nc.isi.fragaria_adapter_rewrite.resources.DataSourceProviderImpl" project="fragaria-adapter-rewrite" 
+    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/resources/DataSourceProviderImpl.java" 
     binary="false">    
     <position height="93" width="268" x="4938" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -296,9 +296,9 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <interface id="31" corner="BOTTOM_RIGHT" language="java" name="nc.isi.fragaria_adapter_rewrite.ressources.Datasource" 
+  <interface id="31" corner="BOTTOM_RIGHT" language="java" name="nc.isi.fragaria_adapter_rewrite.resources.Datasource" 
     project="fragaria-adapter-rewrite" 
-    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/ressources/Datasource.java" 
+    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/resources/Datasource.java" 
     binary="false">    
     <position height="93" width="210" x="4578" y="510"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -326,8 +326,8 @@
     </display>  
   </enumeration>  
   <class id="34" corner="BOTTOM_RIGHT" language="java" 
-    name="nc.isi.fragaria_adapter_rewrite.ressources.DataSourceMetadata" project="fragaria-adapter-rewrite" 
-    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/ressources/DataSourceMetadata.java" 
+    name="nc.isi.fragaria_adapter_rewrite.resources.DataSourceMetadata" project="fragaria-adapter-rewrite" 
+    file="/fragaria-adapter-rewrite/src/main/java/nc/isi/fragaria_adapter_rewrite/resources/DataSourceMetadata.java" 
     binary="false">    
     <position height="161" width="283" x="5782" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      

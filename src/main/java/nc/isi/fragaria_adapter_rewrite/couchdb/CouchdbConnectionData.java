@@ -3,7 +3,7 @@ package nc.isi.fragaria_adapter_rewrite.couchdb;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import nc.isi.fragaria_adapter_rewrite.ressources.ConnectionData;
+import nc.isi.fragaria_adapter_rewrite.resources.ConnectionData;
 
 public class CouchdbConnectionData implements ConnectionData {
 	private final URL url;

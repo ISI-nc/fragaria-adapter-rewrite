@@ -12,7 +12,7 @@ import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactory;
 import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
-import nc.isi.fragaria_adapter_rewrite.ressources.DataSourceProvider;
+import nc.isi.fragaria_adapter_rewrite.resources.DataSourceProvider;
 
 import com.google.common.collect.LinkedListMultimap;
 

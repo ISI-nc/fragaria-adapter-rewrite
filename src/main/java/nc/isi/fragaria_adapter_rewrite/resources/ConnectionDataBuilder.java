@@ -1,4 +1,4 @@
-package nc.isi.fragaria_adapter_rewrite.ressources;
+package nc.isi.fragaria_adapter_rewrite.resources;
 
 import java.util.Collection;
 
