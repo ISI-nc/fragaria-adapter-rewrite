@@ -14,7 +14,7 @@ import com.mysema.query.BooleanBuilder;
  * 
  * @param <T>
  */
-public class IdQuery<T extends Entity> extends AbstractQuery<T> {
+public final class IdQuery<T extends Entity> extends AbstractQuery<T> {
 	private final String id;
 	private String rev;
 
@@ -22,10 +22,10 @@ public class IdQuery<T extends Entity> extends AbstractQuery<T> {
 		super(resultType);
 		checkNotNull(id);
 		this.id = id;
-		builder = initBuilder(id);
+		setBuilder(initBuilder(id));
 	}
 
-	protected BooleanBuilder initBuilder(String id) {
+	private BooleanBuilder initBuilder(String id) {
 		return new BooleanBuilder(createPredicate(Entity.ID, id));
 	}
 
@@ -36,7 +36,7 @@ public class IdQuery<T extends Entity> extends AbstractQuery<T> {
 	public IdQuery<T> addRev(String rev) {
 		checkState(this.rev == null);
 		checkNotNull(rev);
-		builder.and(createPredicate(Entity.REV, rev));
+		getBuilder().and(createPredicate(Entity.REV, rev));
 		this.rev = rev;
 		return this;
 	}

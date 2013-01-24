@@ -6,6 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public interface ObjectMapperProvider extends ObjectMapperFactory {
 
-	public ObjectMapper provide();
+	ObjectMapper provide();
 
 }

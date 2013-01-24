@@ -63,10 +63,10 @@ public class ByViewQuery<T extends Entity> extends AbstractQuery<T> {
 	}
 
 	public ByViewQuery<T> where(Predicate predicate) {
-		checkState(builder == null,
+		checkState(getBuilder() == null,
 				"where a déjà été appelé veuillez préciser l'association via or | and");
 		checkNotNull(predicate);
-		builder = new BooleanBuilder(predicate);
+		setBuilder(new BooleanBuilder(predicate));
 		return this;
 	}
 
@@ -76,7 +76,7 @@ public class ByViewQuery<T extends Entity> extends AbstractQuery<T> {
 
 	public ByViewQuery<T> and(Predicate predicate) {
 		checkAddPredicate(predicate);
-		builder.and(predicate);
+		getBuilder().and(predicate);
 		return this;
 	}
 
@@ -86,13 +86,13 @@ public class ByViewQuery<T extends Entity> extends AbstractQuery<T> {
 
 	public ByViewQuery<T> or(Predicate predicate) {
 		checkAddPredicate(predicate);
-		builder.or(predicate);
+		getBuilder().or(predicate);
 		return this;
 
 	}
 
 	protected void checkAddPredicate(Predicate predicate) {
-		checkState(builder != null, "Appelez where en premier");
+		checkState(getBuilder() != null, "Appelez where en premier");
 		checkNotNull(predicate);
 	}
 

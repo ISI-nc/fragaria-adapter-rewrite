@@ -6,20 +6,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public interface Partialable {
 
-	public Completion getCompletion();
+	Completion getCompletion();
 
-	public void setCompletion(Completion completion);
-
-	@JsonProperty("_id")
-	public String getId();
-
-	@JsonProperty("_rev")
-	public String getRev();
+	void setCompletion(Completion completion);
 
 	@JsonProperty("_id")
-	public void setId(String id);
+	String getId();
 
 	@JsonProperty("_rev")
-	public void setRev(String rev);
+	String getRev();
+
+	@JsonProperty("_id")
+	void setId(String id);
+
+	@JsonProperty("_rev")
+	void setRev(String rev);
 
 }

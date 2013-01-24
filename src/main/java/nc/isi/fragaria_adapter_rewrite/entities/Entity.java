@@ -12,31 +12,31 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public interface Entity extends Serializable, Partialable {
 
-	public static final String ID = "id";
-	public static final String REV = "rev";
-	public static final String TYPES = "types";
+	static final String ID = "id";
+	static final String REV = "rev";
+	static final String TYPES = "types";
 
 	@JsonIgnore
-	public State getState();
+	State getState();
 
-	public void setState(State state);
+	void setState(State state);
 
-	public List<String> getTypes();
+	List<String> getTypes();
 
-	public ObjectNode toJSON();
+	ObjectNode toJSON();
 
-	public ObjectNode toJSON(Class<? extends View> view);
+	ObjectNode toJSON(Class<? extends View> view);
 
-	public void registerListener(Object o);
+	void registerListener(Object o);
 
-	public void unregisterListener(Object listener);
-
-	@JsonIgnore
-	public EntityMetadata getMetadata();
+	void unregisterListener(Object listener);
 
 	@JsonIgnore
-	public Session getSession();
+	EntityMetadata getMetadata();
 
-	public void setSession(Session session);
+	@JsonIgnore
+	Session getSession();
+
+	void setSession(Session session);
 
 }

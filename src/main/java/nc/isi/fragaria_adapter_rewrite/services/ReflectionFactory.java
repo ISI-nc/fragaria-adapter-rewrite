@@ -15,7 +15,7 @@ public class ReflectionFactory {
 			.newBuilder().build(new CacheLoader<Configuration, Reflections>() {
 
 				@Override
-				public Reflections load(Configuration key) throws Exception {
+				public Reflections load(Configuration key) {
 					return new Reflections(key);
 				}
 

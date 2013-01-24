@@ -19,11 +19,9 @@ import nc.isi.fragaria_adapter_rewrite.resources.Datasource;
  */
 public interface Adapter {
 
-	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
-			Query<T> query);
+	<T extends Entity> CollectionQueryResponse<T> executeQuery(Query<T> query);
 
-	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
-			Query<T> query);
+	<T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(Query<T> query);
 
 	/**
 	 * Post un ensemble d'entités ayant été altérées pendant le traitement, On
@@ -34,8 +32,8 @@ public interface Adapter {
 	 * 
 	 * @param entities
 	 */
-	public void post(Entity... entities);
+	void post(Entity... entities);
 
-	public void post(List<Entity> entities);
+	void post(List<Entity> entities);
 
 }

@@ -11,9 +11,17 @@ import com.mysema.query.types.Predicate;
 import com.mysema.query.types.path.PathBuilder;
 
 public abstract class AbstractQuery<T extends Entity> implements Query<T> {
+	protected BooleanBuilder getBuilder() {
+		return builder;
+	}
+
+	protected void setBuilder(BooleanBuilder builder) {
+		this.builder = builder;
+	}
+
 	private final PathBuilder<T> entityPath;
 	private final Class<T> resultType;
-	protected BooleanBuilder builder;
+	private BooleanBuilder builder;
 
 	public AbstractQuery(Class<T> resultType) {
 		checkNotNull(resultType);
@@ -29,8 +37,9 @@ public abstract class AbstractQuery<T extends Entity> implements Query<T> {
 	}
 
 	public Predicate getPredicate() {
-		if (builder == null)
+		if (builder == null) {
 			return null;
+		}
 		return builder.getValue();
 	}
 

@@ -12,10 +12,11 @@ public class QueryExecutorForCollectionImpl implements
 		QueryExecutorForCollection {
 
 	@Override
-	public <T extends Entity> T getUnique(
-			AbstractQuery<T> query, Collection<T> coll) {
-		if (coll == null)
+	public <T extends Entity> T getUnique(AbstractQuery<T> query,
+			Collection<T> coll) {
+		if (coll == null) {
 			return null;
+		}
 		T entity = alias(query.getResultType());
 		return from($(entity), coll).where(query.getPredicate()).uniqueResult(
 				$(entity));

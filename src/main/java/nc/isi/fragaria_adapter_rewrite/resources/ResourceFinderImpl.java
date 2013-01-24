@@ -21,14 +21,14 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Sets;
 
 public class ResourceFinderImpl implements ResourceFinder {
+	private final static long MAX_FILES_TIME = 10L;
 	private final Reflections reflections;
 	private final LoadingCache<String, Set<File>> cache = CacheBuilder
-			.newBuilder().maximumSize(10)
-			.expireAfterAccess(600L, TimeUnit.SECONDS)
+			.newBuilder().expireAfterAccess(MAX_FILES_TIME, TimeUnit.MINUTES)
 			.build(new CacheLoader<String, Set<File>>() {
 
 				@Override
-				public Set<File> load(String key) throws Exception {
+				public Set<File> load(String key) {
 					Set<File> resources = Sets.newHashSet();
 					Set<String> resFiles = reflections.getResources(Pattern
 							.compile(key));

@@ -39,14 +39,6 @@ public class ObjectResolverImpl implements ObjectResolver {
 		T result = null;
 		if (node.has(entity.getMetadata().getJsonPropertyName(propertyName))) {
 			try {
-				if (isEntity(propertyType))
-					return objectMapper
-							.readerWithView(
-									entity.getMetadata().getEmbeded(
-											propertyName))
-							.readValue(
-									node.get(entity.getMetadata()
-											.getJsonPropertyName(propertyName)));
 				return objectMapper.treeToValue(
 						node.get(entity.getMetadata().getJsonPropertyName(
 								propertyName)), propertyType);
@@ -54,8 +46,9 @@ public class ObjectResolverImpl implements ObjectResolver {
 				throw new RuntimeException(e);
 			}
 		} else {
-			if (entity.getCompletion() == Completion.FULL)
+			if (entity.getCompletion() == Completion.FULL) {
 				return result;
+			}
 			complete(node, entity);
 			return resolve(node, propertyType, propertyName, entity);
 		}
@@ -74,11 +67,13 @@ public class ObjectResolverImpl implements ObjectResolver {
 				new IdQuery<>(entityClass, entity.getId()));
 		EntityMetadata entityMetadata = entity.getMetadata();
 		for (String propertyName : entityMetadata.propertyNames()) {
-			if (node.has(entityMetadata.getJsonPropertyName(propertyName)))
+			if (node.has(entityMetadata.getJsonPropertyName(propertyName))) {
 				continue;
-			if (entity.getMetadata().canWrite(propertyName))
+			}
+			if (entity.getMetadata().canWrite(propertyName)) {
 				entity.getMetadata().write(entity, propertyName,
 						entity.getMetadata().read(fromDB, propertyName));
+			}
 		}
 	}
 
@@ -102,19 +97,22 @@ public class ObjectResolverImpl implements ObjectResolver {
 		} else {
 			if (entity.getCompletion() == Completion.FULL) {
 				if (entity.getMetadata().getEmbeded(propertyName) != null
-						|| !isEntity(propertyType))
+						|| !isEntity(propertyType)) {
 					return result;
+				}
 				Class<? extends Entity> propertyEntity = propertyType
 						.asSubclass(Entity.class);
-				if (entity.getMetadata().canWrite(propertyName))
+				if (entity.getMetadata().canWrite(propertyName)) {
 					entity.getMetadata().write(
 							entity,
 							propertyName,
 							getListByBackReference(propertyName, entity,
 									propertyEntity));
+				}
 			} else {
-				if (entity.getCompletion() == Completion.FULL)
+				if (entity.getCompletion() == Completion.FULL) {
 					return result;
+				}
 				complete(node, entity);
 			}
 			return resolveCollection(node, propertyType, propertyName, entity);

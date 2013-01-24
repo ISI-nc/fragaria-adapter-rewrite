@@ -10,6 +10,7 @@ import nc.isi.fragaria_adapter_rewrite.resources.Datasource;
 import nc.isi.fragaria_adapter_rewrite.resources.DatasourceImpl;
 import nc.isi.fragaria_adapter_rewrite.resources.ResourceFinder;
 import nc.isi.fragaria_adapter_rewrite.resources.SpecificDsLoader;
+import nc.isi.fragaria_adapter_rewrite.utils.FileUtils;
 
 import com.google.common.collect.Maps;
 
@@ -45,7 +46,7 @@ public class YamlDsLoader implements SpecificDsLoader {
 	}
 
 	private String getDsKey(String fileName) {
-		return fileName.substring(0, fileName.lastIndexOf("."));
+		return FileUtils.removeExtension(fileName);
 	}
 
 	private DataSourceMetadata buildDsMetadata(File dsFile) throws IOException {

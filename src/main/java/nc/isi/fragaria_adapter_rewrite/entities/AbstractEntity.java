@@ -80,13 +80,13 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	private LinkedList<String> initTypes() {
-		LinkedList<String> types = new LinkedList<>();
+		LinkedList<String> tempTypes = new LinkedList<>();
 		for (Class<?> type = getClass(); Entity.class.isAssignableFrom(type); type = type
 				.getSuperclass()) {
-			types.addLast(type.getName());
+			tempTypes.addLast(type.getName());
 		}
-		objectResolver.write(objectNode, TYPES, types, this);
-		return types;
+		objectResolver.write(objectNode, TYPES, tempTypes, this);
+		return tempTypes;
 	}
 
 	@Override
@@ -96,12 +96,14 @@ public abstract class AbstractEntity implements Entity {
 
 	protected <T> T readProperty(Class<T> propertyType, String propertyName) {
 		checkGlobalSanity(propertyName, Action.READ);
-		if (!cache.keySet().contains(propertyName))
+		if (!cache.keySet().contains(propertyName)) {
 			cache.put(propertyName, objectResolver.resolve(objectNode,
 					propertyType, propertyName, this));
+		}
 		T value = propertyType.cast(cache.get(propertyName));
-		if (Entity.class.isAssignableFrom(propertyType))
+		if (Entity.class.isAssignableFrom(propertyType)) {
 			((Entity) value).setSession(session);
+		}
 		return value;
 	}
 
@@ -109,9 +111,10 @@ public abstract class AbstractEntity implements Entity {
 	protected <T> Collection<T> readCollection(Class<T> collectionGenericType,
 			String collectionName) {
 		checkGlobalSanity(collectionName, Action.READ);
-		if (!cache.containsKey(collectionName))
+		if (!cache.containsKey(collectionName)) {
 			cache.put(collectionName, objectResolver.resolveCollection(
 					objectNode, collectionGenericType, collectionName, this));
+		}
 		Collection<T> collection = (Collection<T>) cache.get(collectionName);
 		if (Entity.class.isAssignableFrom(collectionGenericType)) {
 			for (T o : collection) {
@@ -129,8 +132,9 @@ public abstract class AbstractEntity implements Entity {
 		PropertyChangeEvent propertyChangeEvent = new PropertyChangeEvent(this,
 				propertyName, oldValue, value);
 		eventBus.post(propertyChangeEvent);
-		if (cache.values().containsAll(entityMetadata.propertyNames()))
+		if (cache.values().containsAll(entityMetadata.propertyNames())) {
 			setCompletion(Completion.FULL);
+		}
 	}
 
 	@Override
@@ -181,9 +185,10 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	protected void checkGlobalSanity(String propertyName, Action action) {
-		if (action != Action.READ)
+		if (action != Action.READ) {
 			checkState(state != State.DELETED,
 					"impossible de %s les propriétés d'un objet effacé", action);
+		}
 		checkArgument(entityMetadata.propertyNames().contains(propertyName),
 				"La propriété %s n'est pas connu pour les objets de type %s",
 				propertyName, getClass());
@@ -248,12 +253,15 @@ public abstract class AbstractEntity implements Entity {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!getClass().isAssignableFrom(obj.getClass()))
+		}
+		if (!getClass().isAssignableFrom(obj.getClass())) {
 			return false;
+		}
 		AbstractEntity entity = AbstractEntity.class.cast(obj);
 		return Objects.equal(this.getId(), entity.getId());
 	}

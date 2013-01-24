@@ -84,8 +84,9 @@ public class EntityMetadata {
 					.getPropertyDescriptors(entityClass)) {
 				String propertyName = propertyDescriptor.getName();
 				temp.add(propertyName);
-				if (cache.containsKey(propertyName))
+				if (cache.containsKey(propertyName)) {
 					continue;
+				}
 				cache.put(propertyName, propertyDescriptor);
 			}
 			propertyNames = ImmutableSet.copyOf(temp);

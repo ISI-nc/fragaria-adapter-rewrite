@@ -19,8 +19,9 @@ public class EntitySerializers implements Serializers {
 	@Override
 	public JsonSerializer<?> findSerializer(SerializationConfig config,
 			JavaType type, BeanDescription beanDesc) {
-		if (Entity.class.isAssignableFrom(type.getRawClass()))
+		if (Entity.class.isAssignableFrom(type.getRawClass())) {
 			return new EntityJsonSerializer();
+		}
 		return null;
 	}
 

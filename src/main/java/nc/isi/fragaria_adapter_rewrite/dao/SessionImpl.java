@@ -6,7 +6,7 @@ import static com.google.common.base.Preconditions.checkState;
 import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManager;
@@ -25,7 +25,7 @@ public class SessionImpl implements Session {
 	private final UUID id = UUID.randomUUID();
 	private final EntityBuilder entityBuilder;
 
-	private final LinkedList<Entity> queue = Lists.newLinkedList();
+	private final List<Entity> queue = Lists.newLinkedList();
 
 	private final LinkedListMultimap<Class<? extends Entity>, Entity> createdObjects = LinkedListMultimap
 			.create();
@@ -64,8 +64,9 @@ public class SessionImpl implements Session {
 	public <T extends Entity> T getUnique(Query<T> query) {
 		T entity = adapterManager.executeUniqueQuery(query).getResponse();
 		T cachedValue = getRegisteredValue(entity);
-		if (cachedValue != null)
+		if (cachedValue != null) {
 			entity = cachedValue;
+		}
 		changeSession(entity);
 		return entity;
 	}
@@ -73,9 +74,10 @@ public class SessionImpl implements Session {
 	@SuppressWarnings("unchecked")
 	public <T extends Entity> T getRegisteredValue(T entity) {
 		for (LinkedListMultimap<Class<? extends Entity>, Entity> cache : caches) {
-			if (isRegistered(entity, cache))
+			if (isRegistered(entity, cache)) {
 				return (T) cache.get(entity.getClass()).get(
 						cache.get(entity.getClass()).indexOf(entity));
+			}
 		}
 		return null;
 	}
@@ -99,10 +101,12 @@ public class SessionImpl implements Session {
 	public <T extends Entity> void delete(Collection<T> entities) {
 		checkNotDeleted(entities);
 		for (T entity : entities) {
-			if (isRegistered(entity, createdObjects))
+			if (isRegistered(entity, createdObjects)) {
 				createdObjects.remove(entity.getClass(), entity);
-			if (isRegistered(entity, updatedObjects))
+			}
+			if (isRegistered(entity, updatedObjects)) {
 				updatedObjects.remove(entity.getClass(), entity);
+			}
 			register(entity, deletedObjects);
 			entity.setState(State.DELETED);
 		}
@@ -123,8 +127,9 @@ public class SessionImpl implements Session {
 	public void recordPropertyChange(PropertyChangeEvent e) {
 		Entity entity = (Entity) e.getSource();
 		entity.setState(State.MODIFIED);
-		if (isRegistered(entity, deletedObjects))
+		if (isRegistered(entity, deletedObjects)) {
 			commitError(entity, entity.getState(), State.DELETED);
+		}
 		register(entity, isRegistered(entity, createdObjects) ? createdObjects
 				: updatedObjects);
 	}
@@ -136,8 +141,9 @@ public class SessionImpl implements Session {
 	}
 
 	protected Session renewSession() {
-		for (Multimap<Class<? extends Entity>, Entity> cache : caches)
+		for (Multimap<Class<? extends Entity>, Entity> cache : caches) {
 			cache.clear();
+		}
 		queue.clear();
 		return this;
 	}

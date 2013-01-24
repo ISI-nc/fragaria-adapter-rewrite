@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import nc.isi.fragaria_adapter_rewrite.dao.ByViewQuery;
 import nc.isi.fragaria_adapter_rewrite.dao.CollectionQueryResponse;
@@ -52,17 +53,20 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 public class CouchDbAdapter extends AbstractAdapter implements Adapter {
+	private static final long MAX_INSTANCE_TIME = 60L;
+	private static final long MAX_CONNECTOR = 30L;
 	private final DataSourceProvider dataSourceProvider;
 	private final EntityMetadataFactory entityMetadataFactory;
 	private final CouchDbSerializer serializer;
 	private final ElasticSearchAdapter elasticSearchAdapter;
 	private final ObjectMapperProvider objectMapperProvider;
 	private final LoadingCache<URL, CouchDbInstance> instanceCache = CacheBuilder
-			.newBuilder().maximumSize(10)
+			.newBuilder()
+			.expireAfterAccess(MAX_INSTANCE_TIME, TimeUnit.MINUTES)
 			.build(new CacheLoader<URL, CouchDbInstance>() {
 
 				@Override
-				public CouchDbInstance load(URL key) throws Exception {
+				public CouchDbInstance load(URL key) {
 					HttpClient httpClient = new StdHttpClient.Builder()
 							.url(key).build();
 					return new StdCouchDbInstance(httpClient);
@@ -70,11 +74,12 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 
 			});
 	private final LoadingCache<Datasource, CouchDbConnector> connectors = CacheBuilder
-			.newBuilder().maximumSize(40)
+			.newBuilder().expireAfterAccess(MAX_CONNECTOR, TimeUnit.MINUTES)
 			.build(new CacheLoader<Datasource, CouchDbConnector>() {
 
 				@Override
-				public CouchDbConnector load(Datasource key) throws Exception {
+				public CouchDbConnector load(Datasource key)
+						throws ExecutionException {
 					CouchdbConnectionData couchdbConnectionData = CouchdbConnectionData.class
 							.cast(key.getDsMetadata().getConnectionData());
 					return new StdCouchDbConnector(couchdbConnectionData
@@ -100,9 +105,10 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 			final Query<T> query) {
 		checkNotNull(query);
-		if (query instanceof IdQuery)
+		if (query instanceof IdQuery) {
 			throw new IllegalArgumentException(
 					"Impossible de renvoyer une Collection depuis une IdQuery");
+		}
 		if (query instanceof ByViewQuery) {
 			ByViewQuery<T> bVQuery = (ByViewQuery<T>) query;
 			CollectionQueryResponse<T> response = executeQuery(
@@ -142,8 +148,9 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 		ViewResult result = getConnector(entityMetadata).queryView(viewQuery);
 		Collection<T> collection = Lists.newArrayList();
 		for (Row row : result) {
-			if (row.getValueAsNode() instanceof MissingNode)
+			if (row.getValueAsNode() instanceof MissingNode) {
 				continue;
+			}
 			collection.add(serializer.deSerialize(
 					ObjectNode.class.cast(row.getValueAsNode()), type));
 		}
@@ -189,8 +196,9 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 		for (Entity entity : filtered) {
 			CouchDbConnector couchDbConnector = getConnector(entity
 					.getMetadata());
-			if (!connectorsToFlush.contains(couchDbConnector))
+			if (!connectorsToFlush.contains(couchDbConnector)) {
 				connectorsToFlush.add(couchDbConnector);
+			}
 			couchDbConnector.addToBulkBuffer(deleteIfNeeded(entity));
 		}
 		for (CouchDbConnector connector : connectorsToFlush) {
@@ -256,8 +264,9 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 	private State lookForEntityState(Multimap<State, Entity> dispatch,
 			Entity entity) {
 		for (State state : dispatch.keySet()) {
-			if (dispatch.get(state).contains(entity))
+			if (dispatch.get(state).contains(entity)) {
 				return state;
+			}
 		}
 		return null;
 	}
@@ -276,9 +285,10 @@ public class CouchDbAdapter extends AbstractAdapter implements Adapter {
 
 	private Object deleteIfNeeded(Entity entity) {
 		checkNotNull(entity);
-		if (entity.getState() == State.DELETED)
+		if (entity.getState() == State.DELETED) {
 			return new BulkDeleteDocument(entity.getId().toString(), entity
 					.getRev().toString());
+		}
 		return entity;
 	}
 

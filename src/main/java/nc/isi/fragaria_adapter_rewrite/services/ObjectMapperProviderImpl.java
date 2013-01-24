@@ -36,10 +36,10 @@ public class ObjectMapperProviderImpl implements ObjectMapperProvider {
 
 	@Override
 	public ObjectMapper createObjectMapper(CouchDbConnector connector) {
-		ObjectMapper objectMapper = new ObjectMapper();
-		init(objectMapper);
-		objectMapper.registerModule(new EktorpJacksonModule(connector,
-				objectMapper));
+		ObjectMapper specificOM = new ObjectMapper();
+		init(specificOM);
+		specificOM
+				.registerModule(new EktorpJacksonModule(connector, specificOM));
 		return provide();
 	}
 

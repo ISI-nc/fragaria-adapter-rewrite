@@ -19,9 +19,10 @@ public class EntityBeanDeserializerModifier extends BeanDeserializerModifier {
 	@Override
 	public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config,
 			BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
-		if (Entity.class.isAssignableFrom(beanDesc.getBeanClass()))
+		if (Entity.class.isAssignableFrom(beanDesc.getBeanClass())) {
 			return entityJsonDeserializerFactory
 					.create((Class<? extends Entity>) beanDesc.getBeanClass());
+		}
 		return super.modifyDeserializer(config, beanDesc, deserializer);
 	}
 

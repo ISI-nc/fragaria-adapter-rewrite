@@ -22,24 +22,24 @@ import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 
 public interface Session {
 
-	public <T extends Entity> Collection<T> get(Query<T> query);
+	<T extends Entity> Collection<T> get(Query<T> query);
 
-	public <T extends Entity> T getUnique(Query<T> query);
+	<T extends Entity> T getUnique(Query<T> query);
 
-	public <T extends Entity> T create(Class<T> entityClass);
+	<T extends Entity> T create(Class<T> entityClass);
 
-	public void delete(Entity... entity);
+	void delete(Entity... entity);
 
-	public <T extends Entity> void delete(Collection<T> entity);
+	<T extends Entity> void delete(Collection<T> entity);
 
-	public Session post();
+	Session post();
 
-	public Session cancel();
+	Session cancel();
 
-	public UUID getId();
+	UUID getId();
 
-	public <T extends Entity> void changeSession(Collection<T> entities);
+	<T extends Entity> void changeSession(Collection<T> entities);
 
-	public void changeSession(Entity... entities);
+	void changeSession(Entity... entities);
 
 }

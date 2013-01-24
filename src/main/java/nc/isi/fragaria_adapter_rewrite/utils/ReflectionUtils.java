@@ -10,6 +10,9 @@ import java.lang.reflect.Type;
 import org.springframework.beans.BeanUtils;
 
 public class ReflectionUtils {
+	private ReflectionUtils() {
+
+	}
 
 	public static boolean propertyExists(Class<?> clazz, String fieldName) {
 		return BeanUtils.getPropertyDescriptor(clazz, fieldName) != null;
@@ -28,10 +31,9 @@ public class ReflectionUtils {
 
 	public static Class<?> getClass(Type type) {
 		try {
-			if (type.toString().equals("?"))
-				return Object.class;
-			return Class.forName(type.toString().substring(
-					type.toString().lastIndexOf(' ') + 1));
+			return type.toString().equals("?") ? Object.class : Class
+					.forName(type.toString().substring(
+							type.toString().lastIndexOf(' ') + 1));
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
@@ -39,8 +41,9 @@ public class ReflectionUtils {
 
 	public static <T extends Annotation> T getPropertyAnnotation(
 			Class<?> clazz, Class<T> annotation, String key, boolean recursive) {
-		if (recursive)
+		if (recursive) {
 			return getPropertyAnnotation(clazz, annotation, key);
+		}
 		T fieldAnnotation = null;
 		for (Field field : clazz.getDeclaredFields()) {
 			if (field.getName().equals(key)) {
@@ -50,16 +53,18 @@ public class ReflectionUtils {
 		}
 		T methodAnnotation = null;
 		try {
-			if (propertyExists(clazz, key))
+			if (propertyExists(clazz, key)) {
 				methodAnnotation = clazz
 						.getMethod(fieldToGetMethod(clazz, key)).getAnnotation(
 								annotation);
+			}
 		} catch (NoSuchMethodException | SecurityException e) {
 			methodAnnotation = null;
 		}
-		if (fieldAnnotation != null && methodAnnotation != null)
+		if (fieldAnnotation != null && methodAnnotation != null) {
 			throw new RuntimeException(
 					"The same annotation is present on the field and its readMethod, please choose one of both");
+		}
 		return methodAnnotation != null ? methodAnnotation : fieldAnnotation;
 
 	}
@@ -84,14 +89,16 @@ public class ReflectionUtils {
 			for (Field field : tempClazz.getDeclaredFields()) {
 				if (field.getName().equals(key)) {
 					fieldAnnotation = field.getAnnotation(annotation);
-					if (fieldAnnotation != null)
+					if (fieldAnnotation != null) {
 						break;
+					}
 				}
 			}
 		}
-		if (fieldAnnotation != null && propertyAnnotation != null)
+		if (fieldAnnotation != null && propertyAnnotation != null) {
 			throw new RuntimeException(
 					"The same annotation is present on the field and its readMethod, please choose one of both");
+		}
 		return propertyAnnotation != null ? propertyAnnotation
 				: fieldAnnotation;
 
@@ -103,8 +110,9 @@ public class ReflectionUtils {
 				.isAssignableFrom(tempClazz) && !tempClazz.equals(Object.class); tempClazz = tempClazz
 				.getSuperclass()) {
 			for (Field field : tempClazz.getDeclaredFields()) {
-				if (field.getName().equals(fieldName))
+				if (field.getName().equals(fieldName)) {
 					return field;
+				}
 			}
 		}
 		throw new NoSuchFieldException();
@@ -124,8 +132,9 @@ public class ReflectionUtils {
 
 	public static <T extends Annotation> T getTypeAnnotation(Class<?> clazz,
 			Class<T> annotation, boolean recursive) {
-		if (recursive)
+		if (recursive) {
 			return getTypeAnnotation(clazz, annotation);
+		}
 		return clazz.getAnnotation(annotation);
 	}
 
@@ -134,8 +143,9 @@ public class ReflectionUtils {
 		for (Class<?> tempClazz = clazz; Object.class
 				.isAssignableFrom(tempClazz) && !Object.class.equals(tempClazz); tempClazz = tempClazz
 				.getSuperclass()) {
-			if (tempClazz.getAnnotation(annotation) != null)
+			if (tempClazz.getAnnotation(annotation) != null) {
 				return tempClazz.getAnnotation(annotation);
+			}
 		}
 		return null;
 

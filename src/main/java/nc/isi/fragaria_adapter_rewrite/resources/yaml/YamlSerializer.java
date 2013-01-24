@@ -19,8 +19,9 @@ public class YamlSerializer {
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		} finally {
-			if (input != null)
+			if (input != null) {
 				input.close();
+			}
 		}
 	}
 }
