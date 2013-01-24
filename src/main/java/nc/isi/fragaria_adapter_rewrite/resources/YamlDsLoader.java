@@ -1,9 +1,8 @@
 package nc.isi.fragaria_adapter_rewrite.resources;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
-
 
 import com.beust.jcommander.internal.Maps;
 
@@ -27,7 +26,7 @@ public class YamlDsLoader implements SpecificDsLoader {
 			try {
 				map.put(dsKey, new DatasourceImpl(dsKey,
 						buildDsMetadata(dsFile)));
-			} catch (FileNotFoundException e) {
+			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -42,8 +41,7 @@ public class YamlDsLoader implements SpecificDsLoader {
 		return fileName.substring(0, fileName.lastIndexOf("."));
 	}
 
-	private DataSourceMetadata buildDsMetadata(File dsFile)
-			throws FileNotFoundException {
+	private DataSourceMetadata buildDsMetadata(File dsFile) throws IOException {
 		YamlDatasourceMetadata yamlDs = serializer.serialize(dsFile,
 				YamlDatasourceMetadata.class);
 		return new DataSourceMetadata(yamlDs.getType(), builder.build(

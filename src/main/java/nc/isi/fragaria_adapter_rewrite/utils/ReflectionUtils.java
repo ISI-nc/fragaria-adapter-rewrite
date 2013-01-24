@@ -28,7 +28,7 @@ public class ReflectionUtils {
 
 	public static Class<?> getClass(Type type) {
 		try {
-			if (type.toString() == "?")
+			if (type.toString().equals("?"))
 				return Object.class;
 			return Class.forName(type.toString().substring(
 					type.toString().lastIndexOf(' ') + 1));

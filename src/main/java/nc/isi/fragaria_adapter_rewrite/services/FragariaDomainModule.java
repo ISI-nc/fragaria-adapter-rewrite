@@ -1,6 +1,7 @@
 package nc.isi.fragaria_adapter_rewrite.services;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import nc.isi.fragaria_adapter_rewrite.couchdb.CouchDbAdapter;
 import nc.isi.fragaria_adapter_rewrite.couchdb.CouchDbSerializer;
@@ -90,8 +91,8 @@ public class FragariaDomainModule {
 			MappedConfiguration<String, Datasource> configuration,
 			MasterDsLoader masterDsLoader) {
 		Map<String, Datasource> map = masterDsLoader.getDs();
-		for (String key : map.keySet())
-			configuration.add(key, map.get(key));
+		for (Entry<String, Datasource> entry : map.entrySet())
+			configuration.add(entry.getKey(), entry.getValue());
 	}
 
 	public void contributeAdapterManager(
