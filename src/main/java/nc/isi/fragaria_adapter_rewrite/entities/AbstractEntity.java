@@ -12,9 +12,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import nc.isi.fragaria_adapter_rewrite.dao.Session;
-import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews;
-import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews.Id;
+import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 import nc.isi.fragaria_adapter_rewrite.exceptions.StateChangeException;
@@ -182,8 +181,9 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	protected void checkGlobalSanity(String propertyName, Action action) {
-		checkState(state != State.DELETED,
-				"impossible de %s les propriétés d'un objet effacé", action);
+		if (action != Action.READ)
+			checkState(state != State.DELETED,
+					"impossible de %s les propriétés d'un objet effacé", action);
 		checkArgument(entityMetadata.propertyNames().contains(propertyName),
 				"La propriété %s n'est pas connu pour les objets de type %s",
 				propertyName, getClass());
