@@ -38,7 +38,7 @@ import com.google.common.eventbus.EventBus;
 public abstract class AbstractEntity implements Entity {
 
 	private enum Action {
-		READ("lire"), WRITE("écrire");
+		READ("lire"), WRITE("écrire"), ADD("Ajouté"), REMOVE("enlevé");
 
 		private final String s;
 
@@ -54,7 +54,7 @@ public abstract class AbstractEntity implements Entity {
 
 	private final ObjectNode objectNode;
 	private final ObjectResolver objectResolver;
-	private final Map<String, Object> cache = Maps.newConcurrentMap();
+	private final Map<String, Object> cache = Maps.newHashMap();
 	private final EntityMetadata entityMetadata;
 	private final EventBus eventBus = new EventBus();
 	private final List<String> types;
@@ -122,6 +122,37 @@ public abstract class AbstractEntity implements Entity {
 			}
 		}
 		return collection;
+	}
+
+	protected <T> Boolean addToCollection(String collectionName, T element,
+			Class<T> collectionType) {
+		return modifyCollection(collectionName, element, collectionType,
+				Action.ADD);
+	}
+
+	protected <T> Boolean removeFromCollection(String collectionName,
+			T element, Class<T> collectionType) {
+		return modifyCollection(collectionName, element, collectionType,
+				Action.REMOVE);
+	}
+
+	protected <T> Boolean modifyCollection(String collectionName, T element,
+			Class<T> collectionType, Action action) {
+		Collection<T> collection = readCollection(collectionType,
+				collectionName);
+		boolean result = false;
+		switch (action) {
+		case ADD:
+			result = collection.add(element);
+			break;
+		case REMOVE:
+			result = collection.remove(element);
+			break;
+		default:
+			throw new IllegalArgumentException(action.toString());
+		}
+		writeProperty(collectionName, collection);
+		return result;
 	}
 
 	protected void writeProperty(String propertyName, Object value) {
@@ -233,6 +264,8 @@ public abstract class AbstractEntity implements Entity {
 	 */
 	@Override
 	public void setSession(Session session) {
+		if (Objects.equal(this.session, session))
+			return;
 		if (this.session != null) {
 			unregisterListener(this.session);
 		}

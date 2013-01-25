@@ -77,9 +77,8 @@ public class ObjectResolverImpl implements ObjectResolver {
 	public <T> Collection<T> resolveCollection(ObjectNode node,
 			Class<T> propertyType, String propertyName, Entity entity) {
 		checkParametersNotNull(node, propertyType, propertyName, entity);
-		Collection<T> result = null;
+		Collection<T> result = Lists.newArrayList();
 		if (node.has(entity.getMetadata().getJsonPropertyName(propertyName))) {
-			result = Lists.newArrayList();
 			ArrayNode arrayNode = (ArrayNode) node.get(entity.getMetadata()
 					.getJsonPropertyName(propertyName));
 			try {

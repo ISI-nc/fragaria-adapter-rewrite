@@ -15,12 +15,16 @@ import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 import nc.isi.fragaria_adapter_rewrite.resources.DataSourceProvider;
 
+import org.apache.log4j.Logger;
+
 import com.google.common.collect.LinkedListMultimap;
 
 public class AdapterManagerImpl implements AdapterManager {
 	private final Map<String, Adapter> adapters;
 	private final DataSourceProvider dataSourceProvider;
 	private final EntityMetadataFactory entityMetadataFactory;
+	private static final Logger LOGGER = Logger
+			.getLogger(AdapterManagerImpl.class);
 
 	public AdapterManagerImpl(DataSourceProvider dataSourceProvider,
 			EntityMetadataFactory entityMetadataFactory,
@@ -33,6 +37,7 @@ public class AdapterManagerImpl implements AdapterManager {
 	@Override
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 			Query<T> query) {
+		LOGGER.info("executing collection query : " + query);
 		EntityMetadata entityMetadata = entityMetadataFactory.create(query
 				.getResultType());
 		String dsType = getDsType(entityMetadata);
@@ -48,6 +53,7 @@ public class AdapterManagerImpl implements AdapterManager {
 	@Override
 	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
 			Query<T> query) {
+		LOGGER.info("executing unique query : " + query);
 		EntityMetadata entityMetadata = entityMetadataFactory.create(query
 				.getResultType());
 		String dsType = getDsType(entityMetadata);
@@ -77,6 +83,7 @@ public class AdapterManagerImpl implements AdapterManager {
 
 	@Override
 	public void post(Entity... entities) {
+		LOGGER.info("post : " + entities);
 		LinkedList<Entity> list = new LinkedList<>();
 		for (Entity entity : entities) {
 			list.addLast(entity);
@@ -86,6 +93,7 @@ public class AdapterManagerImpl implements AdapterManager {
 
 	@Override
 	public void post(List<Entity> entities) {
+		LOGGER.info("post : " + entities);
 		LinkedListMultimap<Adapter, Entity> dispatch = LinkedListMultimap
 				.create();
 		for (Entity entity : entities) {
