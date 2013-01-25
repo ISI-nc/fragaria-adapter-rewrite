@@ -2,9 +2,6 @@ package nc.isi.fragaria_adapter_rewrite.services;
 
 import nc.isi.fragaria_adapter_rewrite.utils.jackson.EntityJacksonModule;
 
-import org.ektorp.CouchDbConnector;
-import org.ektorp.impl.jackson.EktorpJacksonModule;
-
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
@@ -18,7 +15,7 @@ public class ObjectMapperProviderImpl implements ObjectMapperProvider {
 		init(objectMapper);
 	}
 
-	private void init(ObjectMapper objectMapper) {
+	protected final void init(ObjectMapper objectMapper) {
 		objectMapper.registerModule(new JodaModule());
 		objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
 		objectMapper.registerModule(entityJacksonModule);
@@ -29,17 +26,7 @@ public class ObjectMapperProviderImpl implements ObjectMapperProvider {
 		return objectMapper;
 	}
 
-	@Override
 	public ObjectMapper createObjectMapper() {
-		return provide();
-	}
-
-	@Override
-	public ObjectMapper createObjectMapper(CouchDbConnector connector) {
-		ObjectMapper specificOM = new ObjectMapper();
-		init(specificOM);
-		specificOM
-				.registerModule(new EktorpJacksonModule(connector, specificOM));
 		return provide();
 	}
 

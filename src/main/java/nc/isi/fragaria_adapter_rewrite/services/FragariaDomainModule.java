@@ -24,22 +24,14 @@ import nc.isi.fragaria_adapter_rewrite.resources.MasterDsLoader;
 import nc.isi.fragaria_adapter_rewrite.resources.MasterDsLoaderImpl;
 import nc.isi.fragaria_adapter_rewrite.resources.ResourceFinder;
 import nc.isi.fragaria_adapter_rewrite.resources.ResourceFinderImpl;
-import nc.isi.fragaria_adapter_rewrite.resources.SpecificDsLoader;
-import nc.isi.fragaria_adapter_rewrite.resources.yaml.YamlDsLoader;
-import nc.isi.fragaria_adapter_rewrite.resources.yaml.YamlSerializer;
 import nc.isi.fragaria_adapter_rewrite.utils.jackson.JacksonModule;
 
-import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.SubModule;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 @SubModule(JacksonModule.class)
 public class FragariaDomainModule {
-	static {
-		SLF4JBridgeHandler.install();
-	}
 
 	public static void bind(ServiceBinder binder) {
 		binder.bind(AdapterManager.class, AdapterManagerImpl.class);
@@ -51,8 +43,6 @@ public class FragariaDomainModule {
 		binder.bind(ObjectResolver.class, ObjectResolverImpl.class);
 		binder.bind(MasterDsLoader.class, MasterDsLoaderImpl.class);
 		binder.bind(ResourceFinder.class, ResourceFinderImpl.class);
-		binder.bind(YamlDsLoader.class);
-		binder.bind(YamlSerializer.class);
 		binder.bind(DataSourceProvider.class, DataSourceProviderImpl.class);
 		binder.bind(ReflectionFactory.class);
 		binder.bind(SessionManager.class, SessionManagerImpl.class);
@@ -60,12 +50,6 @@ public class FragariaDomainModule {
 				QueryExecutorForCollectionImpl.class);
 		binder.bind(ConnectionDataBuilder.class,
 				ConnectionDataBuilderImpl.class);
-	}
-
-	public void contributeMasterDsLoader(
-			Configuration<SpecificDsLoader> configuration,
-			YamlDsLoader yamlDsLoader) {
-		configuration.add(yamlDsLoader);
 	}
 
 	public void contributeDataSourceProvider(
