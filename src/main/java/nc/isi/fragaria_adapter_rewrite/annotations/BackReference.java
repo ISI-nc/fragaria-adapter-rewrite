@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface BackReference {
-	final String DEFAULT = "";
+	String DEFAULT = "";
 
 	String value() default DEFAULT;
 }

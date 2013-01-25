@@ -12,9 +12,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public interface Entity extends Serializable, Partialable {
 
-	final String ID = "id";
-	final String REV = "rev";
-	final String TYPES = "types";
+	String ID = "id";
+	String REV = "rev";
+	String TYPES = "types";
 
 	@JsonIgnore
 	State getState();
