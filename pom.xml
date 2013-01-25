@@ -6,7 +6,7 @@
 	<artifactId>fragaria-adapter-rewrite</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>fragaria-adapter-rewrite Tapestry 5 Application</name>
+	<name>fragaria-adapter-rewrite</name>
 	<dependencies>
 		<!-- Too set up an application with a database, change the artifactId below 
 			to tapestry-hibernate, and add a dependency on your JDBC driver. You'll also 

@@ -1,20 +1,20 @@
-package nc.isi.fragaria_adapter_rewrite.couchdb;
+package nc.isi.fragaria_adapter_rewrite.model;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import nc.isi.fragaria_adapter_rewrite.resources.ConnectionData;
 
-public class CouchdbConnectionData implements ConnectionData {
+public class SampleConnectionData implements ConnectionData {
 	private final URL url;
 	private final String dbName;
 
-	public CouchdbConnectionData(URL url, String dbName) {
+	public SampleConnectionData(URL url, String dbName) {
 		this.url = url;
 		this.dbName = dbName;
 	}
 
-	public CouchdbConnectionData(String url, String dbName) {
+	public SampleConnectionData(String url, String dbName) {
 		try {
 			this.url = new URL(url);
 		} catch (MalformedURLException e) {
@@ -22,7 +22,6 @@ public class CouchdbConnectionData implements ConnectionData {
 		}
 		this.dbName = dbName;
 	}
-
 
 	public URL getUrl() {
 		return url;

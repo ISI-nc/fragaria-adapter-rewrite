@@ -2,15 +2,10 @@ package nc.isi.fragaria_adapter_rewrite.services;
 
 import java.util.Map.Entry;
 
-import nc.isi.fragaria_adapter_rewrite.cayenne.CayenneConnectionData;
-import nc.isi.fragaria_adapter_rewrite.couchdb.CouchDbAdapter;
-import nc.isi.fragaria_adapter_rewrite.couchdb.CouchDbSerializer;
-import nc.isi.fragaria_adapter_rewrite.couchdb.CouchdbConnectionData;
 import nc.isi.fragaria_adapter_rewrite.dao.QueryExecutorForCollection;
 import nc.isi.fragaria_adapter_rewrite.dao.QueryExecutorForCollectionImpl;
 import nc.isi.fragaria_adapter_rewrite.dao.SessionManager;
 import nc.isi.fragaria_adapter_rewrite.dao.SessionManagerImpl;
-import nc.isi.fragaria_adapter_rewrite.dao.adapters.Adapter;
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManager;
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManagerImpl;
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.ElasticSearchAdapter;
@@ -48,9 +43,7 @@ public class FragariaDomainModule {
 
 	public static void bind(ServiceBinder binder) {
 		binder.bind(AdapterManager.class, AdapterManagerImpl.class);
-		binder.bind(CouchDbSerializer.class);
 		binder.bind(ElasticSearchAdapter.class);
-		binder.bind(CouchDbAdapter.class);
 		binder.bind(EntityBuilder.class, EntityBuilderImpl.class);
 		binder.bind(EntityMetadataFactory.class,
 				EntityMetadataFactoryImpl.class);
@@ -69,20 +62,10 @@ public class FragariaDomainModule {
 				ConnectionDataBuilderImpl.class);
 	}
 
-	public void contributeConnectionDataBuilder(
-			MappedConfiguration<String, String> configuration) {
-		configuration.add("CouchDB", CouchdbConnectionData.class.getName());
-		configuration.add("Cayenne", CayenneConnectionData.class.getName());
-	}
-
 	public void contributeMasterDsLoader(
 			Configuration<SpecificDsLoader> configuration,
 			YamlDsLoader yamlDsLoader) {
 		configuration.add(yamlDsLoader);
-	}
-
-	public void contributeResourceFinder(Configuration<String> configuration) {
-		configuration.add("nc.isi.fragaria_adapter_rewrite");
 	}
 
 	public void contributeDataSourceProvider(
@@ -92,12 +75,6 @@ public class FragariaDomainModule {
 				.entrySet()) {
 			configuration.add(entry.getKey(), entry.getValue());
 		}
-	}
-
-	public void contributeAdapterManager(
-			MappedConfiguration<String, Adapter> configuration,
-			CouchDbAdapter couchDbAdapter) {
-		configuration.add("CouchDB", couchDbAdapter);
 	}
 
 }

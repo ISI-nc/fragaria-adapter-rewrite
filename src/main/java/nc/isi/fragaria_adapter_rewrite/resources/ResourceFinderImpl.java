@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import nc.isi.fragaria_adapter_rewrite.services.ReflectionFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -22,6 +23,8 @@ import com.google.common.collect.Sets;
 
 public class ResourceFinderImpl implements ResourceFinder {
 	private static final long MAX_FILES_TIME = 10L;
+	private static final Logger LOGGER = Logger
+			.getLogger(ResourceFinderImpl.class);
 	private final Reflections reflections;
 	private final LoadingCache<String, Set<File>> cache = CacheBuilder
 			.newBuilder().expireAfterAccess(MAX_FILES_TIME, TimeUnit.MINUTES)
@@ -33,6 +36,7 @@ public class ResourceFinderImpl implements ResourceFinder {
 					Set<String> resFiles = reflections.getResources(Pattern
 							.compile(key));
 					for (String res : resFiles) {
+						LOGGER.info(this.getClass().getResource("/" + res));
 						resources.add(FileUtils.toFile(this.getClass()
 								.getResource("/" + res)));
 					}
@@ -44,6 +48,7 @@ public class ResourceFinderImpl implements ResourceFinder {
 			Collection<String> packageNames) {
 		ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
 		for (String packageName : packageNames) {
+			LOGGER.info(String.format("adding package : %s", packageName));
 			configurationBuilder.addUrls(ClasspathHelper
 					.forPackage(packageName));
 		}
@@ -53,6 +58,7 @@ public class ResourceFinderImpl implements ResourceFinder {
 
 	@Override
 	public Set<File> getResourcesMatching(String regExp) {
+		LOGGER.info(String.format("looking for : " + regExp));
 		try {
 			return cache.get(regExp);
 		} catch (ExecutionException e) {

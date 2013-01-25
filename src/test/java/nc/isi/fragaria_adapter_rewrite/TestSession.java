@@ -15,17 +15,12 @@ import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManager;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
 import nc.isi.fragaria_adapter_rewrite.model.PersonData;
-import nc.isi.fragaria_adapter_rewrite.services.FragariaDomainModule;
-
-import org.apache.tapestry5.ioc.Registry;
-import org.apache.tapestry5.ioc.RegistryBuilder;
+import nc.isi.fragaria_adapter_rewrite.model.QaRegistry;
 
 import com.beust.jcommander.internal.Lists;
 
 public class TestSession extends TestCase {
-	private static final Registry REGISTRY = RegistryBuilder
-			.buildAndStartupRegistry(FragariaDomainModule.class);
-	final EntityBuilder entityBuilder = REGISTRY
+	final EntityBuilder entityBuilder = QaRegistry.INSTANCE.getRegistry()
 			.getService(EntityBuilder.class);
 	final PersonData personData = entityBuilder.build(PersonData.class);
 	final List<PersonData> listOfPersons = Lists.newArrayList();

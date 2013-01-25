@@ -1,4 +1,4 @@
-type           : CouchDB
+type           : test
 canEmbed       : true
 connectionData :
   url    : http://localhost:5984/

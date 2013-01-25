@@ -12,6 +12,8 @@ import nc.isi.fragaria_adapter_rewrite.resources.ResourceFinder;
 import nc.isi.fragaria_adapter_rewrite.resources.SpecificDsLoader;
 import nc.isi.fragaria_adapter_rewrite.utils.FileUtils;
 
+import org.apache.log4j.Logger;
+
 import com.google.common.collect.Maps;
 
 /**
@@ -20,6 +22,7 @@ import com.google.common.collect.Maps;
  *         depuis un fichier yaml
  */
 public class YamlDsLoader implements SpecificDsLoader {
+	private static final Logger LOGGER = Logger.getLogger(YamlDsLoader.class);
 	private static final String YAML_REG_EXP = ".*\\.yaml";
 	private final Map<String, Datasource> map = Maps.newHashMap();;
 	private final YamlSerializer serializer;
@@ -30,6 +33,7 @@ public class YamlDsLoader implements SpecificDsLoader {
 		this.serializer = serializer;
 		this.builder = builder;
 		for (File dsFile : finder.getResourcesMatching(YAML_REG_EXP)) {
+			LOGGER.info(dsFile);
 			String dsKey = getDsKey(dsFile.getName());
 			try {
 				map.put(dsKey, new DatasourceImpl(dsKey,
