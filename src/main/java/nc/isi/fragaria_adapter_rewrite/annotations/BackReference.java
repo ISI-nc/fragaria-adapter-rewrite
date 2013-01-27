@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews.All;
+
 /**
  * Définit le nom de la référence à cet objet dans l'enfant dans le cadre d'une
  * relation ONE_TO_MANY
@@ -18,4 +20,6 @@ public @interface BackReference {
 	String DEFAULT = "";
 
 	String value() default DEFAULT;
+
+	Partial partial() default @Partial(All.class);
 }

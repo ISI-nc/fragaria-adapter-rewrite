@@ -20,6 +20,14 @@ public class EntityJsonDeserializer<T extends Entity> extends
 		this.type = type;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nc.isi.fragaria_adapter_rewrite.utils.jackson.IEntityJsonDeserializer
+	 * #deserialize(com.fasterxml.jackson.core.JsonParser,
+	 * com.fasterxml.jackson.databind.DeserializationContext)
+	 */
 	@Override
 	public T deserialize(JsonParser jp, DeserializationContext ctxt)
 			throws IOException {

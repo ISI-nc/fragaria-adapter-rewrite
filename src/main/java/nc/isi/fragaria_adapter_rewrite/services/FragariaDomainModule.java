@@ -44,7 +44,7 @@ public class FragariaDomainModule {
 		binder.bind(MasterDsLoader.class, MasterDsLoaderImpl.class);
 		binder.bind(ResourceFinder.class, ResourceFinderImpl.class);
 		binder.bind(DataSourceProvider.class, DataSourceProviderImpl.class);
-		binder.bind(ReflectionFactory.class);
+		binder.bind(ReflectionFactory.class, ReflectionFactoryImpl.class);
 		binder.bind(SessionManager.class, SessionManagerImpl.class);
 		binder.bind(QueryExecutorForCollection.class,
 				QueryExecutorForCollectionImpl.class);

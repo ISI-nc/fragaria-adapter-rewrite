@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.Module;
 
 public class EntityJacksonModule extends Module {
 	private final EntityBeanDeserializerModifier entityBeanDeserializerModifier;
-	private final EntitySerializers entitySerializers = new EntitySerializers();
+	private final EntitySerializers entitySerializers;
 
 	public EntityJacksonModule(
-			EntityBeanDeserializerModifier entityBeanDeserializerModifier) {
+			EntityBeanDeserializerModifier entityBeanDeserializerModifier,
+			EntitySerializers entitySerializers) {
 		this.entityBeanDeserializerModifier = entityBeanDeserializerModifier;
+		this.entitySerializers = entitySerializers;
 	}
 
 	@Override
@@ -26,7 +28,6 @@ public class EntityJacksonModule extends Module {
 	public void setupModule(SetupContext context) {
 		context.addBeanDeserializerModifier(entityBeanDeserializerModifier);
 		context.addSerializers(entitySerializers);
-
 	}
 
 }

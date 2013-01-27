@@ -7,13 +7,24 @@ import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 
-public class EntityBeanDeserializerModifier extends BeanDeserializerModifier {
+public class EntityBeanDeserializerModifier extends
+		BeanDeserializerModifier {
 	private final EntityJsonDeserializerFactory entityJsonDeserializerFactory;
 
 	public EntityBeanDeserializerModifier(
 			EntityJsonDeserializerFactory entityJsonDeserializerFactory) {
 		this.entityJsonDeserializerFactory = entityJsonDeserializerFactory;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nc.isi.fragaria_adapter_rewrite.utils.jackson.EntityBeanDeserializerModifier
+	 * #modifyDeserializer(com.fasterxml.jackson.databind.DeserializationConfig,
+	 * com.fasterxml.jackson.databind.BeanDescription,
+	 * com.fasterxml.jackson.databind.JsonDeserializer)
+	 */
 
 	@SuppressWarnings("unchecked")
 	@Override

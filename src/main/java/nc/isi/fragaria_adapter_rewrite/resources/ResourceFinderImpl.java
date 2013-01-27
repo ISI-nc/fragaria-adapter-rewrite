@@ -36,7 +36,7 @@ public class ResourceFinderImpl implements ResourceFinder {
 					Set<String> resFiles = reflections.getResources(Pattern
 							.compile(key));
 					for (String res : resFiles) {
-						LOGGER.info(this.getClass().getResource("/" + res));
+						LOGGER.info(res);
 						resources.add(FileUtils.toFile(this.getClass()
 								.getResource("/" + res)));
 					}
