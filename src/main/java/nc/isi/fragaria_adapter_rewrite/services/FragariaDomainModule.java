@@ -30,6 +30,12 @@ import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.SubModule;
 
+/**
+ * Le module Tapestry pour gérer l'ioc
+ * 
+ * @author justin
+ * 
+ */
 @SubModule(JacksonModule.class)
 public class FragariaDomainModule {
 

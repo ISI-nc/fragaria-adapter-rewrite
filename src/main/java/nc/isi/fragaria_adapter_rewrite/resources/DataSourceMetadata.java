@@ -1,5 +1,11 @@
 package nc.isi.fragaria_adapter_rewrite.resources;
 
+/**
+ * Les données permettant de définit une datasource
+ * 
+ * @author justin
+ * 
+ */
 public class DataSourceMetadata {
 	private final String type;
 	private final ConnectionData connectionData;
@@ -12,15 +18,32 @@ public class DataSourceMetadata {
 		this.canEmbed = canEmbed;
 	}
 
+	/**
+	 * le type de datasource (clé de recherche)
+	 * 
+	 * @return
+	 */
 	public String getType() {
 		return type;
 	}
 
+	/**
+	 * Une implémentation de {@link ConnectionData} spécifique au type de
+	 * datasource et à la datasource
+	 * 
+	 * @see ConnectionDataBuilder
+	 * @return
+	 */
 	public ConnectionData getConnectionData() {
 		return connectionData;
 	}
 
-	public boolean isCanEmbed() {
+	/**
+	 * Permet de savoir si la datasource accepte les données embeded ou non
+	 * 
+	 * @return
+	 */
+	public boolean canEmbed() {
 		return canEmbed;
 	}
 }

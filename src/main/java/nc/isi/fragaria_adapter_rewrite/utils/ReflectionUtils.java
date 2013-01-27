@@ -9,15 +9,36 @@ import java.lang.reflect.Type;
 
 import org.springframework.beans.BeanUtils;
 
+/**
+ * Aide à l'utilisation de Reflection
+ * 
+ * @author justin
+ * 
+ */
 public final class ReflectionUtils {
 	private ReflectionUtils() {
 
 	}
 
+	/**
+	 * vérifie si une propriété existe pour une classe donnée
+	 * 
+	 * @param clazz
+	 * @param fieldName
+	 * @return
+	 */
 	public static boolean propertyExists(Class<?> clazz, String fieldName) {
 		return BeanUtils.getPropertyDescriptor(clazz, fieldName) != null;
 	}
 
+	/**
+	 * récupère la valeur d'une propritété pour un object donné en utilisant la
+	 * ReadMethod
+	 * 
+	 * @param o
+	 * @param propertyName
+	 * @return
+	 */
 	public static Object getPropertyValue(Object o, String propertyName) {
 		PropertyDescriptor propertyDescriptor = getPropertyDescriptor(
 				o.getClass(), propertyName);
@@ -29,6 +50,12 @@ public final class ReflectionUtils {
 		}
 	}
 
+	/**
+	 * Essaye de récupérer la {@link Class} depuis un {@link Type}
+	 * 
+	 * @param type
+	 * @return
+	 */
 	public static Class<?> getClass(Type type) {
 		try {
 			return type.toString().equals("?") ? Object.class : Class
@@ -39,6 +66,17 @@ public final class ReflectionUtils {
 		}
 	}
 
+	/**
+	 * cherche une annotation sur une propriété ou sa méthode read
+	 * <p>
+	 * si recursive = true => vérifie sur les méthodes des superclasses
+	 * 
+	 * @param clazz
+	 * @param annotation
+	 * @param key
+	 * @param recursive
+	 * @return
+	 */
 	public static <T extends Annotation> T getPropertyAnnotation(
 			Class<?> clazz, Class<T> annotation, String key, boolean recursive) {
 		if (recursive) {
@@ -76,6 +114,16 @@ public final class ReflectionUtils {
 		return method != null ? method.getName() : "";
 	}
 
+	/**
+	 * @see public static <T extends Annotation> T getPropertyAnnotation(
+	 *      Class<?> clazz, Class<T> annotation, String key, boolean recursive)
+	 *      <p>
+	 *      avec recursive = true;
+	 * @param clazz
+	 * @param annotation
+	 * @param key
+	 * @return
+	 */
 	public static <T extends Annotation> T getPropertyAnnotation(
 			Class<?> clazz, Class<T> annotation, String key) {
 		PropertyDescriptor propertyDescriptor = getPropertyDescriptor(clazz,
@@ -104,6 +152,14 @@ public final class ReflectionUtils {
 
 	}
 
+	/**
+	 * récupère la propriété d'une classe par rapport à son nom
+	 * 
+	 * @param clazz
+	 * @param fieldName
+	 * @return
+	 * @throws NoSuchFieldException
+	 */
 	public static Field getField(Class<?> clazz, String fieldName)
 			throws NoSuchFieldException {
 		for (Class<?> tempClazz = clazz; Object.class
@@ -119,6 +175,13 @@ public final class ReflectionUtils {
 
 	}
 
+	/**
+	 * récupère le {@link PropertyDescriptor} d'une propriété pour une classe
+	 * 
+	 * @param clazz
+	 * @param key
+	 * @return
+	 */
 	public static PropertyDescriptor getPropertyDescriptor(Class<?> clazz,
 			String key) {
 		PropertyDescriptor propertyDescriptor = BeanUtils
@@ -130,6 +193,16 @@ public final class ReflectionUtils {
 		return propertyDescriptor;
 	}
 
+	/**
+	 * récupère la valeur d'une annotation pour un type donné
+	 * <p>
+	 * si recursive = true, cherche dans les super
+	 * 
+	 * @param clazz
+	 * @param annotation
+	 * @param recursive
+	 * @return
+	 */
 	public static <T extends Annotation> T getTypeAnnotation(Class<?> clazz,
 			Class<T> annotation, boolean recursive) {
 		if (recursive) {
@@ -138,6 +211,15 @@ public final class ReflectionUtils {
 		return clazz.getAnnotation(annotation);
 	}
 
+	/**
+	 * @see <T extends Annotation> T getTypeAnnotation(Class<?> clazz, Class<T>
+	 *      annotation, boolean recursive)
+	 *      <p>
+	 *      avec recursive = true
+	 * @param clazz
+	 * @param annotation
+	 * @return
+	 */
 	public static <T extends Annotation> T getTypeAnnotation(Class<?> clazz,
 			Class<T> annotation) {
 		for (Class<?> tempClazz = clazz; Object.class

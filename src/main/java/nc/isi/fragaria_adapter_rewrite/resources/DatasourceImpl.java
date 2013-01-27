@@ -1,17 +1,14 @@
 package nc.isi.fragaria_adapter_rewrite.resources;
 
-public class DatasourceImpl implements Datasource{
+public class DatasourceImpl implements Datasource {
 
 	private final String key;
 	private final DataSourceMetadata dsMetadata;
-	
-	
+
 	public DatasourceImpl(String key, DataSourceMetadata dsMetadata) {
-		super();
 		this.key = key;
 		this.dsMetadata = dsMetadata;
 	}
-
 
 	@Override
 	public String getKey() {
