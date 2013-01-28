@@ -12,8 +12,8 @@ import nc.isi.fragaria_adapter_rewrite.dao.ByViewQuery;
 import nc.isi.fragaria_adapter_rewrite.dao.Session;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
+import nc.isi.fragaria_adapter_rewrite.entities.views.GenericQueryViews.All;
 import nc.isi.fragaria_adapter_rewrite.entities.views.View;
-import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews.All;
 import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 

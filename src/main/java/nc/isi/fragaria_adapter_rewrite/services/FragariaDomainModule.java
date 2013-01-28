@@ -15,6 +15,13 @@ import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactory;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactoryImpl;
 import nc.isi.fragaria_adapter_rewrite.entities.ObjectResolver;
 import nc.isi.fragaria_adapter_rewrite.entities.ObjectResolverImpl;
+import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigBuilderProvider;
+import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigBuilderProviderImpl;
+import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigProvider;
+import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigProviderImpl;
+import nc.isi.fragaria_adapter_rewrite.entities.views.ViewGeneratorManager;
+import nc.isi.fragaria_adapter_rewrite.entities.views.ViewGeneratorManagerImpl;
+import nc.isi.fragaria_adapter_rewrite.entities.views.ViewInitializer;
 import nc.isi.fragaria_adapter_rewrite.resources.ConnectionDataBuilder;
 import nc.isi.fragaria_adapter_rewrite.resources.ConnectionDataBuilderImpl;
 import nc.isi.fragaria_adapter_rewrite.resources.DataSourceProvider;
@@ -28,6 +35,7 @@ import nc.isi.fragaria_adapter_rewrite.utils.jackson.JacksonModule;
 
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
+import org.apache.tapestry5.ioc.annotations.Startup;
 import org.apache.tapestry5.ioc.annotations.SubModule;
 
 /**
@@ -56,6 +64,11 @@ public class FragariaDomainModule {
 				QueryExecutorForCollectionImpl.class);
 		binder.bind(ConnectionDataBuilder.class,
 				ConnectionDataBuilderImpl.class);
+		binder.bind(ViewInitializer.class);
+		binder.bind(ViewConfigBuilderProvider.class,
+				ViewConfigBuilderProviderImpl.class);
+		binder.bind(ViewConfigProvider.class, ViewConfigProviderImpl.class);
+		binder.bind(ViewGeneratorManager.class, ViewGeneratorManagerImpl.class);
 	}
 
 	public void contributeDataSourceProvider(
@@ -65,6 +78,11 @@ public class FragariaDomainModule {
 				.entrySet()) {
 			configuration.add(entry.getKey(), entry.getValue());
 		}
+	}
+
+	@Startup
+	public void initializeViews(ViewInitializer viewInitializer) {
+		viewInitializer.initialize();
 	}
 
 }

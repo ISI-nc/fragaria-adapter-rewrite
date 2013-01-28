@@ -6,7 +6,7 @@ import static com.google.common.base.Preconditions.checkState;
 import java.util.Map;
 
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
-import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews.All;
+import nc.isi.fragaria_adapter_rewrite.entities.views.GenericQueryViews.All;
 import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 
 import com.google.common.collect.Maps;

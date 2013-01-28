@@ -13,8 +13,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -46,14 +44,8 @@ public class ResourceFinderImpl implements ResourceFinder {
 
 	public ResourceFinderImpl(ReflectionFactory reflectionFactory,
 			Collection<String> packageNames) {
-		ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-		for (String packageName : packageNames) {
-			LOGGER.info(String.format("adding package : %s", packageName));
-			configurationBuilder.addUrls(ClasspathHelper
-					.forPackage(packageName));
-		}
-		reflections = reflectionFactory.create(configurationBuilder
-				.setScanners(new ResourcesScanner()));
+		reflections = reflectionFactory.create(packageNames,
+				new ResourcesScanner());
 	}
 
 	@Override

@@ -1,8 +1,7 @@
 package nc.isi.fragaria_adapter_rewrite.entities.views;
 
-public class GenericViews {
-	public static class Id implements View {
-	};
+
+public class GenericQueryViews {
 
 	/**
 	 * Toutes les propriétés font partie de cette vue par défaut
@@ -10,7 +9,7 @@ public class GenericViews {
 	 * @author jmaltat
 	 * 
 	 */
-	public static final class All extends Id {
+	public static final class All implements QueryView {
 
 	};
 

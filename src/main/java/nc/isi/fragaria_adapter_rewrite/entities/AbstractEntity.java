@@ -11,8 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.dao.Session;
-import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews.Id;
+import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews;
 import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
@@ -22,7 +23,6 @@ import nc.isi.fragaria_adapter_rewrite.services.TapestryRegistry;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
@@ -227,7 +227,7 @@ public abstract class AbstractEntity implements Entity {
 				propertyName, getClass());
 	}
 
-	@JsonView(Id.class)
+	@InView(GenericEmbedingViews.Id.class)
 	@JsonProperty("_id")
 	public String getId() {
 		return readProperty(String.class, ID);
@@ -238,6 +238,7 @@ public abstract class AbstractEntity implements Entity {
 		writeProperty(ID, id);
 	}
 
+	@InView(GenericEmbedingViews.Id.class)
 	@JsonProperty("_rev")
 	public String getRev() {
 		return readProperty(String.class, REV);

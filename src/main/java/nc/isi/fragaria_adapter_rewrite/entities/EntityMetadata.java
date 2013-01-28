@@ -13,16 +13,16 @@ import java.util.Set;
 import nc.isi.fragaria_adapter_rewrite.annotations.BackReference;
 import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
 import nc.isi.fragaria_adapter_rewrite.annotations.Embeded;
+import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.annotations.Partial;
-import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews.All;
-import nc.isi.fragaria_adapter_rewrite.entities.views.GenericViews.Id;
+import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews.Id;
+import nc.isi.fragaria_adapter_rewrite.entities.views.GenericQueryViews.All;
 import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 import nc.isi.fragaria_adapter_rewrite.utils.ReflectionUtils;
 
 import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
@@ -34,7 +34,8 @@ public class EntityMetadata {
 	private final Class<? extends Entity> entityClass;
 	private ImmutableSet<String> propertyNames;
 	private BiMap<String, PropertyDescriptor> cache = HashBiMap.create();
-	private Multimap<Class<?>, String> viewProperties = HashMultimap.create();
+	private Multimap<Class<? extends View>, String> viewProperties = HashMultimap
+			.create();
 	private String dsKey;
 
 	public EntityMetadata(Class<? extends Entity> entityClass) {
@@ -96,23 +97,26 @@ public class EntityMetadata {
 
 	@SuppressWarnings("unchecked")
 	public Collection<String> propertyNames(Class<? extends View> view) {
-		if (viewProperties.isEmpty()) {
-			for (String name : propertyNames) {
-				JsonView annotation = getPropertyAnnotation(name,
-						JsonView.class);
-				if (annotation != null) {
-					for (Class<?> tempView : annotation.value()) {
-						viewProperties.put(tempView, name);
-					}
-				}
-			}
-		}
+		initViewProperties();
 		Collection<String> properties = viewProperties.get(view);
 		if (View.class.isAssignableFrom(view.getSuperclass())) {
 			properties.addAll(propertyNames((Class<? extends View>) view
 					.getSuperclass()));
 		}
 		return properties;
+	}
+
+	protected void initViewProperties() {
+		if (viewProperties.isEmpty()) {
+			for (String name : propertyNames) {
+				InView annotation = getPropertyAnnotation(name, InView.class);
+				if (annotation != null) {
+					for (Class<? extends View> tempView : annotation.value()) {
+						viewProperties.put(tempView, name);
+					}
+				}
+			}
+		}
 	}
 
 	public Class<? extends Entity> getEntityClass() {
@@ -127,6 +131,19 @@ public class EntityMetadata {
 		JsonProperty jsonProperty = getPropertyAnnotation(propertyName,
 				JsonProperty.class);
 		return jsonProperty == null ? propertyName : jsonProperty.value();
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends View> Collection<Class<? extends T>> getViews(
+			Class<T> viewType) {
+		checkNotNull(viewType);
+		Collection<Class<? extends T>> views = Sets.newHashSet();
+		for (Class<? extends View> view : viewProperties.keySet()) {
+			if (viewType.isAssignableFrom(view)) {
+				views.add((Class<? extends T>) view);
+			}
+		}
+		return views;
 	}
 
 	/**
