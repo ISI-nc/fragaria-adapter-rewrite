@@ -19,4 +19,8 @@ public interface DataSourceProvider {
 	 */
 	Collection<Datasource> datasources();
 
+	void register(Datasource ds);
+
+	void unregister(Datasource ds);
+
 }
