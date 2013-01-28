@@ -135,4 +135,16 @@ public class AdapterManagerImpl implements AdapterManager {
 		getAdapter(entityMetadata).buildView(viewConfig, entityMetadata);
 	}
 
+	@Override
+	public Boolean exist(ViewConfig viewConfig,
+			Class<? extends Entity> entityClass) {
+		return exist(viewConfig, entityMetadataFactory.create(entityClass));
+	}
+
+	@Override
+	public void buildView(ViewConfig viewConfig,
+			Class<? extends Entity> entityClass) {
+		buildView(viewConfig, entityMetadataFactory.create(entityClass));
+	}
+
 }

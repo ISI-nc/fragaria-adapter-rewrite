@@ -1,7 +1,5 @@
 package nc.isi.fragaria_adapter_rewrite.entities.views;
 
-import java.util.Map;
-
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactory;
@@ -13,16 +11,16 @@ import org.apache.log4j.Logger;
 public class ViewGeneratorManagerImpl implements ViewGeneratorManager {
 	private static final Logger LOGGER = Logger
 			.getLogger(ViewGeneratorManagerImpl.class);
-	private final Map<String, ViewGenerator> dsTypeGenerator;
+	private final ViewGenerator viewGenerator;
 	private final EntityMetadataFactory entityMetadataFactory;
 	private final DataSourceProvider dataSourceProvider;
 	private final ViewConfigBuilderProvider viewConfigBuilderProvider;
 
-	public ViewGeneratorManagerImpl(Map<String, ViewGenerator> dsTypeGenerator,
+	public ViewGeneratorManagerImpl(ViewGenerator viewGenerator,
 			EntityMetadataFactory entityMetadataFactory,
 			DataSourceProvider dataSourceProvider,
 			ViewConfigBuilderProvider viewConfigBuilderProvider) {
-		this.dsTypeGenerator = dsTypeGenerator;
+		this.viewGenerator = viewGenerator;
 		this.entityMetadataFactory = entityMetadataFactory;
 		this.dataSourceProvider = dataSourceProvider;
 		this.viewConfigBuilderProvider = viewConfigBuilderProvider;
@@ -41,7 +39,7 @@ public class ViewGeneratorManagerImpl implements ViewGeneratorManager {
 				.getDsKey());
 		String dsType = datasource.getDsMetadata().getType();
 		LOGGER.debug("dsType : " + dsType);
-		dsTypeGenerator.get(dsType).generate(entityMetadata,
+		viewGenerator.generate(entityMetadata,
 				viewConfigBuilderProvider.provide(dsType));
 	}
 

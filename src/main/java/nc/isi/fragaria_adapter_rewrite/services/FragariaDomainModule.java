@@ -19,6 +19,8 @@ import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigBuilderProvider;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigBuilderProviderImpl;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigProvider;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigProviderImpl;
+import nc.isi.fragaria_adapter_rewrite.entities.views.ViewGenerator;
+import nc.isi.fragaria_adapter_rewrite.entities.views.ViewGeneratorImpl;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewGeneratorManager;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewGeneratorManagerImpl;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewInitializer;
@@ -69,6 +71,7 @@ public class FragariaDomainModule {
 				ViewConfigBuilderProviderImpl.class);
 		binder.bind(ViewConfigProvider.class, ViewConfigProviderImpl.class);
 		binder.bind(ViewGeneratorManager.class, ViewGeneratorManagerImpl.class);
+		binder.bind(ViewGenerator.class, ViewGeneratorImpl.class);
 	}
 
 	public void contributeDataSourceProvider(
