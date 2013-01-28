@@ -6,6 +6,8 @@ import nc.isi.fragaria_adapter_rewrite.dao.CollectionQueryResponse;
 import nc.isi.fragaria_adapter_rewrite.dao.Query;
 import nc.isi.fragaria_adapter_rewrite.dao.UniqueQueryResponse;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
+import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
+import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfig;
 import nc.isi.fragaria_adapter_rewrite.resources.Datasource;
 
 /**
@@ -34,5 +36,9 @@ public interface Adapter {
 	void post(Entity... entities);
 
 	void post(List<Entity> entities);
+
+	Boolean exist(ViewConfig viewConfig, EntityMetadata entityMetadata);
+
+	void buildView(ViewConfig viewConfig, EntityMetadata entityMetadata);
 
 }

@@ -1,17 +1,21 @@
 package nc.isi.fragaria_adapter_rewrite.entities.views;
 
+import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManager;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericQueryViews.All;
 
 import org.apache.log4j.Logger;
 
-public abstract class AbstractGenerator implements ViewGenerator {
+public class ViewGeneratorImpl implements ViewGenerator {
 	private static final Logger LOGGER = Logger
-			.getLogger(AbstractGenerator.class);
+			.getLogger(ViewGeneratorImpl.class);
 	private final ViewConfigProvider viewConfigProvider;
+	private final AdapterManager adapterManager;
 
-	public AbstractGenerator(ViewConfigProvider viewConfigProvider) {
+	public ViewGeneratorImpl(ViewConfigProvider viewConfigProvider,
+			AdapterManager adapterManager) {
 		this.viewConfigProvider = viewConfigProvider;
+		this.adapterManager = adapterManager;
 	}
 
 	@Override
@@ -35,10 +39,12 @@ public abstract class AbstractGenerator implements ViewGenerator {
 		build(viewConfig, entityMetadata);
 	}
 
-	protected abstract void build(ViewConfig viewConfig,
-			EntityMetadata entityMetadata);
+	protected void build(ViewConfig viewConfig, EntityMetadata entityMetadata) {
+		adapterManager.buildView(viewConfig, entityMetadata);
+	}
 
-	protected abstract Boolean exist(ViewConfig viewConfig,
-			EntityMetadata entityMetadata);
+	protected Boolean exist(ViewConfig viewConfig, EntityMetadata entityMetadata) {
+		return adapterManager.exist(viewConfig, entityMetadata);
+	}
 
 }

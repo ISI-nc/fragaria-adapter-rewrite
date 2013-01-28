@@ -1,11 +1,13 @@
 package nc.isi.fragaria_adapter_rewrite.entities.views;
 
+import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManager;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
 
-public class ViewGeneratorMock extends AbstractGenerator {
+public class ViewGeneratorMock extends ViewGeneratorImpl {
 
-	public ViewGeneratorMock(ViewConfigProvider viewConfigProvider) {
-		super(viewConfigProvider);
+	public ViewGeneratorMock(ViewConfigProvider viewConfigProvider,
+			AdapterManager adapterManager) {
+		super(viewConfigProvider, adapterManager);
 	}
 
 	@Override

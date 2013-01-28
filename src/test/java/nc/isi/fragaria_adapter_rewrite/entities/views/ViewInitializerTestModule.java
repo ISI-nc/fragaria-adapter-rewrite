@@ -57,12 +57,12 @@ public class ViewInitializerTestModule {
 			@Override
 			public ViewConfig buildDefault(Class<? extends Entity> entityClass,
 					Class<? extends QueryView> view) {
-				return new ViewConfigMock("default-"
+				return new ViewConfigMock(view.getSimpleName(), "default-"
 						+ view.getSimpleName().toLowerCase());
 			}
 
 			@Override
-			public ViewConfig build(File file) {
+			public ViewConfig build(String name, File file) {
 				String s;
 				try {
 					BufferedReader bufferedReader = Files.newBufferedReader(
@@ -72,7 +72,7 @@ public class ViewInitializerTestModule {
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
-				return new ViewConfigMock(s);
+				return new ViewConfigMock(name, s);
 			}
 		});
 	}

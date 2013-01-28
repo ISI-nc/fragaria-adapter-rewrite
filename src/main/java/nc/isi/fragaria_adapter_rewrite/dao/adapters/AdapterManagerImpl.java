@@ -11,6 +11,7 @@ import nc.isi.fragaria_adapter_rewrite.dao.UniqueQueryResponse;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactory;
+import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfig;
 import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 import nc.isi.fragaria_adapter_rewrite.resources.DataSourceProvider;
@@ -34,14 +35,25 @@ public class AdapterManagerImpl implements AdapterManager {
 		this.entityMetadataFactory = entityMetadataFactory;
 	}
 
+	private Adapter getAdapter(EntityMetadata entityMetadata) {
+		String dsType = getDsType(entityMetadata);
+		return adapters.get(dsType);
+
+	}
+
+	private Adapter getAdapter(Class<? extends Entity> entityClass) {
+		EntityMetadata entityMetadata = entityMetadataFactory
+				.create(entityClass);
+		return getAdapter(entityMetadata);
+	}
+
 	@Override
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 			Query<T> query) {
 		LOGGER.info("executing collection query : " + query);
 		EntityMetadata entityMetadata = entityMetadataFactory.create(query
 				.getResultType());
-		String dsType = getDsType(entityMetadata);
-		CollectionQueryResponse<T> queryResponse = adapters.get(dsType)
+		CollectionQueryResponse<T> queryResponse = getAdapter(entityMetadata)
 				.executeQuery(query);
 		CollectionQueryResponse<T> collectionQueryResponse = (CollectionQueryResponse<T>) queryResponse;
 		for (T response : collectionQueryResponse.getResponse()) {
@@ -56,8 +68,7 @@ public class AdapterManagerImpl implements AdapterManager {
 		LOGGER.info("executing unique query : " + query);
 		EntityMetadata entityMetadata = entityMetadataFactory.create(query
 				.getResultType());
-		String dsType = getDsType(entityMetadata);
-		UniqueQueryResponse<T> queryResponse = adapters.get(dsType)
+		UniqueQueryResponse<T> queryResponse = getAdapter(entityMetadata)
 				.executeUniqueQuery(query);
 		init(queryResponse.getResponse(), query, entityMetadata);
 		return queryResponse;
@@ -97,7 +108,7 @@ public class AdapterManagerImpl implements AdapterManager {
 		LinkedListMultimap<Adapter, Entity> dispatch = LinkedListMultimap
 				.create();
 		for (Entity entity : entities) {
-			dispatch.put(adapters.get(getDsType(entity)), entity);
+			dispatch.put(getAdapter(entity.getClass()), entity);
 		}
 		for (Adapter adapter : dispatch.keySet()) {
 			adapter.post(new LinkedList<>(dispatch.get(adapter)));
@@ -112,6 +123,16 @@ public class AdapterManagerImpl implements AdapterManager {
 	protected String getDsType(EntityMetadata entityMetadata) {
 		return dataSourceProvider.provide(entityMetadata.getDsKey())
 				.getDsMetadata().getType();
+	}
+
+	@Override
+	public Boolean exist(ViewConfig viewConfig, EntityMetadata entityMetadata) {
+		return getAdapter(entityMetadata).exist(viewConfig, entityMetadata);
+	}
+
+	@Override
+	public void buildView(ViewConfig viewConfig, EntityMetadata entityMetadata) {
+		getAdapter(entityMetadata).buildView(viewConfig, entityMetadata);
 	}
 
 }

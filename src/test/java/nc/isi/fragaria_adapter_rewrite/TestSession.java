@@ -14,6 +14,8 @@ import nc.isi.fragaria_adapter_rewrite.dao.UniqueQueryResponse;
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManager;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
+import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
+import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfig;
 import nc.isi.fragaria_adapter_rewrite.model.PersonData;
 import nc.isi.fragaria_adapter_rewrite.model.QaRegistry;
 
@@ -160,6 +162,20 @@ public class TestSession extends TestCase {
 
 				return new CollectionQueryResponse<T>(
 						(Collection<T>) listOfPersons);
+			}
+
+			@Override
+			public Boolean exist(ViewConfig viewConfig,
+					EntityMetadata entityMetadata) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public void buildView(ViewConfig viewConfig,
+					EntityMetadata entityMetadata) {
+				// TODO Auto-generated method stub
+
 			}
 		}, entityBuilder);
 

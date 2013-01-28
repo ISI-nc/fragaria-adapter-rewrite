@@ -6,9 +6,9 @@ import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 
 public interface ViewConfigBuilder {
 
-	ViewConfig build(File file);
-
 	ViewConfig buildDefault(Class<? extends Entity> entityClass,
 			Class<? extends QueryView> view);
+
+	ViewConfig build(String name, File file);
 
 }
