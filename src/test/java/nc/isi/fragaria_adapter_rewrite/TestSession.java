@@ -177,6 +177,20 @@ public class TestSession extends TestCase {
 				// TODO Auto-generated method stub
 
 			}
+
+			@Override
+			public Boolean exist(ViewConfig viewConfig,
+					Class<? extends Entity> entityClass) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public void buildView(ViewConfig viewConfig,
+					Class<? extends Entity> entityClass) {
+				// TODO Auto-generated method stub
+
+			}
 		}, entityBuilder);
 
 		return (Session) session;

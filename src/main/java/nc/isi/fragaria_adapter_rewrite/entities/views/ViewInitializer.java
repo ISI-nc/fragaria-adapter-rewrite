@@ -18,13 +18,13 @@ public class ViewInitializer {
 
 	public ViewInitializer(ViewGeneratorManager viewGenerator,
 			ReflectionFactory reflectionFactory, Collection<String> packageNames) {
+		LOGGER.info("packageNames : " + packageNames);
 		this.viewGenerator = viewGenerator;
 		this.reflections = reflectionFactory.create(packageNames,
 				new SubTypesScanner());
 	}
 
 	public void initialize() {
-		LOGGER.info(reflections.getSubTypesOf(Entity.class));
 		for (Class<? extends Entity> entityClass : reflections
 				.getSubTypesOf(Entity.class)) {
 			if (Modifier.isAbstract(entityClass.getModifiers())

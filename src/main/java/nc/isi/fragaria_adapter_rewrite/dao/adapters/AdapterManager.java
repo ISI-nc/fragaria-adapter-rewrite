@@ -31,6 +31,10 @@ public interface AdapterManager {
 
 	Boolean exist(ViewConfig viewConfig, EntityMetadata entityMetadata);
 
+	Boolean exist(ViewConfig viewConfig, Class<? extends Entity> entityClass);
+
 	void buildView(ViewConfig viewConfig, EntityMetadata entityMetadata);
+
+	void buildView(ViewConfig viewConfig, Class<? extends Entity> entityClass);
 
 }
