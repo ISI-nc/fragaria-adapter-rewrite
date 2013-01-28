@@ -1,12 +1,12 @@
 package nc.isi.fragaria_adapter_rewrite.model;
 
 import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
+import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.entities.AbstractEntity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactory;
 import nc.isi.fragaria_adapter_rewrite.entities.ObjectResolver;
 import nc.isi.fragaria_adapter_rewrite.model.CityViews.Name;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @DsKey("test")
@@ -22,7 +22,7 @@ public class City extends AbstractEntity {
 		super();
 	}
 
-	@JsonView(Name.class)
+	@InView(Name.class)
 	public String getName() {
 		return readProperty(String.class, NAME);
 	}

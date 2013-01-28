@@ -9,6 +9,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import nc.isi.fragaria_adapter_rewrite.annotations.BackReference;
 import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
@@ -23,8 +24,9 @@ import nc.isi.fragaria_adapter_rewrite.utils.ReflectionUtils;
 import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
@@ -33,9 +35,19 @@ import com.google.common.collect.Sets;
 public class EntityMetadata {
 	private final Class<? extends Entity> entityClass;
 	private ImmutableSet<String> propertyNames;
-	private BiMap<String, PropertyDescriptor> cache = HashBiMap.create();
+	private LoadingCache<String, PropertyDescriptor> cache = CacheBuilder
+			.newBuilder().build(new CacheLoader<String, PropertyDescriptor>() {
+
+				@Override
+				public PropertyDescriptor load(String key) {
+					return checkNotNull(BeanUtils.getPropertyDescriptor(
+							entityClass, key));
+				}
+			});
+
 	private Multimap<Class<? extends View>, String> viewProperties = HashMultimap
 			.create();
+	private boolean viewPropertiesInitialized = false;
 	private String dsKey;
 
 	public EntityMetadata(Class<? extends Entity> entityClass) {
@@ -85,10 +97,6 @@ public class EntityMetadata {
 					.getPropertyDescriptors(entityClass)) {
 				String propertyName = propertyDescriptor.getName();
 				temp.add(propertyName);
-				if (cache.containsKey(propertyName)) {
-					continue;
-				}
-				cache.put(propertyName, propertyDescriptor);
 			}
 			propertyNames = ImmutableSet.copyOf(temp);
 		}
@@ -107,8 +115,8 @@ public class EntityMetadata {
 	}
 
 	protected void initViewProperties() {
-		if (viewProperties.isEmpty()) {
-			for (String name : propertyNames) {
+		if (!viewPropertiesInitialized) {
+			for (String name : propertyNames()) {
 				InView annotation = getPropertyAnnotation(name, InView.class);
 				if (annotation != null) {
 					for (Class<? extends View> tempView : annotation.value()) {
@@ -116,6 +124,7 @@ public class EntityMetadata {
 					}
 				}
 			}
+			viewPropertiesInitialized = true;
 		}
 	}
 
@@ -137,6 +146,7 @@ public class EntityMetadata {
 	public <T extends View> Collection<Class<? extends T>> getViews(
 			Class<T> viewType) {
 		checkNotNull(viewType);
+		initViewProperties();
 		Collection<Class<? extends T>> views = Sets.newHashSet();
 		for (Class<? extends View> view : viewProperties.keySet()) {
 			if (viewType.isAssignableFrom(view)) {
@@ -171,11 +181,11 @@ public class EntityMetadata {
 	}
 
 	public PropertyDescriptor getPropertyDescriptor(String propertyName) {
-		if (!cache.containsKey(propertyName)) {
-			cache.put(propertyName, checkNotNull(BeanUtils
-					.getPropertyDescriptor(entityClass, propertyName)));
+		try {
+			return cache.get(propertyName);
+		} catch (ExecutionException e) {
+			throw new RuntimeException(e);
 		}
-		return cache.get(propertyName);
 	}
 
 	public Object read(Entity entity, String propertyName) {

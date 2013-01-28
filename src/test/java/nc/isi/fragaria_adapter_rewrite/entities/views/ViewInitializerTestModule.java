@@ -57,7 +57,8 @@ public class ViewInitializerTestModule {
 			@Override
 			public ViewConfig buildDefault(Class<? extends Entity> entityClass,
 					Class<? extends QueryView> view) {
-				return new ViewConfigMock("default");
+				return new ViewConfigMock("default-"
+						+ view.getSimpleName().toLowerCase());
 			}
 
 			@Override

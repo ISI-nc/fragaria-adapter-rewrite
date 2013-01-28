@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
 import nc.isi.fragaria_adapter_rewrite.annotations.Embeded;
+import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.entities.AbstractEntity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactory;
 import nc.isi.fragaria_adapter_rewrite.entities.ObjectResolver;
@@ -30,6 +31,7 @@ public class PersonData extends AbstractEntity {
 		super();
 	}
 
+	@InView(Name.class)
 	public String getName() {
 		return readProperty(String.class, NAME);
 	}

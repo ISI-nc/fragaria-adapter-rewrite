@@ -2,8 +2,9 @@ package nc.isi.fragaria_adapter_rewrite;
 
 import junit.framework.TestCase;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
+import nc.isi.fragaria_adapter_rewrite.entities.views.QueryView;
+import nc.isi.fragaria_adapter_rewrite.model.CityViews.Name;
 import nc.isi.fragaria_adapter_rewrite.model.PersonData;
-import nc.isi.fragaria_adapter_rewrite.model.PersonViews.NameView;
 
 public class TestEntityMetadata extends TestCase {
 
@@ -16,9 +17,9 @@ public class TestEntityMetadata extends TestCase {
 				message += " <" + typeVariable + ">";
 			}
 			System.out.println(message);
-			System.out.println(entityMetadata.getBackReference(name));
 		}
-		System.out.println(entityMetadata.propertyNames(NameView.class));
+		System.out.println(entityMetadata.propertyNames(Name.class));
+		System.out.println(entityMetadata.getViews(QueryView.class));
 	}
 
 }

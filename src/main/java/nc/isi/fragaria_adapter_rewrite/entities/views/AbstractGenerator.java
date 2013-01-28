@@ -3,7 +3,11 @@ package nc.isi.fragaria_adapter_rewrite.entities.views;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericQueryViews.All;
 
+import org.apache.log4j.Logger;
+
 public abstract class AbstractGenerator implements ViewGenerator {
+	private static final Logger LOGGER = Logger
+			.getLogger(AbstractGenerator.class);
 	private final ViewConfigProvider viewConfigProvider;
 
 	public AbstractGenerator(ViewConfigProvider viewConfigProvider) {
@@ -15,6 +19,7 @@ public abstract class AbstractGenerator implements ViewGenerator {
 			ViewConfigBuilder viewConfigBuilder) {
 		for (Class<? extends QueryView> view : entityMetadata
 				.getViews(QueryView.class)) {
+			LOGGER.info("build view : " + view.getSimpleName());
 			build(entityMetadata, viewConfigBuilder, view);
 		}
 		build(entityMetadata, viewConfigBuilder, All.class);
