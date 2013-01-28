@@ -31,6 +31,50 @@ public class ViewInitializerTestModule {
 		configuration.add("nc.isi.fragaria_adapter_rewrite");
 	}
 
+	public void contributeAdapterManager(
+			MappedConfiguration<String, Adapter> configuration) {
+		configuration.add("test", new Adapter() {
+
+			@Override
+			public void post(List<Entity> entities) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void post(Entity... entities) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public Boolean exist(ViewConfig viewConfig,
+					EntityMetadata entityMetadata) {
+				return false;
+			}
+
+			@Override
+			public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
+					Query<T> query) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public <T extends Entity> CollectionQueryResponse<T> executeQuery(
+					Query<T> query) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public void buildView(ViewConfig viewConfig,
+					EntityMetadata entityMetadata) {
+				System.out.println(viewConfig.getName());
+			}
+		});
+	}
+
 	public void contributeDataSourceProvider(
 			MappedConfiguration<String, Datasource> configuration) {
 		configuration.add("test", new DatasourceImpl("test",
