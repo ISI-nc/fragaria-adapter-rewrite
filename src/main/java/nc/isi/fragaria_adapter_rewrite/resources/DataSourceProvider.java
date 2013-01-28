@@ -1,5 +1,7 @@
 package nc.isi.fragaria_adapter_rewrite.resources;
 
+import java.util.Collection;
+
 public interface DataSourceProvider {
 
 	/**
@@ -9,5 +11,12 @@ public interface DataSourceProvider {
 	 * @return
 	 */
 	Datasource provide(String key);
+
+	/**
+	 * renvoie l'ensemble des {@link Datasource} connues
+	 * 
+	 * @return
+	 */
+	Collection<Datasource> datasources();
 
 }

@@ -1,5 +1,6 @@
 package nc.isi.fragaria_adapter_rewrite.resources;
 
+import java.util.Collection;
 import java.util.Map;
 
 public class DataSourceProviderImpl implements DataSourceProvider {
@@ -12,6 +13,10 @@ public class DataSourceProviderImpl implements DataSourceProvider {
 	@Override
 	public Datasource provide(String key) {
 		return map.get(key);
+	}
+
+	public Collection<Datasource> datasources() {
+		return map.values();
 	}
 
 }
