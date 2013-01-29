@@ -86,7 +86,7 @@ public abstract class AbstractEntity implements Entity {
 	/**
 	 * do your initialization here with init(property, value)
 	 */
-	protected void init() {
+	private void init() {
 		if (getId() == null) {
 			writeProperty(ID, UUID.randomUUID().toString());
 			setState(State.NEW);
