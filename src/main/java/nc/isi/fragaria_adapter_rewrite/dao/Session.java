@@ -28,6 +28,8 @@ public interface Session {
 
 	<T extends Entity> T create(Class<T> entityClass);
 
+	<T extends Entity> T create(Class<T> entityClass, Object... params);
+
 	void delete(Entity... entity);
 
 	<T extends Entity> void delete(Collection<T> entity);

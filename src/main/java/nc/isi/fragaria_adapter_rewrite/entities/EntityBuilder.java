@@ -7,4 +7,9 @@ public interface EntityBuilder {
 
 	<E extends Entity> E build(Class<E> entityClass);
 
+	<E extends Entity> E build(Class<E> entityClass, Object... params);
+
+	<E extends Entity> E build(ObjectNode objectNode, Class<E> entityClass,
+			Object... params);
+
 }
