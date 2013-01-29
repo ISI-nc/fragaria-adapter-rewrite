@@ -117,7 +117,7 @@ public abstract class AbstractEntity implements Entity {
 					propertyType, propertyName, this));
 		}
 		T value = propertyType.cast(cache.get(propertyName));
-		if (Entity.class.isAssignableFrom(propertyType)) {
+		if (Entity.class.isAssignableFrom(propertyType) && value!=null) {
 			((Entity) value).setSession(session);
 		}
 		return value;
