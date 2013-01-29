@@ -107,13 +107,6 @@ public class TestQuery extends TestCase {
 			}
 
 			@Override
-			@JsonProperty("_id")
-			public void setId(String id) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
 			@JsonProperty("_rev")
 			public void setRev(String rev) {
 				// TODO Auto-generated method stub

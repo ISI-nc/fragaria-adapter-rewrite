@@ -12,6 +12,8 @@ import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 import nc.isi.fragaria_adapter_rewrite.services.ObjectMapperProvider;
 
+import org.apache.log4j.Logger;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -19,6 +21,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 
 public class ObjectResolverImpl implements ObjectResolver {
+	private static final Logger LOGGER = Logger
+			.getLogger(ObjectResolverImpl.class);
 	private final ObjectMapper objectMapper;
 
 	public ObjectResolverImpl(ObjectMapperProvider objectMapperProvider) {
@@ -42,6 +46,10 @@ public class ObjectResolverImpl implements ObjectResolver {
 				throw new RuntimeException(e);
 			}
 		} else {
+			if (propertyName.equals(Entity.ID)) {
+				entity.setCompletion(Completion.FULL);
+				return result;
+			}
 			if (entity.getCompletion() == Completion.FULL) {
 				return result;
 			}
@@ -59,6 +67,8 @@ public class ObjectResolverImpl implements ObjectResolver {
 
 	protected void completeFromDS(ObjectNode node, Entity entity) {
 		Class<? extends Entity> entityClass = entity.getClass();
+		if (entity.getId() == null)
+			return;
 		Entity fromDB = entity.getSession().getUnique(
 				new IdQuery<>(entityClass, entity.getId()));
 		EntityMetadata entityMetadata = entity.getMetadata();

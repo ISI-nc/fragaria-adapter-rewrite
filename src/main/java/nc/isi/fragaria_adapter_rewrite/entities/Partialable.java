@@ -16,9 +16,6 @@ public interface Partialable {
 	@JsonProperty("_rev")
 	String getRev();
 
-	@JsonProperty("_id")
-	void setId(String id);
-
 	@JsonProperty("_rev")
 	void setRev(String rev);
 

@@ -21,6 +21,8 @@ import nc.isi.fragaria_adapter_rewrite.exceptions.StateChangeException;
 import nc.isi.fragaria_adapter_rewrite.services.ObjectMapperProvider;
 import nc.isi.fragaria_adapter_rewrite.services.TapestryRegistry;
 
+import org.apache.log4j.Logger;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -36,6 +38,7 @@ import com.google.common.eventbus.EventBus;
  * 
  */
 public abstract class AbstractEntity implements Entity {
+	private static final Logger LOGGER = Logger.getLogger(AbstractEntity.class);
 
 	private enum Action {
 		READ("lire"), WRITE("écrire"), ADD("Ajouté"), REMOVE("enlevé");
@@ -61,7 +64,6 @@ public abstract class AbstractEntity implements Entity {
 	private State state = State.COMMITED;
 	private Completion completion = Completion.PARTIAL;
 	private Session session;
-	private final String tempId = UUID.randomUUID().toString();
 
 	public AbstractEntity() {
 		this(TapestryRegistry.INSTANCE.getRegistry()
@@ -69,6 +71,7 @@ public abstract class AbstractEntity implements Entity {
 				.createObjectNode(), TapestryRegistry.INSTANCE.getRegistry()
 				.getService(ObjectResolver.class), TapestryRegistry.INSTANCE
 				.getRegistry().getService(EntityMetadataFactory.class));
+		init();
 	}
 
 	public AbstractEntity(ObjectNode objectNode, ObjectResolver objectResolver,
@@ -77,6 +80,17 @@ public abstract class AbstractEntity implements Entity {
 		this.objectResolver = objectResolver;
 		this.entityMetadata = entityMetadataFactory.create(getClass());
 		this.types = initTypes();
+		init();
+	}
+
+	/**
+	 * do your initialization here with init(property, value)
+	 */
+	protected void init() {
+		if (getId() == null) {
+			writeProperty(ID, UUID.randomUUID().toString());
+			setState(State.NEW);
+		}
 	}
 
 	private List<String> initTypes() {
@@ -95,6 +109,8 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	protected <T> T readProperty(Class<T> propertyType, String propertyName) {
+		LOGGER.debug(String.format("read property : %s in %s", propertyName,
+				getClass()));
 		checkGlobalSanity(propertyName, Action.READ);
 		if (!cache.keySet().contains(propertyName)) {
 			cache.put(propertyName, objectResolver.resolve(objectNode,
@@ -110,6 +126,8 @@ public abstract class AbstractEntity implements Entity {
 	@SuppressWarnings("unchecked")
 	protected <T> Collection<T> readCollection(Class<T> collectionGenericType,
 			String collectionName) {
+		LOGGER.debug(String.format("read collection : %s in %s",
+				collectionName, getClass()));
 		checkGlobalSanity(collectionName, Action.READ);
 		if (!cache.containsKey(collectionName)) {
 			cache.put(collectionName, objectResolver.resolveCollection(
@@ -124,20 +142,23 @@ public abstract class AbstractEntity implements Entity {
 		return collection;
 	}
 
-	protected <T> Boolean addToCollection(String collectionName, T element,
+	protected <T> Boolean add(String collectionName, T element,
 			Class<T> collectionType) {
 		return modifyCollection(collectionName, element, collectionType,
 				Action.ADD);
 	}
 
-	protected <T> Boolean removeFromCollection(String collectionName,
-			T element, Class<T> collectionType) {
+	protected <T> Boolean remove(String collectionName, T element,
+			Class<T> collectionType) {
 		return modifyCollection(collectionName, element, collectionType,
 				Action.REMOVE);
 	}
 
 	protected <T> Boolean modifyCollection(String collectionName, T element,
 			Class<T> collectionType, Action action) {
+		LOGGER.debug(String.format("%s %s %s %s in %s", action, element,
+				action == Action.READ ? "from" : "to", collectionName,
+				getClass()));
 		Collection<T> collection = readCollection(collectionType,
 				collectionName);
 		boolean result = false;
@@ -156,6 +177,8 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	protected void writeProperty(String propertyName, Object value) {
+		LOGGER.debug(String.format("write %s in %s in %s", value, propertyName,
+				getClass()));
 		checkGlobalSanity(propertyName, Action.WRITE);
 		Object oldValue = cache.get(propertyName);
 		objectResolver.write(objectNode, propertyName, value, this);
@@ -168,6 +191,23 @@ public abstract class AbstractEntity implements Entity {
 		}
 	}
 
+	/**
+	 * La même chose que write mais seulement si la propriété est vide
+	 * 
+	 * @param propertyName
+	 * @param value
+	 */
+	protected void init(String propertyName, Object value) {
+		LOGGER.debug(String.format("init %s in %s in %s", value, propertyName,
+				getClass()));
+		if (readProperty(value.getClass(), propertyName) != null) {
+			writeProperty(propertyName, value);
+			LOGGER.debug(String.format("init completed"));
+		} else {
+			LOGGER.debug(String.format("no initialization required"));
+		}
+	}
+
 	@Override
 	public State getState() {
 		return this.state;
@@ -176,9 +216,6 @@ public abstract class AbstractEntity implements Entity {
 	@Override
 	public void setState(State state) {
 		checkChange(this.state, state);
-		if (state == State.NEW) {
-			setId(tempId);
-		}
 		this.state = state;
 	}
 
@@ -233,12 +270,6 @@ public abstract class AbstractEntity implements Entity {
 		return readProperty(String.class, ID);
 	}
 
-	@JsonProperty("_id")
-	public void setId(String id) {
-		writeProperty(ID, id);
-	}
-
-	@InView(GenericEmbedingViews.Id.class)
 	@JsonProperty("_rev")
 	public String getRev() {
 		return readProperty(String.class, REV);

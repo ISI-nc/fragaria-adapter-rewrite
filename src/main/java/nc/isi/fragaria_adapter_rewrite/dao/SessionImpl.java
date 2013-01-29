@@ -12,7 +12,6 @@ import java.util.UUID;
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManager;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
-import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 
 import com.google.common.collect.LinkedListMultimap;
@@ -85,8 +84,6 @@ public class SessionImpl implements Session {
 	@Override
 	public <T extends Entity> T create(Class<T> entityClass) {
 		T entity = entityBuilder.build(entityClass);
-		entity.setState(State.NEW);
-		entity.setCompletion(Completion.FULL);
 		entity.setSession(this);
 		register(entity, createdObjects);
 		return entity;
