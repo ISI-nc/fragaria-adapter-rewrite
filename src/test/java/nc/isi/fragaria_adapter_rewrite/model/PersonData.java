@@ -74,4 +74,9 @@ public class PersonData extends AbstractEntity {
 		writeProperty(CITY, city);
 	}
 
+	@Override
+	public String toString() {
+		return getId();
+	}
+
 }

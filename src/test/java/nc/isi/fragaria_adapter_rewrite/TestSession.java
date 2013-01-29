@@ -36,13 +36,20 @@ public class TestSession extends TestCase {
 		}
 
 		Session session = buildSession();
-		List<PersonData> listGet = new ArrayList<>(
-				session.get(new ByViewQuery<>(PersonData.class, null)));
+		Collection<PersonData> listGet = session.get(new ByViewQuery<>(
+				PersonData.class, null));
 		int nbBefore = listGet.size();
+		System.out.println(listGet);
+		System.out.println(nbBefore);
 		session.create(PersonData.class);
-		listGet = new ArrayList<>(session.get(new ByViewQuery<>(
-				PersonData.class, null)));
+		listGet = session.get(new ByViewQuery<>(PersonData.class, null));
 		int nbAfter = listGet.size();
+		System.out.println(listGet);
+		System.out.println(nbAfter);
+		for (PersonData personData : listGet) {
+			System.out.println(personData.getId() + " : "
+					+ personData.getState());
+		}
 		assertTrue(nbAfter == nbBefore + 1);
 	}
 

@@ -84,7 +84,6 @@ public class SessionImpl implements Session {
 	@Override
 	public <T extends Entity> T create(Class<T> entityClass) {
 		T entity = entityBuilder.build(entityClass);
-		sessionize(entity);
 		return sessionize(entity);
 	}
 

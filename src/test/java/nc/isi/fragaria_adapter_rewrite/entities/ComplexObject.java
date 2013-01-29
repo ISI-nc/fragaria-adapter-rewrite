@@ -1,9 +1,12 @@
 package nc.isi.fragaria_adapter_rewrite.entities;
 
+import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
+
 import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@DsKey("test")
 public class ComplexObject extends AbstractEntity {
 	private final String test;
 	private final DateTime creation;
