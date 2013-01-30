@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 import nc.isi.fragaria_adapter_rewrite.annotations.BackReference;
 import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
 import nc.isi.fragaria_adapter_rewrite.annotations.Embeded;
+import nc.isi.fragaria_adapter_rewrite.annotations.Final;
 import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.annotations.Partial;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews.Id;
@@ -86,8 +87,8 @@ public class EntityMetadata {
 
 	protected <T extends Annotation> T getPropertyAnnotation(
 			String propertyName, Class<T> annotation) {
-		return getPropertyDescriptor(propertyName).getReadMethod()
-				.getAnnotation(annotation);
+		return ReflectionUtils.getRecursivePropertyAnnotation(getEntityClass(),
+				annotation, propertyName);
 	}
 
 	public ImmutableSet<String> propertyNames() {
@@ -211,6 +212,10 @@ public class EntityMetadata {
 				| InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public boolean isFinal(String propertyName) {
+		return getPropertyAnnotation(propertyName, Final.class) != null;
 	}
 
 }

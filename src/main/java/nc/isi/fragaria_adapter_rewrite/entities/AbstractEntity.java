@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import nc.isi.fragaria_adapter_rewrite.annotations.Final;
 import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.dao.Session;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews;
@@ -188,19 +189,20 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	/**
-	 * La même chose que write mais seulement si la propriété est vide
+	 * La même chose que write mais seulement si la propriété est vide Lève une
+	 * {@link IllegalStateException} si la propriété a été annotée {@link Final}
 	 * 
 	 * @param propertyName
 	 * @param value
 	 */
-	protected Boolean init(String propertyName, Object value) {
+	protected void init(String propertyName, Object value) {
 		LOGGER.debug(String.format("init %s in %s in %s", value, propertyName,
 				getClass()));
-		if (readProperty(value.getClass(), propertyName) != null) {
+		if (readProperty(value.getClass(), propertyName) == null) {
 			writeProperty(propertyName, value);
-			return true;
 		} else {
-			return false;
+			checkState(!entityMetadata.isFinal(propertyName), "%s is not null",
+					propertyName);
 		}
 	}
 
