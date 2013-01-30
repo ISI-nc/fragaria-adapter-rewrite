@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
-import nc.isi.fragaria_adapter_rewrite.resources.ResourceFinder;
+import nc.isi.fragaria_reflection.services.ResourceFinder;
 
 import com.google.common.collect.Lists;
 

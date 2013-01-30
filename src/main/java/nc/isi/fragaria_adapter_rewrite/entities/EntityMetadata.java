@@ -19,7 +19,7 @@ import nc.isi.fragaria_adapter_rewrite.annotations.Partial;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews.Id;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericQueryViews.All;
 import nc.isi.fragaria_adapter_rewrite.entities.views.View;
-import nc.isi.fragaria_adapter_rewrite.utils.ReflectionUtils;
+import nc.isi.fragaria_reflection.utils.ReflectionUtils;
 
 import org.springframework.beans.BeanUtils;
 

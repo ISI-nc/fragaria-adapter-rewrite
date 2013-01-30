@@ -31,9 +31,8 @@ import nc.isi.fragaria_adapter_rewrite.resources.DataSourceProviderImpl;
 import nc.isi.fragaria_adapter_rewrite.resources.Datasource;
 import nc.isi.fragaria_adapter_rewrite.resources.MasterDsLoader;
 import nc.isi.fragaria_adapter_rewrite.resources.MasterDsLoaderImpl;
-import nc.isi.fragaria_adapter_rewrite.resources.ResourceFinder;
-import nc.isi.fragaria_adapter_rewrite.resources.ResourceFinderImpl;
 import nc.isi.fragaria_adapter_rewrite.utils.jackson.JacksonModule;
+import nc.isi.fragaria_reflection.services.FragariaReflectionModule;
 
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
@@ -46,7 +45,7 @@ import org.apache.tapestry5.ioc.annotations.SubModule;
  * @author justin
  * 
  */
-@SubModule(JacksonModule.class)
+@SubModule({ JacksonModule.class, FragariaReflectionModule.class })
 public class FragariaDomainModule {
 
 	public static void bind(ServiceBinder binder) {
@@ -58,9 +57,7 @@ public class FragariaDomainModule {
 		binder.bind(ObjectMapperProvider.class, ObjectMapperProviderImpl.class);
 		binder.bind(ObjectResolver.class, ObjectResolverImpl.class);
 		binder.bind(MasterDsLoader.class, MasterDsLoaderImpl.class);
-		binder.bind(ResourceFinder.class, ResourceFinderImpl.class);
 		binder.bind(DataSourceProvider.class, DataSourceProviderImpl.class);
-		binder.bind(ReflectionFactory.class, ReflectionFactoryImpl.class);
 		binder.bind(SessionManager.class, SessionManagerImpl.class);
 		binder.bind(QueryExecutorForCollection.class,
 				QueryExecutorForCollectionImpl.class);

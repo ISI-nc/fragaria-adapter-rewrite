@@ -4,7 +4,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
-import nc.isi.fragaria_adapter_rewrite.services.ReflectionFactory;
+import nc.isi.fragaria_reflection.services.ReflectionFactory;
 
 import org.apache.log4j.Logger;
 import org.reflections.Reflections;

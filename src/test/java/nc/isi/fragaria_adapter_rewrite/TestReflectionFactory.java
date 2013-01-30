@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.model.QaRegistry;
-import nc.isi.fragaria_adapter_rewrite.services.ReflectionFactory;
+import nc.isi.fragaria_reflection.services.ReflectionFactory;
 
 import org.junit.Test;
 import org.reflections.Reflections;
