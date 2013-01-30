@@ -4,8 +4,6 @@ import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
 
 import org.joda.time.DateTime;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 @DsKey("test")
 public class ComplexObject extends AbstractEntity {
 	private final String test;
@@ -13,11 +11,8 @@ public class ComplexObject extends AbstractEntity {
 	private final String a;
 	private final String b;
 
-	public ComplexObject(ObjectNode objectNode, ObjectResolver objectResolver,
-			EntityMetadataFactory entityMetadataFactory, String test,
-			DateTime creation, String a, String b) {
-
-		super(objectNode, objectResolver, entityMetadataFactory);
+	public ComplexObject(String test, DateTime creation, String a, String b) {
+		super();
 		this.test = test;
 		this.creation = creation;
 		this.a = a;

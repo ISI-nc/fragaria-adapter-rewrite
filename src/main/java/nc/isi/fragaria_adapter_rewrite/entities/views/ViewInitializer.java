@@ -3,6 +3,7 @@ package nc.isi.fragaria_adapter_rewrite.entities.views;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 
+import nc.isi.fragaria_adapter_rewrite.entities.AbstractEntity;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_reflection.services.ReflectionFactory;
 
@@ -25,8 +26,9 @@ public class ViewInitializer {
 	}
 
 	public void initialize() {
+		LOGGER.info("begin view initialization");
 		for (Class<? extends Entity> entityClass : reflections
-				.getSubTypesOf(Entity.class)) {
+				.getSubTypesOf(AbstractEntity.class)) {
 			if (Modifier.isAbstract(entityClass.getModifiers())
 					|| entityClass.isAnonymousClass()
 					|| entityClass.isInterface())

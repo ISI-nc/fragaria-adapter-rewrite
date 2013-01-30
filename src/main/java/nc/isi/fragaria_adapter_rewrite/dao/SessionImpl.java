@@ -66,7 +66,8 @@ public class SessionImpl implements Session {
 		if (cachedValue != null) {
 			entity = cachedValue;
 		}
-		changeSession(entity);
+		if (entity != null)
+			changeSession(entity);
 		return entity;
 	}
 

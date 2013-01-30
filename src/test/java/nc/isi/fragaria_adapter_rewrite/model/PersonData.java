@@ -7,11 +7,7 @@ import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
 import nc.isi.fragaria_adapter_rewrite.annotations.Embeded;
 import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.entities.AbstractEntity;
-import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactory;
-import nc.isi.fragaria_adapter_rewrite.entities.ObjectResolver;
 import nc.isi.fragaria_adapter_rewrite.model.CityViews.Name;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @DsKey("test")
 public class PersonData extends AbstractEntity {
@@ -21,11 +17,6 @@ public class PersonData extends AbstractEntity {
 	public static final String ADRESS = "adress";
 	public static final String CITIES = "cities";
 	public static final String CITY = "city";
-
-	public PersonData(ObjectNode objectNode, ObjectResolver objectResolver,
-			EntityMetadataFactory entityMetadataFactory) {
-		super(objectNode, objectResolver, entityMetadataFactory);
-	}
 
 	public PersonData() {
 		super();

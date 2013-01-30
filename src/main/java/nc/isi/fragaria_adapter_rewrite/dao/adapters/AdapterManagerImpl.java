@@ -76,6 +76,8 @@ public class AdapterManagerImpl implements AdapterManager {
 
 	protected <T extends Entity> void init(T entity, Query<T> query,
 			EntityMetadata entityMetadata) {
+		if (entity == null)
+			return;
 		if (query instanceof ByViewQuery) {
 			ByViewQuery<?> vQuery = ByViewQuery.class.cast(query);
 			if (vQuery.getView() == null) {

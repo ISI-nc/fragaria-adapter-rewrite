@@ -1,7 +1,6 @@
 package nc.isi.fragaria_adapter_rewrite.entities;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.beans.PropertyChangeEvent;
@@ -56,9 +55,12 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	private final ObjectNode objectNode;
-	private final ObjectResolver objectResolver;
+	private final ObjectResolver objectResolver = TapestryRegistry.INSTANCE
+			.getRegistry().getService(ObjectResolver.class);
 	private final Map<String, Object> cache = Maps.newHashMap();
-	private final EntityMetadata entityMetadata;
+	private final EntityMetadata entityMetadata = TapestryRegistry.INSTANCE
+			.getRegistry().getService(EntityMetadataFactory.class)
+			.create(getClass());
 	private final EventBus eventBus = new EventBus();
 	private final List<String> types;
 	private State state = State.COMMITED;
@@ -66,19 +68,13 @@ public abstract class AbstractEntity implements Entity {
 	private Session session;
 
 	public AbstractEntity() {
-		this(TapestryRegistry.INSTANCE.getRegistry()
-				.getService(ObjectMapperProvider.class).provide()
-				.createObjectNode(), TapestryRegistry.INSTANCE.getRegistry()
-				.getService(ObjectResolver.class), TapestryRegistry.INSTANCE
-				.getRegistry().getService(EntityMetadataFactory.class));
-		init();
+		this(null);
 	}
 
-	public AbstractEntity(ObjectNode objectNode, ObjectResolver objectResolver,
-			EntityMetadataFactory entityMetadataFactory) {
-		this.objectNode = checkNotNull(objectNode);
-		this.objectResolver = objectResolver;
-		this.entityMetadata = entityMetadataFactory.create(getClass());
+	public AbstractEntity(ObjectNode node) {
+		this.objectNode = node == null ? TapestryRegistry.INSTANCE
+				.getRegistry().getService(ObjectMapperProvider.class).provide()
+				.createObjectNode() : node;
 		this.types = initTypes();
 		init();
 	}
@@ -117,7 +113,7 @@ public abstract class AbstractEntity implements Entity {
 					propertyType, propertyName, this));
 		}
 		T value = propertyType.cast(cache.get(propertyName));
-		if (Entity.class.isAssignableFrom(propertyType) && value!=null) {
+		if (Entity.class.isAssignableFrom(propertyType) && value != null) {
 			((Entity) value).setSession(session);
 		}
 		return value;
@@ -197,14 +193,14 @@ public abstract class AbstractEntity implements Entity {
 	 * @param propertyName
 	 * @param value
 	 */
-	protected void init(String propertyName, Object value) {
+	protected Boolean init(String propertyName, Object value) {
 		LOGGER.debug(String.format("init %s in %s in %s", value, propertyName,
 				getClass()));
 		if (readProperty(value.getClass(), propertyName) != null) {
 			writeProperty(propertyName, value);
-			LOGGER.debug(String.format("init completed"));
+			return true;
 		} else {
-			LOGGER.debug(String.format("no initialization required"));
+			return false;
 		}
 	}
 

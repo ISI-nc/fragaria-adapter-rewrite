@@ -34,9 +34,11 @@ public class ViewGeneratorImpl implements ViewGenerator {
 		ViewConfig viewConfig = viewConfigProvider.provide(
 				entityMetadata.getEntityClass(), view, viewConfigBuilder);
 		if (exist(viewConfig, entityMetadata)) {
+			LOGGER.info("view already exists");
 			return;
 		}
 		build(viewConfig, entityMetadata);
+		LOGGER.info("view created");
 	}
 
 	protected void build(ViewConfig viewConfig, EntityMetadata entityMetadata) {
