@@ -40,8 +40,4 @@ public interface Session {
 
 	UUID getId();
 
-	<T extends Entity> void changeSession(Collection<T> entities);
-
-	void changeSession(Entity... entities);
-
 }

@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import nc.isi.fragaria_adapter_rewrite.annotations.BackReference;
+import nc.isi.fragaria_adapter_rewrite.annotations.CollectionType;
 import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
 import nc.isi.fragaria_adapter_rewrite.annotations.Embeded;
 import nc.isi.fragaria_adapter_rewrite.annotations.Final;
@@ -52,6 +53,13 @@ public class EntityMetadata {
 
 	public EntityMetadata(Class<? extends Entity> entityClass) {
 		this.entityClass = entityClass;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public Class<? extends Collection> getCollectionType(String propertyName) {
+		CollectionType collectionType = getPropertyAnnotation(propertyName,
+				CollectionType.class);
+		return collectionType != null ? collectionType.value() : null;
 	}
 
 	public String getDsKey() {

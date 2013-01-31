@@ -39,9 +39,13 @@ public class ObjectResolverImpl implements ObjectResolver {
 		T result = null;
 		if (node.has(entity.metadata().getJsonPropertyName(propertyName))) {
 			try {
-				return objectMapper.treeToValue(
+				T o = objectMapper.treeToValue(
 						node.get(entity.metadata().getJsonPropertyName(
 								propertyName)), propertyType);
+				if (o instanceof Entity && ((Entity) o).getSession() == null) {
+					((Entity) o).attributeSession(entity.getSession());
+				}
+				return o;
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -98,7 +102,11 @@ public class ObjectResolverImpl implements ObjectResolver {
 					.getJsonPropertyName(propertyName));
 			try {
 				for (JsonNode jsonNode : arrayNode) {
-					result.add(objectMapper.treeToValue(jsonNode, propertyType));
+					T temp = objectMapper.treeToValue(jsonNode, propertyType);
+					if (temp instanceof Entity) {
+						((Entity) temp).attributeSession(entity.getSession());
+					}
+					result.add(temp);
 				}
 				return result;
 			} catch (IOException e) {

@@ -101,7 +101,7 @@ public class TestQuery extends TestCase {
 			}
 
 			@Override
-			public void setSession(Session session) {
+			public void attributeSession(Session session) {
 				// TODO Auto-generated method stub
 
 			}

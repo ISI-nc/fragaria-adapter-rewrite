@@ -37,6 +37,6 @@ public interface Entity extends Serializable, Partialable {
 	@JsonIgnore
 	Session getSession();
 
-	void setSession(Session session);
+	void attributeSession(Session session);
 
 }

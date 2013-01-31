@@ -1,6 +1,7 @@
 package nc.isi.fragaria_adapter_rewrite.entities;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.beans.PropertyChangeEvent;
@@ -115,7 +116,7 @@ public abstract class AbstractEntity implements Entity {
 		}
 		T value = propertyType.cast(cache.get(propertyName));
 		if (Entity.class.isAssignableFrom(propertyType) && value != null) {
-			((Entity) value).setSession(session);
+			((Entity) value).attributeSession(session);
 		}
 		return value;
 	}
@@ -130,17 +131,12 @@ public abstract class AbstractEntity implements Entity {
 			cache.put(collectionName, objectResolver.resolveCollection(
 					objectNode, collectionGenericType, collectionName, this));
 		}
-		Collection<T> collection = (Collection<T>) cache.get(collectionName);
-		if (Entity.class.isAssignableFrom(collectionGenericType)) {
-			for (T o : collection) {
-				((Entity) o).setSession(session);
-			}
-		}
-		return collection;
+		return (Collection<T>) cache.get(collectionName);
 	}
 
 	protected <T> Boolean add(String collectionName, T element,
 			Class<T> collectionType) {
+		checkSessionSanity(collectionName, element);
 		return modifyCollection(collectionName, element, collectionType,
 				Action.ADD);
 	}
@@ -174,6 +170,7 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	protected void writeProperty(String propertyName, Object value) {
+		checkSessionSanity(propertyName, value);
 		LOGGER.debug(String.format("write %s in %s in %s", value, propertyName,
 				getClass()));
 		checkGlobalSanity(propertyName, Action.WRITE);
@@ -262,6 +259,35 @@ public abstract class AbstractEntity implements Entity {
 				propertyName, getClass());
 	}
 
+	@SuppressWarnings("unchecked")
+	protected void checkSessionSanity(String propertyName, Object o) {
+		if (o == null) {
+			return;
+		}
+		if (!Entity.class.isAssignableFrom(o.getClass())) {
+			if (!Collection.class.isAssignableFrom(o.getClass()))
+				return;
+			Class<?> parameterType = entityMetadata
+					.propertyParameterClasses(propertyName)[0];
+			if (!Entity.class.isAssignableFrom(parameterType))
+				return;
+			Collection<? extends Entity> col = (Collection<? extends Entity>) o;
+			for (Entity e : col) {
+				checkSessionSanity(propertyName, e);
+				return;
+			}
+		}
+		Entity entity = (Entity) o;
+		if (getSession().equals(entity.getSession())) {
+			return;
+		}
+		if (entity.getState() == State.COMMITED) {
+			return;
+		}
+		throw new IllegalArgumentException(
+				"Only entities from same session or in state COMMITED can be added");
+	}
+
 	@InView(GenericEmbedingViews.Id.class)
 	@JsonProperty("_id")
 	public String getId() {
@@ -293,16 +319,11 @@ public abstract class AbstractEntity implements Entity {
 	 * comme listener de l'entité et supprime la session précédente des listener
 	 */
 	@Override
-	public void setSession(Session session) {
-		if (Objects.equal(this.session, session))
-			return;
-		if (this.session != null) {
-			unregisterListener(this.session);
-		}
+	public void attributeSession(Session session) {
+		checkState(this.session == null, "session has already been set");
+		checkNotNull(session, "session may not be null");
 		this.session = session;
-		if (session != null) {
-			registerListener(session);
-		}
+		registerListener(session);
 	}
 
 	@Override

@@ -64,10 +64,12 @@ public class SessionImpl implements Session {
 		T entity = adapterManager.executeUniqueQuery(query).getResponse();
 		T cachedValue = getRegisteredValue(entity);
 		if (cachedValue != null) {
+			System.out.println("was registered");
 			entity = cachedValue;
-		}
-		if (entity != null)
+		} else if (entity != null) {
 			changeSession(entity);
+		}
+		System.out.println(entity);
 		return entity;
 	}
 
@@ -95,7 +97,7 @@ public class SessionImpl implements Session {
 	}
 
 	protected <T extends Entity> T sessionize(T entity) {
-		entity.setSession(this);
+		changeSession(entity);
 		register(entity, createdObjects);
 		return entity;
 	}
@@ -134,10 +136,10 @@ public class SessionImpl implements Session {
 	@Subscribe
 	public void recordPropertyChange(PropertyChangeEvent e) {
 		Entity entity = (Entity) e.getSource();
-		entity.setState(State.MODIFIED);
 		if (isRegistered(entity, deletedObjects)) {
 			commitError(entity, entity.getState(), State.DELETED);
 		}
+		entity.setState(State.MODIFIED);
 		register(entity, isRegistered(entity, createdObjects) ? createdObjects
 				: updatedObjects);
 	}
@@ -186,9 +188,9 @@ public class SessionImpl implements Session {
 		return map.containsValue(entity);
 	}
 
-	public <T extends Entity> void changeSession(Collection<T> entities) {
+	private <T extends Entity> void changeSession(Collection<T> entities) {
 		for (T entity : entities) {
-			entity.setSession(this);
+			entity.attributeSession(this);
 		}
 	}
 
