@@ -159,9 +159,9 @@ public class ObjectResolverImpl implements ObjectResolver {
 		if (value != null) {
 			Class<? extends View> view = entity.metadata().getEmbeded(
 					propertyName);
-			if (view == null)
-				return;
 			if (isEntity(value)) {
+				if (view == null)
+					return;
 				Entity property = Entity.class.cast(value);
 				node.put(entity.metadata().getJsonPropertyName(propertyName),
 						getJson(property, view));
@@ -171,6 +171,8 @@ public class ObjectResolverImpl implements ObjectResolver {
 				Class<?> propertyType = entity.metadata()
 						.propertyParameterClasses(propertyName)[0];
 				if (isEntity(propertyType)) {
+					if (view == null)
+						return;
 					Collection<? extends Entity> collection = Collection.class
 							.cast(value);
 					ArrayNode array = objectMapper.createArrayNode();
@@ -182,9 +184,11 @@ public class ObjectResolverImpl implements ObjectResolver {
 					return;
 				}
 			}
+			node.put(entity.metadata().getJsonPropertyName(propertyName),
+					objectMapper.valueToTree(value));
+		} else {
+			node.remove(propertyName);
 		}
-		node.put(entity.metadata().getJsonPropertyName(propertyName),
-				objectMapper.valueToTree(value));
 	}
 
 	private ObjectNode getJson(Entity entity, Class<? extends View> view) {

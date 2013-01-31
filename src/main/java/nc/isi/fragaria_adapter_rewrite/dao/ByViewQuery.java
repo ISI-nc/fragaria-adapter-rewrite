@@ -18,11 +18,6 @@ import com.mysema.query.types.Predicate;
  * ViewQueryImpl predicate est prévu pour être utilisé via un {@link Alias} sans
  * spécification du path construit via {@code alias(Class<T> cl)}
  * 
- * La view devra avoir été créée dans la datasource //TODO: Générer les vues en
- * fonction des datasources et de critères prédéfinis
- * 
- * La fonction {@code filterBy()} sera utilisée sur la requête, chaque
- * {@link Entry} sera ajouté comme un and à la whereClause
  * 
  * Le predicate sera appliqué au résultat de la requête
  * 

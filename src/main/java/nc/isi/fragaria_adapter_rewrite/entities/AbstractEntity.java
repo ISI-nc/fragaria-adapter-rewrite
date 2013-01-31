@@ -329,7 +329,7 @@ public abstract class AbstractEntity implements Entity {
 		if (!getClass().isAssignableFrom(obj.getClass())) {
 			return false;
 		}
-		AbstractEntity entity = AbstractEntity.class.cast(obj);
+		Entity entity = Entity.class.cast(obj);
 		return Objects.equal(this.getId(), entity.getId());
 	}
 
