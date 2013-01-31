@@ -96,7 +96,7 @@ public abstract class AbstractEntity implements Entity {
 				.getSuperclass()) {
 			tempTypes.addLast(type.getName());
 		}
-		objectResolver.write(objectNode, TYPES, tempTypes, this);
+		writeProperty(TYPES, tempTypes);
 		return tempTypes;
 	}
 
@@ -279,7 +279,7 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	@Override
-	public EntityMetadata getMetadata() {
+	public EntityMetadata metadata() {
 		return entityMetadata;
 	}
 

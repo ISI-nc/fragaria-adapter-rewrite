@@ -119,7 +119,7 @@ public class AdapterManagerImpl implements AdapterManager {
 	}
 
 	protected String getDsType(Entity entity) {
-		return getDsType(entity.getMetadata());
+		return getDsType(entity.metadata());
 	}
 
 	protected String getDsType(EntityMetadata entityMetadata) {

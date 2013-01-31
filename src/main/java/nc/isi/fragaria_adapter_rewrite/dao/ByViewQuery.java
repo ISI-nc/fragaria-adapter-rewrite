@@ -95,4 +95,14 @@ public class ByViewQuery<T extends Entity> extends AbstractQuery<T> {
 		checkNotNull(predicate);
 	}
 
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("for class : " + getResultType() + "\n");
+		sb.append("with view : " + getView() + "\n");
+		sb.append("where filter : " + getFilter() + "\n");
+		sb.append("and predicate : " + getPredicate());
+		return sb.toString();
+	}
+
 }

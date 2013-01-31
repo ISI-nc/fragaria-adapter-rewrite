@@ -37,10 +37,10 @@ public class ObjectResolverImpl implements ObjectResolver {
 		checkNotNull(propertyName);
 		checkNotNull(entity);
 		T result = null;
-		if (node.has(entity.getMetadata().getJsonPropertyName(propertyName))) {
+		if (node.has(entity.metadata().getJsonPropertyName(propertyName))) {
 			try {
 				return objectMapper.treeToValue(
-						node.get(entity.getMetadata().getJsonPropertyName(
+						node.get(entity.metadata().getJsonPropertyName(
 								propertyName)), propertyType);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
@@ -71,25 +71,30 @@ public class ObjectResolverImpl implements ObjectResolver {
 			return;
 		Entity fromDB = entity.getSession().getUnique(
 				new IdQuery<>(entityClass, entity.getId()));
-		EntityMetadata entityMetadata = entity.getMetadata();
+		EntityMetadata entityMetadata = entity.metadata();
 		for (String propertyName : entityMetadata.propertyNames()) {
 			if (node.has(entityMetadata.getJsonPropertyName(propertyName))) {
 				continue;
 			}
-			if (entity.getMetadata().canWrite(propertyName)) {
-				entity.getMetadata().write(entity, propertyName,
-						entity.getMetadata().read(fromDB, propertyName));
+			if (entity.metadata().canWrite(propertyName)) {
+				entity.metadata().write(entity, propertyName,
+						entity.metadata().read(fromDB, propertyName));
 			}
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> Collection<T> resolveCollection(ObjectNode node,
 			Class<T> propertyType, String propertyName, Entity entity) {
 		checkParametersNotNull(node, propertyType, propertyName, entity);
 		Collection<T> result = Lists.newArrayList();
-		if (node.has(entity.getMetadata().getJsonPropertyName(propertyName))) {
-			ArrayNode arrayNode = (ArrayNode) node.get(entity.getMetadata()
+		LOGGER.debug(String.format(
+				"resolve collection for entity %s with property %s ", entity,
+				propertyName));
+		if (node.has(entity.metadata().getJsonPropertyName(propertyName))) {
+			LOGGER.debug("is in node");
+			ArrayNode arrayNode = (ArrayNode) node.get(entity.metadata()
 					.getJsonPropertyName(propertyName));
 			try {
 				for (JsonNode jsonNode : arrayNode) {
@@ -100,19 +105,21 @@ public class ObjectResolverImpl implements ObjectResolver {
 				throw new RuntimeException(e);
 			}
 		} else {
-			if (entity.getCompletion() == Completion.FULL) {
-				if (entity.getMetadata().getEmbeded(propertyName) != null
+			if (entity.getCompletion() != Completion.FULL) {
+				LOGGER.debug("is incomplete");
+				if (entity.metadata().getEmbeded(propertyName) != null
 						|| !isEntity(propertyType)) {
 					return result;
 				}
 				Class<? extends Entity> propertyEntity = propertyType
 						.asSubclass(Entity.class);
-				if (entity.getMetadata().canWrite(propertyName)) {
-					entity.getMetadata().write(
-							entity,
-							propertyName,
-							getListByBackReference(propertyName, entity,
-									propertyEntity));
+				if (entity.metadata().canWrite(propertyName)) {
+					result = (Collection<T>) getListByBackReference(
+							propertyName, entity, propertyEntity);
+					entity.metadata().write(entity, propertyName, result);
+					return result;
+				} else {
+					throw new NoWriteMethodFoundException(entity, propertyName);
 				}
 			} else {
 				if (entity.getCompletion() == Completion.FULL) {
@@ -121,6 +128,7 @@ public class ObjectResolverImpl implements ObjectResolver {
 				complete(node, entity);
 			}
 			return resolveCollection(node, propertyType, propertyName, entity);
+
 		}
 	}
 
@@ -128,10 +136,9 @@ public class ObjectResolverImpl implements ObjectResolver {
 			String propertyName, Entity entity,
 			Class<? extends Entity> propertyEntity) {
 		return entity.getSession().get(
-				new ByViewQuery<>(propertyEntity, entity.getMetadata()
-						.getPartial(propertyName)).filterBy(entity
-						.getMetadata().getBackReference(propertyName), entity
-						.getId()));
+				new ByViewQuery<>(propertyEntity, entity.metadata().getPartial(
+						propertyName)).filterBy(entity.metadata()
+						.getBackReference(propertyName), entity.getId()));
 	}
 
 	protected void checkParametersNotNull(Object... objects) {
@@ -148,36 +155,35 @@ public class ObjectResolverImpl implements ObjectResolver {
 	@Override
 	public void write(ObjectNode node, String propertyName, Object value,
 			Entity entity) {
-		checkParametersNotNull(node, value, propertyName, entity);
+		checkParametersNotNull(node, propertyName, entity);
 		if (value != null) {
+			Class<? extends View> view = entity.metadata().getEmbeded(
+					propertyName);
+			if (view == null)
+				return;
 			if (isEntity(value)) {
-				Class<? extends View> view = entity.getMetadata().getEmbeded(
-						propertyName);
 				Entity property = Entity.class.cast(value);
-				node.put(
-						entity.getMetadata().getJsonPropertyName(propertyName),
+				node.put(entity.metadata().getJsonPropertyName(propertyName),
 						getJson(property, view));
 				return;
 			}
 			if (Collection.class.isAssignableFrom(value.getClass())) {
-				Class<?> propertyType = entity.getMetadata()
+				Class<?> propertyType = entity.metadata()
 						.propertyParameterClasses(propertyName)[0];
 				if (isEntity(propertyType)) {
 					Collection<? extends Entity> collection = Collection.class
 							.cast(value);
 					ArrayNode array = objectMapper.createArrayNode();
 					for (Entity temp : collection) {
-						array.add(getJson(temp, entity.getMetadata()
-								.getEmbeded(propertyName)));
+						array.add(getJson(temp, view));
 					}
-					node.put(
-							entity.getMetadata().getJsonPropertyName(
-									propertyName), array);
+					node.put(entity.metadata()
+							.getJsonPropertyName(propertyName), array);
 					return;
 				}
 			}
 		}
-		node.put(entity.getMetadata().getJsonPropertyName(propertyName),
+		node.put(entity.metadata().getJsonPropertyName(propertyName),
 				objectMapper.valueToTree(value));
 	}
 
@@ -189,10 +195,10 @@ public class ObjectResolverImpl implements ObjectResolver {
 			Entity entity) {
 		checkParametersNotNull(node, view, entity);
 		ObjectNode copy = objectMapper.createObjectNode();
-		for (String property : entity.getMetadata().propertyNames(view)) {
-			JsonNode value = objectMapper.valueToTree(entity.getMetadata()
-					.read(entity, property));
-			copy.put(entity.getMetadata().getJsonPropertyName(property), value);
+		for (String property : entity.metadata().propertyNames(view)) {
+			JsonNode value = objectMapper.valueToTree(entity.metadata().read(
+					entity, property));
+			copy.put(entity.metadata().getJsonPropertyName(property), value);
 		}
 		return copy;
 	}

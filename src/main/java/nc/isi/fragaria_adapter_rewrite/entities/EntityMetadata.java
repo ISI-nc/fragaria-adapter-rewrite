@@ -17,7 +17,6 @@ import nc.isi.fragaria_adapter_rewrite.annotations.Embeded;
 import nc.isi.fragaria_adapter_rewrite.annotations.Final;
 import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.annotations.Partial;
-import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews.Id;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericQueryViews.All;
 import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 import nc.isi.fragaria_reflection.utils.ReflectionUtils;
@@ -66,8 +65,7 @@ public class EntityMetadata {
 
 	public Class<? extends View> getEmbeded(String propertyName) {
 		Embeded embeded = getPropertyAnnotation(propertyName, Embeded.class);
-		return embeded != null ? embeded.value() : Entity.class
-				.isAssignableFrom(propertyType(propertyName)) ? Id.class : null;
+		return embeded != null ? embeded.value() : null;
 	}
 
 	public Class<? extends View> getPartial(String propertyName) {

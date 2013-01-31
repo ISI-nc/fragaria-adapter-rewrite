@@ -83,7 +83,7 @@ public class TestQuery extends TestCase {
 			}
 
 			@Override
-			public EntityMetadata getMetadata() {
+			public EntityMetadata metadata() {
 				// TODO Auto-generated method stub
 				return null;
 			}

@@ -9,6 +9,8 @@ import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.entities.AbstractEntity;
 import nc.isi.fragaria_adapter_rewrite.model.CityViews.Name;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 @DsKey("test")
 public class PersonData extends AbstractEntity {
 
@@ -20,6 +22,10 @@ public class PersonData extends AbstractEntity {
 
 	public PersonData() {
 		super();
+	}
+
+	public PersonData(ObjectNode node) {
+		super(node);
 	}
 
 	@InView(Name.class)

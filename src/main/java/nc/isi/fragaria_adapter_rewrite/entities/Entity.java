@@ -32,7 +32,7 @@ public interface Entity extends Serializable, Partialable {
 	void unregisterListener(Object listener);
 
 	@JsonIgnore
-	EntityMetadata getMetadata();
+	EntityMetadata metadata();
 
 	@JsonIgnore
 	Session getSession();
