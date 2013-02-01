@@ -19,8 +19,6 @@ import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 import nc.isi.fragaria_adapter_rewrite.exceptions.StateChangeException;
-import nc.isi.fragaria_adapter_rewrite.services.ObjectMapperProvider;
-import nc.isi.fragaria_adapter_rewrite.services.TapestryRegistry;
 
 import org.apache.log4j.Logger;
 
@@ -38,7 +36,7 @@ import com.google.common.eventbus.EventBus;
  * @author jmaltat
  * 
  */
-public abstract class AbstractEntity implements Entity {
+public abstract class AbstractEntity extends ObjectNodeWrapper {
 	private static final Logger LOGGER = Logger.getLogger(AbstractEntity.class);
 
 	private enum Action {
@@ -56,13 +54,8 @@ public abstract class AbstractEntity implements Entity {
 		}
 	}
 
-	private final ObjectNode objectNode;
-	private final ObjectResolver objectResolver = TapestryRegistry.INSTANCE
-			.getRegistry().getService(ObjectResolver.class);
 	private final Map<String, Object> cache = Maps.newHashMap();
-	private final EntityMetadata entityMetadata = TapestryRegistry.INSTANCE
-			.getRegistry().getService(EntityMetadataFactory.class)
-			.create(getClass());
+	private EntityMetadata entityMetadata = new EntityMetadata(getClass());
 	private final EventBus eventBus = new EventBus();
 	private final List<String> types;
 	private State state = State.COMMITED;
@@ -70,13 +63,13 @@ public abstract class AbstractEntity implements Entity {
 	private Session session;
 
 	public AbstractEntity() {
-		this(null);
+		super();
+		this.types = initTypes();
+		init();
 	}
 
 	public AbstractEntity(ObjectNode node) {
-		this.objectNode = node == null ? TapestryRegistry.INSTANCE
-				.getRegistry().getService(ObjectMapperProvider.class).provide()
-				.createObjectNode() : node;
+		super(node);
 		this.types = initTypes();
 		init();
 	}
@@ -101,18 +94,12 @@ public abstract class AbstractEntity implements Entity {
 		return tempTypes;
 	}
 
-	@Override
-	public ObjectNode toJSON() {
-		return objectNode.deepCopy();
-	}
-
-	protected <T> T readProperty(Class<T> propertyType, String propertyName) {
+	public <T> T readProperty(Class<T> propertyType, String propertyName) {
 		LOGGER.debug(String.format("read property : %s in %s", propertyName,
 				getClass()));
 		checkGlobalSanity(propertyName, Action.READ);
 		if (!cache.keySet().contains(propertyName)) {
-			cache.put(propertyName, objectResolver.resolve(objectNode,
-					propertyType, propertyName, this));
+			cache.put(propertyName, resolve(propertyType, propertyName));
 		}
 		T value = propertyType.cast(cache.get(propertyName));
 		if (Entity.class.isAssignableFrom(propertyType) && value != null) {
@@ -122,14 +109,14 @@ public abstract class AbstractEntity implements Entity {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected <T> Collection<T> readCollection(Class<T> collectionGenericType,
+	public <T> Collection<T> readCollection(Class<T> collectionGenericType,
 			String collectionName) {
 		LOGGER.debug(String.format("read collection : %s in %s",
 				collectionName, getClass()));
 		checkGlobalSanity(collectionName, Action.READ);
 		if (!cache.containsKey(collectionName)) {
-			cache.put(collectionName, objectResolver.resolveCollection(
-					objectNode, collectionGenericType, collectionName, this));
+			cache.put(collectionName,
+					resolveCollection(collectionGenericType, collectionName));
 		}
 		return (Collection<T>) cache.get(collectionName);
 	}
@@ -169,13 +156,13 @@ public abstract class AbstractEntity implements Entity {
 		return result;
 	}
 
-	protected void writeProperty(String propertyName, Object value) {
+	public void writeProperty(String propertyName, Object value) {
 		checkSessionSanity(propertyName, value);
 		LOGGER.debug(String.format("write %s in %s in %s", value, propertyName,
 				getClass()));
 		checkGlobalSanity(propertyName, Action.WRITE);
 		Object oldValue = cache.get(propertyName);
-		objectResolver.write(objectNode, propertyName, value, this);
+		write(propertyName, value);
 		cache.put(propertyName, value);
 		PropertyChangeEvent propertyChangeEvent = new PropertyChangeEvent(this,
 				propertyName, oldValue, value);
@@ -276,6 +263,7 @@ public abstract class AbstractEntity implements Entity {
 				checkSessionSanity(propertyName, e);
 				return;
 			}
+			return;
 		}
 		Entity entity = (Entity) o;
 		if (getSession().equals(entity.getSession())) {
@@ -328,7 +316,7 @@ public abstract class AbstractEntity implements Entity {
 
 	@Override
 	public ObjectNode toJSON(Class<? extends View> view) {
-		return objectResolver.clone(objectNode, view, this);
+		return clone(view);
 	}
 
 	@Override

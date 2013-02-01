@@ -45,4 +45,13 @@ public final class IdQuery<T extends Entity> extends AbstractQuery<T> {
 		return id;
 	}
 
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("for class : " + getResultType() + "\n");
+		sb.append("with id: " + getId() + "\n");
+		sb.append("where rev : " + getRev() + "\n");
+		return sb.toString();
+	}
+
 }

@@ -7,14 +7,8 @@ import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 
-public class EntityBeanDeserializerModifier extends
-		BeanDeserializerModifier {
-	private final EntityJsonDeserializerFactory entityJsonDeserializerFactory;
-
-	public EntityBeanDeserializerModifier(
-			EntityJsonDeserializerFactory entityJsonDeserializerFactory) {
-		this.entityJsonDeserializerFactory = entityJsonDeserializerFactory;
-	}
+public class EntityBeanDeserializerModifier extends BeanDeserializerModifier {
+	private final EntityJsonDeserializerFactory entityJsonDeserializerFactory = new EntityJsonDeserializerFactoryImpl();
 
 	/*
 	 * (non-Javadoc)

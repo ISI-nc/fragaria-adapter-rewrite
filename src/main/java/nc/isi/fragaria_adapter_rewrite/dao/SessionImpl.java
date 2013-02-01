@@ -63,13 +63,13 @@ public class SessionImpl implements Session {
 	public <T extends Entity> T getUnique(Query<T> query) {
 		T entity = adapterManager.executeUniqueQuery(query).getResponse();
 		T cachedValue = getRegisteredValue(entity);
+		System.out.println("cachedValue : " + cachedValue);
 		if (cachedValue != null) {
 			System.out.println("was registered");
 			entity = cachedValue;
 		} else if (entity != null) {
 			changeSession(entity);
 		}
-		System.out.println(entity);
 		return entity;
 	}
 

@@ -2,7 +2,6 @@ package nc.isi.fragaria_adapter_rewrite.entities.views;
 
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
-import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactory;
 import nc.isi.fragaria_adapter_rewrite.resources.DataSourceProvider;
 import nc.isi.fragaria_adapter_rewrite.resources.Datasource;
 
@@ -12,23 +11,20 @@ public class ViewGeneratorManagerImpl implements ViewGeneratorManager {
 	private static final Logger LOGGER = Logger
 			.getLogger(ViewGeneratorManagerImpl.class);
 	private final ViewGenerator viewGenerator;
-	private final EntityMetadataFactory entityMetadataFactory;
 	private final DataSourceProvider dataSourceProvider;
 	private final ViewConfigBuilderProvider viewConfigBuilderProvider;
 
 	public ViewGeneratorManagerImpl(ViewGenerator viewGenerator,
-			EntityMetadataFactory entityMetadataFactory,
 			DataSourceProvider dataSourceProvider,
 			ViewConfigBuilderProvider viewConfigBuilderProvider) {
 		this.viewGenerator = viewGenerator;
-		this.entityMetadataFactory = entityMetadataFactory;
 		this.dataSourceProvider = dataSourceProvider;
 		this.viewConfigBuilderProvider = viewConfigBuilderProvider;
 	}
 
 	@Override
 	public void generate(Class<? extends Entity> entityClass) {
-		generate(entityMetadataFactory.create(entityClass));
+		generate(new EntityMetadata(entityClass));
 	}
 
 	@Override

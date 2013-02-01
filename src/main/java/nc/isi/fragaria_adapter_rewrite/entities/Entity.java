@@ -1,6 +1,7 @@
 package nc.isi.fragaria_adapter_rewrite.entities;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 import nc.isi.fragaria_adapter_rewrite.dao.Session;
@@ -38,5 +39,12 @@ public interface Entity extends Serializable, Partialable {
 	Session getSession();
 
 	void attributeSession(Session session);
+
+	void writeProperty(String propertyName, Object value);
+
+	<T> T readProperty(Class<T> propertyType, String propertyName);
+
+	<T> Collection<T> readCollection(Class<T> collectionGenericType,
+			String collectionName);
 
 }

@@ -7,11 +7,9 @@ public class EntityJacksonModule extends Module {
 	private final EntityBeanDeserializerModifier entityBeanDeserializerModifier;
 	private final EntitySerializers entitySerializers;
 
-	public EntityJacksonModule(
-			EntityBeanDeserializerModifier entityBeanDeserializerModifier,
-			EntitySerializers entitySerializers) {
-		this.entityBeanDeserializerModifier = entityBeanDeserializerModifier;
-		this.entitySerializers = entitySerializers;
+	public EntityJacksonModule() {
+		this.entityBeanDeserializerModifier = new EntityBeanDeserializerModifier();
+		this.entitySerializers = new EntitySerializers();
 	}
 
 	@Override

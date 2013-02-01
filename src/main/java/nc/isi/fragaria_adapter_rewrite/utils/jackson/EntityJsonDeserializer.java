@@ -1,22 +1,25 @@
 package nc.isi.fragaria_adapter_rewrite.utils.jackson;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
-import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
+
+import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Throwables;
 
 public class EntityJsonDeserializer<T extends Entity> extends
 		JsonDeserializer<T> {
-	private final EntityBuilder entityBuilder;
+	private static final Logger LOGGER = Logger
+			.getLogger(EntityJsonDeserializer.class);
 	private final Class<T> type;
 
-	public EntityJsonDeserializer(EntityBuilder entityBuilder, Class<T> type) {
-		this.entityBuilder = entityBuilder;
+	public EntityJsonDeserializer(Class<T> type) {
 		this.type = type;
 	}
 
@@ -31,8 +34,17 @@ public class EntityJsonDeserializer<T extends Entity> extends
 	@Override
 	public T deserialize(JsonParser jp, DeserializationContext ctxt)
 			throws IOException {
+		LOGGER.info("deserialize : " + type);
 		ObjectNode objectNode = jp.readValueAsTree();
-		return entityBuilder.build(objectNode, type);
+		LOGGER.info("deserialized : " + type + " in : " + objectNode.toString());
+		try {
+			return type.getConstructor(ObjectNode.class)
+					.newInstance(objectNode);
+		} catch (InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			throw Throwables.propagate(e);
+		}
 	}
 
 }

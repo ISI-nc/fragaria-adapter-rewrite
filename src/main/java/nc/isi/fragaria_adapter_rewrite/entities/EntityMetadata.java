@@ -34,6 +34,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 public class EntityMetadata {
+	private static final String ID_TOKEN = "._id";
 	private final Class<? extends Entity> entityClass;
 	private ImmutableSet<String> propertyNames;
 	private LoadingCache<String, PropertyDescriptor> cache = CacheBuilder
@@ -84,11 +85,9 @@ public class EntityMetadata {
 	public String getBackReference(String propertyName) {
 		BackReference reference = getPropertyAnnotation(propertyName,
 				BackReference.class);
-		return reference != null ? (reference.value().equals(
-				BackReference.DEFAULT) ? entityClass.getSimpleName()
-				.substring(0, 1).toLowerCase()
-				+ entityClass.getSimpleName().substring(1) : reference.value())
-				: null;
+		return reference != null ? reference.value() : entityClass
+				.getSimpleName().substring(0, 1).toLowerCase()
+				+ entityClass.getSimpleName().substring(1);
 	}
 
 	protected <T extends Annotation> T getPropertyAnnotation(

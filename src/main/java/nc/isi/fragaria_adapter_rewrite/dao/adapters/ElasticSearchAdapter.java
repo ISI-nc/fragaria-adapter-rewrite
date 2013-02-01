@@ -11,7 +11,6 @@ import nc.isi.fragaria_adapter_rewrite.dao.SearchQuery;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
-import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactory;
 import nc.isi.fragaria_adapter_rewrite.services.ObjectMapperProvider;
 
 import org.elasticsearch.action.search.SearchResponse;
@@ -27,15 +26,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ElasticSearchAdapter {
 	private final TransportClient transportClient;
-	private final EntityMetadataFactory entityMetadataFactory;
 	private final ObjectMapper objectMapper;
 	private final EntityBuilder entityBuilder;
 
-	public ElasticSearchAdapter(EntityMetadataFactory entityMetadataFactory,
-			ObjectMapperProvider objectMapperProvider,
+	public ElasticSearchAdapter(ObjectMapperProvider objectMapperProvider,
 			EntityBuilder entityBuilder) {
 		this.objectMapper = objectMapperProvider.provide();
-		this.entityMetadataFactory = entityMetadataFactory;
 		this.entityBuilder = entityBuilder;
 		Settings settings = ImmutableSettings.settingsBuilder()
 				.put("cluster.name", "test").build();
@@ -69,8 +65,8 @@ public class ElasticSearchAdapter {
 
 	private <T extends Entity> SearchResponse search(
 			final SearchQuery<T> searchQuery) {
-		EntityMetadata entityMetadata = entityMetadataFactory
-				.create(searchQuery.getResultType());
+		EntityMetadata entityMetadata = new EntityMetadata(
+				searchQuery.getResultType());
 		return transportClient.prepareSearch(entityMetadata.getDsKey())
 				.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
 				.setQuery(searchQuery.getQueryBuilder()).execute().actionGet();

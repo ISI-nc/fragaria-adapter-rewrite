@@ -17,9 +17,8 @@ import nc.isi.fragaria_adapter_rewrite.entities.views.GenericQueryViews.All;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface BackReference {
-	String DEFAULT = "";
 
-	String value() default DEFAULT;
+	String value();
 
 	Partial partial() default @Partial(All.class);
 }

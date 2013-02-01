@@ -11,10 +11,6 @@ import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManagerImpl;
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.ElasticSearchAdapter;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilderImpl;
-import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactory;
-import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactoryImpl;
-import nc.isi.fragaria_adapter_rewrite.entities.ObjectResolver;
-import nc.isi.fragaria_adapter_rewrite.entities.ObjectResolverImpl;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigBuilderProvider;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigBuilderProviderImpl;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigProvider;
@@ -52,10 +48,7 @@ public class FragariaDomainModule {
 		binder.bind(AdapterManager.class, AdapterManagerImpl.class);
 		binder.bind(ElasticSearchAdapter.class);
 		binder.bind(EntityBuilder.class, EntityBuilderImpl.class);
-		binder.bind(EntityMetadataFactory.class,
-				EntityMetadataFactoryImpl.class);
 		binder.bind(ObjectMapperProvider.class, ObjectMapperProviderImpl.class);
-		binder.bind(ObjectResolver.class, ObjectResolverImpl.class);
 		binder.bind(MasterDsLoader.class, MasterDsLoaderImpl.class);
 		binder.bind(DataSourceProvider.class, DataSourceProviderImpl.class);
 		binder.bind(SessionManager.class, SessionManagerImpl.class);

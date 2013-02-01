@@ -6,11 +6,11 @@ import java.util.Map;
 
 import nc.isi.fragaria_adapter_rewrite.dao.ByViewQuery;
 import nc.isi.fragaria_adapter_rewrite.dao.CollectionQueryResponse;
+import nc.isi.fragaria_adapter_rewrite.dao.IdQuery;
 import nc.isi.fragaria_adapter_rewrite.dao.Query;
 import nc.isi.fragaria_adapter_rewrite.dao.UniqueQueryResponse;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
-import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadataFactory;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfig;
 import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
@@ -23,16 +23,13 @@ import com.google.common.collect.LinkedListMultimap;
 public class AdapterManagerImpl implements AdapterManager {
 	private final Map<String, Adapter> adapters;
 	private final DataSourceProvider dataSourceProvider;
-	private final EntityMetadataFactory entityMetadataFactory;
 	private static final Logger LOGGER = Logger
 			.getLogger(AdapterManagerImpl.class);
 
 	public AdapterManagerImpl(DataSourceProvider dataSourceProvider,
-			EntityMetadataFactory entityMetadataFactory,
 			Map<String, Adapter> adapters) {
 		this.adapters = adapters;
 		this.dataSourceProvider = dataSourceProvider;
-		this.entityMetadataFactory = entityMetadataFactory;
 	}
 
 	private Adapter getAdapter(EntityMetadata entityMetadata) {
@@ -42,8 +39,7 @@ public class AdapterManagerImpl implements AdapterManager {
 	}
 
 	private Adapter getAdapter(Class<? extends Entity> entityClass) {
-		EntityMetadata entityMetadata = entityMetadataFactory
-				.create(entityClass);
+		EntityMetadata entityMetadata = new EntityMetadata(entityClass);
 		return getAdapter(entityMetadata);
 	}
 
@@ -51,8 +47,8 @@ public class AdapterManagerImpl implements AdapterManager {
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 			Query<T> query) {
 		LOGGER.info("executing collection query : " + query);
-		EntityMetadata entityMetadata = entityMetadataFactory.create(query
-				.getResultType());
+		EntityMetadata entityMetadata = new EntityMetadata(
+				query.getResultType());
 		CollectionQueryResponse<T> queryResponse = getAdapter(entityMetadata)
 				.executeQuery(query);
 		CollectionQueryResponse<T> collectionQueryResponse = (CollectionQueryResponse<T>) queryResponse;
@@ -66,8 +62,8 @@ public class AdapterManagerImpl implements AdapterManager {
 	public <T extends Entity> UniqueQueryResponse<T> executeUniqueQuery(
 			Query<T> query) {
 		LOGGER.info("executing unique query : " + query);
-		EntityMetadata entityMetadata = entityMetadataFactory.create(query
-				.getResultType());
+		EntityMetadata entityMetadata = new EntityMetadata(
+				query.getResultType());
 		UniqueQueryResponse<T> queryResponse = getAdapter(entityMetadata)
 				.executeUniqueQuery(query);
 		init(queryResponse.getResponse(), query, entityMetadata);
@@ -82,15 +78,16 @@ public class AdapterManagerImpl implements AdapterManager {
 			ByViewQuery<?> vQuery = ByViewQuery.class.cast(query);
 			if (vQuery.getView() == null) {
 				entity.setCompletion(Completion.FULL);
-				return;
 			}
 			if (entityMetadata.propertyNames(vQuery.getView()).containsAll(
 					entityMetadata.propertyNames())) {
 				entity.setCompletion(Completion.FULL);
-				return;
 			}
+		} else if (query instanceof IdQuery) {
+			entity.setCompletion(Completion.FULL);
+		} else {
+			entity.setCompletion(Completion.PARTIAL);
 		}
-		entity.setCompletion(Completion.PARTIAL);
 		entity.setState(State.COMMITED);
 	}
 
@@ -140,13 +137,13 @@ public class AdapterManagerImpl implements AdapterManager {
 	@Override
 	public Boolean exist(ViewConfig viewConfig,
 			Class<? extends Entity> entityClass) {
-		return exist(viewConfig, entityMetadataFactory.create(entityClass));
+		return exist(viewConfig, new EntityMetadata(entityClass));
 	}
 
 	@Override
 	public void buildView(ViewConfig viewConfig,
 			Class<? extends Entity> entityClass) {
-		buildView(viewConfig, entityMetadataFactory.create(entityClass));
+		buildView(viewConfig, new EntityMetadata(entityClass));
 	}
 
 }
