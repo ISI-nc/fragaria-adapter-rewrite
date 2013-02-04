@@ -206,9 +206,10 @@ public class EntityMetadata {
 	}
 
 	public Object read(Entity entity, String propertyName) {
-		System.out
-				.println(String.format("read %s in %s", propertyName, entity));
+//		System.out
+//				.println(String.format("read %s in %s", propertyName, entity));
 		try {
+			System.out.println(propertyName);
 			return getPropertyDescriptor(propertyName).getReadMethod().invoke(
 					entity, (Object[]) null);
 		} catch (IllegalAccessException | IllegalArgumentException
