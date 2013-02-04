@@ -281,7 +281,6 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		return readProperty(String.class, REV);
 	}
 
-	@JsonProperty("_rev")
 	public void setRev(String rev) {
 		writeProperty(REV, rev);
 	}
