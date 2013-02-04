@@ -175,8 +175,6 @@ public class SessionImpl implements Session {
 	protected <T extends Entity> T sessionize(T entity) {
 		changeSession(entity);
 		register(entity, createdObjects);
-		LOGGER.debug(String.format("register %s in %s", entity,
-				"createdObjects"));
 		return entity;
 	}
 
@@ -217,8 +215,6 @@ public class SessionImpl implements Session {
 		if (isRegistered(entity, deletedObjects)) {
 			commitError(entity, entity.getState(), State.DELETED);
 		}
-		LOGGER.debug(String.format("register %s in %s", entity, entity
-				.getState() == State.NEW ? "createdObjects" : "updatedObjects"));
 		if (entity.getState() == State.NEW) {
 			register(entity, createdObjects);
 			return;
@@ -255,6 +251,8 @@ public class SessionImpl implements Session {
 	 */
 	protected <T extends Entity> void register(T entity,
 			Multimap<Class<? extends Entity>, Entity> map) {
+		LOGGER.info(String.format("register %s in %s", entity, entity
+				.getState() == State.NEW ? "createdObjects" : "updatedObjects"));
 		map.put(entity.getClass(), entity);
 		queue.add(entity);
 	}
@@ -273,7 +271,9 @@ public class SessionImpl implements Session {
 
 	private <T extends Entity> void changeSession(Collection<T> entities) {
 		for (T entity : entities) {
-			entity.attributeSession(this);
+			if (entity.getSession() == null) {
+				entity.attributeSession(this);
+			}
 		}
 	}
 

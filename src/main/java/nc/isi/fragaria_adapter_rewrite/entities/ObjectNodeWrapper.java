@@ -198,7 +198,12 @@ public abstract class ObjectNodeWrapper implements Entity {
 
 	@Override
 	public ObjectNode toJSON() {
-		if (getSession() != null) {
+		return toJSON(Completion.PARTIAL);
+	}
+
+	@Override
+	public ObjectNode toJSON(Completion completion) {
+		if (getSession() != null && completion == Completion.FULL) {
 			for (String property : metadata().propertyNames()) {
 				metadata().read(this, property);
 			}
@@ -210,7 +215,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 		return view == null ? entity.toJSON() : entity.toJSON(view);
 	}
 
-	public ObjectNode clone(Class<? extends View> view) {
+	public ObjectNode toJSON(Class<? extends View> view) {
 		checkParametersNotNull(view);
 		ObjectNode copy = objectMapper.createObjectNode();
 		for (String property : metadata().propertyNames(view)) {

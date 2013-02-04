@@ -15,7 +15,6 @@ import nc.isi.fragaria_adapter_rewrite.annotations.Final;
 import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.dao.Session;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews;
-import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 import nc.isi.fragaria_adapter_rewrite.exceptions.StateChangeException;
@@ -307,11 +306,6 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		checkNotNull(session, "session may not be null");
 		this.session = session;
 		registerListener(session);
-	}
-
-	@Override
-	public ObjectNode toJSON(Class<? extends View> view) {
-		return clone(view);
 	}
 
 	@Override

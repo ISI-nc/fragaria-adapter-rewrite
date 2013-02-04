@@ -23,6 +23,7 @@ import nc.isi.fragaria_adapter_rewrite.entities.views.GenericQueryViews.All;
 import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 import nc.isi.fragaria_reflection.utils.ReflectionUtils;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,6 +36,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 public class EntityMetadata {
+	private static final Logger LOGGER = Logger.getLogger(EntityMetadata.class);
 	private static final Collection<String> excludedProperties = Arrays
 			.asList("class");
 	private static final String ID_TOKEN = "._id";
@@ -206,8 +208,7 @@ public class EntityMetadata {
 	}
 
 	public Object read(Entity entity, String propertyName) {
-		System.out
-				.println(String.format("read %s in %s", propertyName, entity));
+		LOGGER.debug(String.format("read %s in %s", propertyName, entity));
 		try {
 			return getPropertyDescriptor(propertyName).getReadMethod().invoke(
 					entity, (Object[]) null);
