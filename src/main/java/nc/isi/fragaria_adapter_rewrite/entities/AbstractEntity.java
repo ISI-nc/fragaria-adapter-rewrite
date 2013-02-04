@@ -73,7 +73,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 	}
 
 	private List<String> initTypes() {
-		System.out.println("initializing types");
+		LOGGER.debug("initializing types");
 		LinkedList<String> tempTypes = new LinkedList<>();
 		for (Class<?> type = getClass(); Entity.class.isAssignableFrom(type); type = type
 				.getSuperclass()) {
@@ -268,10 +268,13 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 	@InView(GenericEmbedingViews.Id.class)
 	@JsonProperty("_id")
 	public String getId() {
-		if (readProperty(String.class, ID) == null) {
+		String id = readProperty(String.class, ID);
+		if (id == null) {
+			state = State.NEW;
 			writeProperty(ID, UUID.randomUUID().toString());
+			return getId();
 		}
-		return readProperty(String.class, ID);
+		return id;
 	}
 
 	@JsonProperty("_rev")
