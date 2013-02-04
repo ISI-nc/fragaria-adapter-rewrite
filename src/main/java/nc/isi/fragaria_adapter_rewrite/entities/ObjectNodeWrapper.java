@@ -81,7 +81,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 	protected void completeFromDS() {
 		Class<? extends Entity> entityClass = getClass();
 		Entity fromDB = getSession().getUnique(
-				new IdQuery<>(entityClass, getId()));
+				new IdQuery<>(entityClass, getId()), false);
 		LOGGER.debug(String.format("fromDB completion %s",
 				fromDB.getCompletion()));
 		EntityMetadata entityMetadata = metadata();
@@ -198,8 +198,10 @@ public abstract class ObjectNodeWrapper implements Entity {
 
 	@Override
 	public ObjectNode toJSON() {
-		for (String property : metadata().propertyNames()) {
-			metadata().read(this, property);
+		if (getSession() != null) {
+			for (String property : metadata().propertyNames()) {
+				metadata().read(this, property);
+			}
 		}
 		return node.deepCopy();
 	}

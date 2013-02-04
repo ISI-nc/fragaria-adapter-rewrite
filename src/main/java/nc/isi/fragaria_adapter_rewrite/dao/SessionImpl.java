@@ -2,11 +2,15 @@ package nc.isi.fragaria_adapter_rewrite.dao;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static com.mysema.query.alias.Alias.$;
+import static com.mysema.query.alias.Alias.alias;
+import static com.mysema.query.collections.MiniApi.from;
 
 import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManager;
@@ -16,10 +20,16 @@ import nc.isi.fragaria_adapter_rewrite.enums.State;
 
 import org.apache.log4j.Logger;
 
-import com.google.common.collect.LinkedListMultimap;
+import com.google.common.base.CaseFormat;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.eventbus.Subscribe;
+import com.mysema.query.BooleanBuilder;
+import com.mysema.query.support.Expressions;
+import com.mysema.query.types.Ops;
+import com.mysema.query.types.Predicate;
+import com.mysema.query.types.path.PathBuilder;
 
 public class SessionImpl implements Session {
 	private static final Logger LOGGER = Logger.getLogger(SessionImpl.class);
@@ -29,14 +39,14 @@ public class SessionImpl implements Session {
 
 	private final List<Entity> queue = Lists.newLinkedList();
 
-	private final LinkedListMultimap<Class<? extends Entity>, Entity> createdObjects = LinkedListMultimap
+	private final HashMultimap<Class<? extends Entity>, Entity> createdObjects = HashMultimap
 			.create();
-	private final LinkedListMultimap<Class<? extends Entity>, Entity> deletedObjects = LinkedListMultimap
+	private final HashMultimap<Class<? extends Entity>, Entity> deletedObjects = HashMultimap
 			.create();
-	private final LinkedListMultimap<Class<? extends Entity>, Entity> updatedObjects = LinkedListMultimap
+	private final HashMultimap<Class<? extends Entity>, Entity> updatedObjects = HashMultimap
 			.create();
 	@SuppressWarnings("unchecked")
-	private final LinkedListMultimap<Class<? extends Entity>, Entity>[] caches = new LinkedListMultimap[] {
+	private final HashMultimap<Class<? extends Entity>, Entity>[] caches = new HashMultimap[] {
 			createdObjects, deletedObjects, updatedObjects };
 
 	public SessionImpl(AdapterManager adapterManager,
@@ -47,41 +57,104 @@ public class SessionImpl implements Session {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Entity> Collection<T> get(Query<T> query) {
+	public <T extends Entity> Collection<T> get(Query<T> query, boolean cache) {
 		CollectionQueryResponse<T> response = (CollectionQueryResponse<T>) adapterManager
 				.executeQuery(query);
 		Collection<T> objects = response.getResponse();
-		Class<T> entityClass = query.getResultType();
-		objects.addAll((Collection<T>) createdObjects.get(entityClass));
-		objects.removeAll(deletedObjects.get(entityClass));
-		for (T o : (Collection<T>) updatedObjects.get(entityClass)) {
-			objects.remove(o);
-			objects.add(o);
+		LOGGER.debug(String.format("list without cache : %s", objects));
+		if (cache) {
+			Class<T> entityClass = query.getResultType();
+			objects.addAll((Collection<T>) createdObjects.get(entityClass));
+			objects.removeAll(deletedObjects.get(entityClass));
+			for (T o : (Collection<T>) updatedObjects.get(entityClass)) {
+				objects.remove(o);
+				objects.add(o);
+			}
+			LOGGER.debug(String.format("list after cache : %s", objects));
 		}
 		changeSession(objects);
 		return objects;
 	}
 
 	@Override
-	public <T extends Entity> T getUnique(Query<T> query) {
+	public <T extends Entity> Collection<T> get(Query<T> query) {
+		return get(query, true);
+	}
+
+	@Override
+	public <T extends Entity> T getUnique(Query<T> query, boolean cache) {
 		T entity = adapterManager.executeUniqueQuery(query).getResponse();
-		T cachedValue = getRegisteredValue(entity);
-		LOGGER.debug("cachedValue : " + cachedValue);
-		if (cachedValue != null) {
-			LOGGER.debug("was registered");
-			entity = cachedValue;
-		} else if (entity != null) {
+		if (cache) {
+			T cachedValue = entity != null ? getRegisteredValue(entity)
+					: findCachedValue(query);
+			LOGGER.debug("cachedValue : " + cachedValue);
+			if (cachedValue != null) {
+				LOGGER.debug("was registered");
+				entity = cachedValue;
+			}
+		}
+		if (entity != null && entity.getSession() == null) {
 			changeSession(entity);
 		}
 		return entity;
 	}
 
+	@Override
+	public <T extends Entity> T getUnique(Query<T> query) {
+		return getUnique(query, true);
+	}
+
+	private <T extends Entity> T findCachedValue(Query<T> query) {
+		Collection<T> cachedValues = getValuesFromCache(query.getResultType());
+		LOGGER.debug(String.format("cachedValues %s : ", cachedValues));
+		if (query instanceof IdQuery) {
+			T entity = alias(query.getResultType());
+			return from($(entity), cachedValues).where(
+					$(entity.getId()).eq(((IdQuery<T>) query).getId()))
+					.uniqueResult($(entity));
+		}
+		if (query instanceof ByViewQuery) {
+			T entity = alias(query.getResultType());
+			return from($(entity), cachedValues).where(
+					buildFullPredicate((ByViewQuery<T>) query)).uniqueResult(
+					$(entity));
+		}
+		return null;
+	}
+
+	private Predicate buildFullPredicate(ByViewQuery<?> query) {
+		BooleanBuilder booleanBuilder = new BooleanBuilder();
+		for (Entry<String, Object> entry : query.getFilter().entrySet()) {
+			booleanBuilder.and(createPredicate(query.getResultType(),
+					entry.getKey(), entry.getValue()));
+		}
+		return booleanBuilder.and(query.getPredicate());
+	}
+
+	protected Predicate createPredicate(Class<?> type, String key, Object value) {
+		checkNotNull(key);
+		PathBuilder<?> entityPath = new PathBuilder<>(type,
+				CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL,
+						type.getSimpleName()));
+		return Expressions.predicate(Ops.EQ, entityPath.get(key),
+				value == null ? null : Expressions.constant(value));
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T extends Entity> Collection<T> getValuesFromCache(Class<T> type) {
+		Collection<T> cachedValue = Lists.newArrayList();
+		for (HashMultimap<Class<? extends Entity>, Entity> cache : caches) {
+			cachedValue.addAll((Collection<? extends T>) cache.get(type));
+		}
+		return cachedValue;
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T extends Entity> T getRegisteredValue(T entity) {
-		for (LinkedListMultimap<Class<? extends Entity>, Entity> cache : caches) {
-			if (isRegistered(entity, cache)) {
-				return (T) cache.get(entity.getClass()).get(
-						cache.get(entity.getClass()).indexOf(entity));
+		for (HashMultimap<Class<? extends Entity>, Entity> cache : caches) {
+			for (Entity result : cache.get(entity.getClass())) {
+				if (result.equals(entity))
+					return (T) result;
 			}
 		}
 		return null;
@@ -102,6 +175,8 @@ public class SessionImpl implements Session {
 	protected <T extends Entity> T sessionize(T entity) {
 		changeSession(entity);
 		register(entity, createdObjects);
+		LOGGER.debug(String.format("register %s in %s", entity,
+				"createdObjects"));
 		return entity;
 	}
 
@@ -142,10 +217,14 @@ public class SessionImpl implements Session {
 		if (isRegistered(entity, deletedObjects)) {
 			commitError(entity, entity.getState(), State.DELETED);
 		}
-		if (entity.getState() != State.NEW)
-			entity.setState(State.MODIFIED);
-		register(entity, isRegistered(entity, createdObjects) ? createdObjects
-				: updatedObjects);
+		LOGGER.debug(String.format("register %s in %s", entity, entity
+				.getState() == State.NEW ? "createdObjects" : "updatedObjects"));
+		if (entity.getState() == State.NEW) {
+			register(entity, createdObjects);
+			return;
+		}
+		entity.setState(State.MODIFIED);
+		register(entity, updatedObjects);
 	}
 
 	@Override

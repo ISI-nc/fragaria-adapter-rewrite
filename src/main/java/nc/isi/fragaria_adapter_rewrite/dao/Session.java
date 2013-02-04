@@ -22,7 +22,11 @@ import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 
 public interface Session {
 
+	<T extends Entity> Collection<T> get(Query<T> query, boolean cache);
+
 	<T extends Entity> Collection<T> get(Query<T> query);
+
+	<T extends Entity> T getUnique(Query<T> query, boolean cache);
 
 	<T extends Entity> T getUnique(Query<T> query);
 
