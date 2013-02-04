@@ -14,12 +14,15 @@ import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 
+import org.apache.log4j.Logger;
+
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.eventbus.Subscribe;
 
 public class SessionImpl implements Session {
+	private static final Logger LOGGER = Logger.getLogger(SessionImpl.class);
 	private final AdapterManager adapterManager;
 	private final UUID id = UUID.randomUUID();
 	private final EntityBuilder entityBuilder;
@@ -63,9 +66,9 @@ public class SessionImpl implements Session {
 	public <T extends Entity> T getUnique(Query<T> query) {
 		T entity = adapterManager.executeUniqueQuery(query).getResponse();
 		T cachedValue = getRegisteredValue(entity);
-		System.out.println("cachedValue : " + cachedValue);
+		LOGGER.debug("cachedValue : " + cachedValue);
 		if (cachedValue != null) {
-			System.out.println("was registered");
+			LOGGER.debug("was registered");
 			entity = cachedValue;
 		} else if (entity != null) {
 			changeSession(entity);
@@ -139,7 +142,8 @@ public class SessionImpl implements Session {
 		if (isRegistered(entity, deletedObjects)) {
 			commitError(entity, entity.getState(), State.DELETED);
 		}
-		entity.setState(State.MODIFIED);
+		if (entity.getState() != State.NEW)
+			entity.setState(State.MODIFIED);
 		register(entity, isRegistered(entity, createdObjects) ? createdObjects
 				: updatedObjects);
 	}

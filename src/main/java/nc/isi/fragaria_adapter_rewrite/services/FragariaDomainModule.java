@@ -11,6 +11,7 @@ import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManagerImpl;
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.ElasticSearchAdapter;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilderImpl;
+import nc.isi.fragaria_adapter_rewrite.entities.FragariaObjectMapperContributor;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigBuilderProvider;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigBuilderProviderImpl;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigProvider;
@@ -27,13 +28,18 @@ import nc.isi.fragaria_adapter_rewrite.resources.DataSourceProviderImpl;
 import nc.isi.fragaria_adapter_rewrite.resources.Datasource;
 import nc.isi.fragaria_adapter_rewrite.resources.MasterDsLoader;
 import nc.isi.fragaria_adapter_rewrite.resources.MasterDsLoaderImpl;
+import nc.isi.fragaria_adapter_rewrite.utils.jackson.EntityJacksonModule;
 import nc.isi.fragaria_adapter_rewrite.utils.jackson.JacksonModule;
 import nc.isi.fragaria_reflection.services.FragariaReflectionModule;
 
+import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Startup;
 import org.apache.tapestry5.ioc.annotations.SubModule;
+
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 /**
  * Le module Tapestry pour gérer l'ioc
@@ -62,6 +68,7 @@ public class FragariaDomainModule {
 		binder.bind(ViewConfigProvider.class, ViewConfigProviderImpl.class);
 		binder.bind(ViewGeneratorManager.class, ViewGeneratorManagerImpl.class);
 		binder.bind(ViewGenerator.class, ViewGeneratorImpl.class);
+		binder.bind(FragariaObjectMapperContributor.class);
 	}
 
 	public void contributeDataSourceProvider(
@@ -73,9 +80,17 @@ public class FragariaDomainModule {
 		}
 	}
 
+	public void contributeFragariaObjectMapperContributor(
+			Configuration<Module> configuration) {
+		configuration.add(new EntityJacksonModule());
+		configuration.add(new JodaModule());
+	}
+
 	@Startup
-	public void initializeViews(ViewInitializer viewInitializer) {
+	public void initializeViews(ViewInitializer viewInitializer,
+			FragariaObjectMapperContributor fragariaObjectMapperContributor) {
 		viewInitializer.initialize();
+		fragariaObjectMapperContributor.initialiaze();
 	}
 
 }

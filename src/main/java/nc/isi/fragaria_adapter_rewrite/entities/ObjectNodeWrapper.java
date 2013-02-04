@@ -70,7 +70,9 @@ public abstract class ObjectNodeWrapper implements Entity {
 	}
 
 	private void complete() {
-		if (this.getState() != State.NEW) {
+		LOGGER.debug(String
+				.format("complete %s for id %s", getClass(), getId()));
+		if (getState() != State.NEW) {
 			completeFromDS();
 		}
 		this.setCompletion(Completion.FULL);
@@ -78,30 +80,21 @@ public abstract class ObjectNodeWrapper implements Entity {
 
 	protected void completeFromDS() {
 		Class<? extends Entity> entityClass = getClass();
-		if (getId() == null)
-			return;
 		Entity fromDB = getSession().getUnique(
 				new IdQuery<>(entityClass, getId()));
+		LOGGER.debug(String.format("fromDB completion %s",
+				fromDB.getCompletion()));
 		EntityMetadata entityMetadata = metadata();
 		for (String propertyName : entityMetadata.propertyNames()) {
 			if (node.has(entityMetadata.getJsonPropertyName(propertyName))) {
 				continue;
 			}
-			if (isNotEmbededList(propertyName)) {
+			if (metadata().isNotEmbededList(propertyName)) {
 				continue;
 			}
 			Class<?> propertyType = metadata().propertyType(propertyName);
-			writeProperty(propertyName,
-					fromDB.readProperty(propertyType, propertyName));
+			write(propertyName, fromDB.readProperty(propertyType, propertyName));
 		}
-	}
-
-	private boolean isNotEmbededList(String propertyName) {
-		Class<?> propertyType = metadata().propertyType(propertyName);
-		return Collection.class.isAssignableFrom(propertyType)
-				&& Entity.class.isAssignableFrom(metadata()
-						.propertyParameterClasses(propertyName)[0])
-				&& metadata().getEmbeded(propertyName) == null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -129,12 +122,13 @@ public abstract class ObjectNodeWrapper implements Entity {
 				throw new RuntimeException(e);
 			}
 		} else {
-			if (isNotEmbededList(propertyName)) {
+			if (metadata().isNotEmbededList(propertyName)) {
 				Class<? extends Entity> propertyEntity = propertyType
 						.asSubclass(Entity.class);
 				result = (Collection<T>) getListByBackReference(propertyName,
 						propertyEntity);
 				writeProperty(propertyName, result);
+				complete();
 				return result;
 			} else {
 				if (this.getCompletion() == Completion.FULL) {
@@ -168,7 +162,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 	@SuppressWarnings("unchecked")
 	protected void write(String propertyName, Object value) {
 		checkParametersNotNull(propertyName);
-		if (isNotEmbededList(propertyName))
+		if (metadata().isNotEmbededList(propertyName))
 			return;
 		if (value != null) {
 			Class<? extends View> view = metadata().getEmbeded(propertyName);
@@ -204,6 +198,9 @@ public abstract class ObjectNodeWrapper implements Entity {
 
 	@Override
 	public ObjectNode toJSON() {
+		for (String property : metadata().propertyNames()) {
+			metadata().read(this, property);
+		}
 		return node.deepCopy();
 	}
 
@@ -214,10 +211,10 @@ public abstract class ObjectNodeWrapper implements Entity {
 	public ObjectNode clone(Class<? extends View> view) {
 		checkParametersNotNull(view);
 		ObjectNode copy = objectMapper.createObjectNode();
-		for (String property : this.metadata().propertyNames(view)) {
-			JsonNode value = objectMapper.valueToTree(this.metadata().read(
-					this, property));
-			copy.put(this.metadata().getJsonPropertyName(property), value);
+		for (String property : metadata().propertyNames(view)) {
+			JsonNode value = objectMapper.valueToTree(metadata().read(this,
+					property));
+			copy.put(metadata().getJsonPropertyName(property), value);
 		}
 		return copy;
 	}

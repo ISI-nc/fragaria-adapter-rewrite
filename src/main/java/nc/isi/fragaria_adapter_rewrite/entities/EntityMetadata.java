@@ -7,6 +7,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -34,6 +35,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 public class EntityMetadata {
+	private static final Collection<String> excludedProperties = Arrays
+			.asList("class");
 	private static final String ID_TOKEN = "._id";
 	private final Class<? extends Entity> entityClass;
 	private ImmutableSet<String> propertyNames;
@@ -54,6 +57,14 @@ public class EntityMetadata {
 
 	public EntityMetadata(Class<? extends Entity> entityClass) {
 		this.entityClass = entityClass;
+	}
+
+	public boolean isNotEmbededList(String propertyName) {
+		Class<?> propertyType = propertyType(propertyName);
+		return Collection.class.isAssignableFrom(propertyType)
+				&& Entity.class
+						.isAssignableFrom(propertyParameterClasses(propertyName)[0])
+				&& getEmbeded(propertyName) == null;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -195,6 +206,8 @@ public class EntityMetadata {
 	}
 
 	public Object read(Entity entity, String propertyName) {
+		System.out
+				.println(String.format("read %s in %s", propertyName, entity));
 		try {
 			return getPropertyDescriptor(propertyName).getReadMethod().invoke(
 					entity, (Object[]) null);

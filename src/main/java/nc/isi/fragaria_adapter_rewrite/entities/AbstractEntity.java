@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 
@@ -57,40 +58,29 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 	private final Map<String, Object> cache = Maps.newHashMap();
 	private EntityMetadata entityMetadata = new EntityMetadata(getClass());
 	private final EventBus eventBus = new EventBus();
-	private final List<String> types;
 	private State state = State.COMMITED;
 	private Completion completion = Completion.PARTIAL;
 	private Session session;
+	private boolean typesInitialized = false;
 
 	public AbstractEntity() {
 		super();
-		this.types = initTypes();
-		init();
+		state = State.NEW;
 	}
 
 	public AbstractEntity(ObjectNode node) {
 		super(node);
-		this.types = initTypes();
-		init();
-	}
-
-	/**
-	 * do your initialization here with init(property, value)
-	 */
-	private void init() {
-		if (getId() == null) {
-			writeProperty(ID, UUID.randomUUID().toString());
-			setState(State.NEW);
-		}
 	}
 
 	private List<String> initTypes() {
+		System.out.println("initializing types");
 		LinkedList<String> tempTypes = new LinkedList<>();
 		for (Class<?> type = getClass(); Entity.class.isAssignableFrom(type); type = type
 				.getSuperclass()) {
 			tempTypes.addLast(type.getName());
 		}
 		writeProperty(TYPES, tempTypes);
+		typesInitialized = true;
 		return tempTypes;
 	}
 
@@ -101,11 +91,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		if (!cache.keySet().contains(propertyName)) {
 			cache.put(propertyName, resolve(propertyType, propertyName));
 		}
-		T value = propertyType.cast(cache.get(propertyName));
-		if (Entity.class.isAssignableFrom(propertyType) && value != null) {
-			((Entity) value).attributeSession(session);
-		}
-		return value;
+		return propertyType.cast(cache.get(propertyName));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -201,17 +187,20 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		this.state = state;
 	}
 
-	private void checkChange(State oldState, State newSate) {
+	private void checkChange(State oldState, State newState) {
 		if (oldState == State.DELETED
-				|| (oldState == State.MODIFIED && newSate == State.NEW)) {
-			throw new StateChangeException(oldState, newSate);
+				|| (oldState == State.MODIFIED && newState == State.NEW)) {
+			throw new StateChangeException(oldState, newState);
 		}
 
 	}
 
 	@Override
 	public List<String> getTypes() {
-		return types;
+		if (!typesInitialized) {
+			initTypes();
+		}
+		return ImmutableList.copyOf(readCollection(String.class, TYPES));
 	}
 
 	@Override
@@ -279,6 +268,9 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 	@InView(GenericEmbedingViews.Id.class)
 	@JsonProperty("_id")
 	public String getId() {
+		if (readProperty(String.class, ID) == null) {
+			writeProperty(ID, UUID.randomUUID().toString());
+		}
 		return readProperty(String.class, ID);
 	}
 

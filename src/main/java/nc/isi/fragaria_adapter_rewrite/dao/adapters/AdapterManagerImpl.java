@@ -11,6 +11,7 @@ import nc.isi.fragaria_adapter_rewrite.dao.Query;
 import nc.isi.fragaria_adapter_rewrite.dao.UniqueQueryResponse;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
+import nc.isi.fragaria_adapter_rewrite.entities.views.GenericQueryViews.All;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfig;
 import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
@@ -72,22 +73,29 @@ public class AdapterManagerImpl implements AdapterManager {
 
 	protected <T extends Entity> void init(T entity, Query<T> query,
 			EntityMetadata entityMetadata) {
+		LOGGER.debug(String.format(
+				"init for query %s idQuery? %s byViewQuery? %s", query,
+				(query instanceof IdQuery), (query instanceof ByViewQuery)));
 		if (entity == null)
 			return;
 		if (query instanceof ByViewQuery) {
 			ByViewQuery<?> vQuery = ByViewQuery.class.cast(query);
-			if (vQuery.getView() == null) {
+			if (vQuery.getView() == null || vQuery.getView().equals(All.class)) {
 				entity.setCompletion(Completion.FULL);
 			}
 			if (entityMetadata.propertyNames(vQuery.getView()).containsAll(
 					entityMetadata.propertyNames())) {
 				entity.setCompletion(Completion.FULL);
 			}
-		} else if (query instanceof IdQuery) {
-			entity.setCompletion(Completion.FULL);
 		} else {
-			entity.setCompletion(Completion.PARTIAL);
+			if (query instanceof IdQuery) {
+				entity.setCompletion(Completion.FULL);
+			} else {
+				entity.setCompletion(Completion.PARTIAL);
+			}
 		}
+		LOGGER.debug(String.format("entity completion : %s",
+				entity.getCompletion()));
 		entity.setState(State.COMMITED);
 	}
 
