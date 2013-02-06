@@ -37,6 +37,8 @@ import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Startup;
 import org.apache.tapestry5.ioc.annotations.SubModule;
+import org.reflections.scanners.Scanner;
+import org.reflections.scanners.SubTypesScanner;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
@@ -69,6 +71,10 @@ public class FragariaDomainModule {
 		binder.bind(ViewGeneratorManager.class, ViewGeneratorManagerImpl.class);
 		binder.bind(ViewGenerator.class, ViewGeneratorImpl.class);
 		binder.bind(FragariaObjectMapperContributor.class);
+	}
+
+	public void contributeScannerProvider(Configuration<Scanner> configuration) {
+		configuration.add(new SubTypesScanner());
 	}
 
 	public void contributeDataSourceProvider(

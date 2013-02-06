@@ -27,7 +27,7 @@ import org.apache.tapestry5.ioc.annotations.SubModule;
 @SubModule(FragariaDomainModule.class)
 public class ViewInitializerTestModule {
 
-	public void contributeViewInitializer(Configuration<String> configuration) {
+	public void contributeReflectionProvider(Configuration<String> configuration) {
 		configuration.add("nc.isi.fragaria_adapter_rewrite");
 	}
 
@@ -86,10 +86,6 @@ public class ViewInitializerTestModule {
 				}
 			}
 		});
-	}
-
-	public void contributeResourceFinder(Configuration<String> configuration) {
-		configuration.add("nc.isi.fragaria_adapter_rewrite");
 	}
 
 	public void contributeViewConfigProvider(Configuration<String> configuration) {

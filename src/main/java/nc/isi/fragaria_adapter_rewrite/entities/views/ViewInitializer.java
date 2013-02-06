@@ -1,15 +1,13 @@
 package nc.isi.fragaria_adapter_rewrite.entities.views;
 
 import java.lang.reflect.Modifier;
-import java.util.Collection;
 
 import nc.isi.fragaria_adapter_rewrite.entities.AbstractEntity;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
-import nc.isi.fragaria_reflection.services.ReflectionFactory;
+import nc.isi.fragaria_reflection.services.ReflectionProvider;
 
 import org.apache.log4j.Logger;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 
 public class ViewInitializer {
 	private static final Logger LOGGER = Logger
@@ -18,11 +16,9 @@ public class ViewInitializer {
 	private final Reflections reflections;
 
 	public ViewInitializer(ViewGeneratorManager viewGenerator,
-			ReflectionFactory reflectionFactory, Collection<String> packageNames) {
-		LOGGER.info("packageNames : " + packageNames);
+			ReflectionProvider reflectionProvider) {
 		this.viewGenerator = viewGenerator;
-		this.reflections = reflectionFactory.create(packageNames,
-				new SubTypesScanner());
+		this.reflections = reflectionProvider.provide();
 	}
 
 	public void initialize() {
