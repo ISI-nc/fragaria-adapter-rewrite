@@ -19,6 +19,7 @@ import nc.isi.fragaria_adapter_rewrite.annotations.Embeded;
 import nc.isi.fragaria_adapter_rewrite.annotations.Final;
 import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.annotations.Partial;
+import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews.Full;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericQueryViews.All;
 import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 import nc.isi.fragaria_reflection.utils.ReflectionUtils;
@@ -26,6 +27,7 @@ import nc.isi.fragaria_reflection.utils.ReflectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -59,6 +61,20 @@ public class EntityMetadata {
 
 	public EntityMetadata(Class<? extends Entity> entityClass) {
 		this.entityClass = entityClass;
+	}
+
+	public ImmutableSet<String> writablesPropertyNames() {
+		Set<String> writableProperties = Sets.newHashSet();
+		for (String name : propertyNames) {
+			if (getPropertyAnnotation(name, JsonIgnore.class) != null) {
+				continue;
+			}
+			if (excludedProperties.contains(name)) {
+				continue;
+			}
+			writableProperties.add(name);
+		}
+		return ImmutableSet.copyOf(writableProperties);
 	}
 
 	public boolean isNotEmbededList(String propertyName) {
@@ -125,6 +141,9 @@ public class EntityMetadata {
 	@SuppressWarnings("unchecked")
 	public Collection<String> propertyNames(Class<? extends View> view) {
 		initViewProperties();
+		if (Full.class.isAssignableFrom(view)) {
+			return propertyNames();
+		}
 		Collection<String> properties = viewProperties.get(view);
 		if (View.class.isAssignableFrom(view.getSuperclass())) {
 			properties.addAll(propertyNames((Class<? extends View>) view
@@ -210,7 +229,6 @@ public class EntityMetadata {
 	public Object read(Entity entity, String propertyName) {
 		LOGGER.debug(String.format("read %s in %s", propertyName, entity));
 		try {
-			System.out.println(propertyName);
 			return getPropertyDescriptor(propertyName).getReadMethod().invoke(
 					entity, (Object[]) null);
 		} catch (IllegalAccessException | IllegalArgumentException

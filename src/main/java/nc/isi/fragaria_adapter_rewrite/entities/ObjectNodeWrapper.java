@@ -204,8 +204,9 @@ public abstract class ObjectNodeWrapper implements Entity {
 	@Override
 	public ObjectNode toJSON(Completion completion) {
 		if (getSession() != null && completion == Completion.FULL) {
-			for (String property : metadata().propertyNames()) {
-				metadata().read(this, property);
+			for (String property : metadata().writablesPropertyNames()) {
+				Object value = metadata().read(this, property);
+				write(property, value);
 			}
 		}
 		return node.deepCopy();

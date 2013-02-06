@@ -175,6 +175,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		}
 	}
 
+	@JsonIgnore
 	@Override
 	public State getState() {
 		return this.state;
@@ -281,15 +282,18 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		return readProperty(String.class, REV);
 	}
 
+	@JsonProperty("_rev")
 	public void setRev(String rev) {
 		writeProperty(REV, rev);
 	}
 
+	@JsonIgnore
 	@Override
 	public EntityMetadata metadata() {
 		return entityMetadata;
 	}
 
+	@JsonIgnore
 	@Override
 	public Session getSession() {
 		return session;

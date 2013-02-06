@@ -9,7 +9,6 @@ import nc.isi.fragaria_adapter_rewrite.entities.views.View;
 import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public interface Entity extends Serializable, Partialable {
@@ -18,7 +17,6 @@ public interface Entity extends Serializable, Partialable {
 	String REV = "rev";
 	String TYPES = "types";
 
-	@JsonIgnore
 	State getState();
 
 	void setState(State state);
@@ -33,10 +31,8 @@ public interface Entity extends Serializable, Partialable {
 
 	void unregisterListener(Object listener);
 
-	@JsonIgnore
 	EntityMetadata metadata();
 
-	@JsonIgnore
 	Session getSession();
 
 	void attributeSession(Session session);

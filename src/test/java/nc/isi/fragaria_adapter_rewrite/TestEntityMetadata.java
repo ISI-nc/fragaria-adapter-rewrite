@@ -20,6 +20,7 @@ public class TestEntityMetadata extends TestCase {
 		}
 		System.out.println(entityMetadata.propertyNames(Name.class));
 		System.out.println(entityMetadata.getViews(QueryView.class));
+		System.out.println(entityMetadata.writablesPropertyNames());
 	}
 
 }
