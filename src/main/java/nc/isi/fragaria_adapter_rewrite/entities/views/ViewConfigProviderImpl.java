@@ -10,6 +10,19 @@ import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_reflection.services.ResourceFinder;
 
 import com.google.common.collect.Lists;
+/**
+ * 
+ * @author bjonathas
+ *
+ *This service will provide a ViewConfig for a given Class and View thanks 
+ *to a ViewConfigBuilder. The ViewConfigBuilder can be different depending 
+ *on the Datasource type (like Cayenne or Couchdb). In order to build the 
+ *ViewConfig, the ViewConfigBuilder uses the View definition file which has to :
+ *	- have the same extension as the one in fileExtensions for 
+ *		the Datasource Type of this class,
+ *	- respect the naming convention, by default : “class-view.ext” (in lower case) 
+ *		(ex : etablissement-name.sql)
+ */
 
 public class ViewConfigProviderImpl implements ViewConfigProvider {
 	private final String FORMAT = "%s-%s%s";
