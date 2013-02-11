@@ -106,14 +106,16 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		return (Collection<T>) cache.get(collectionName);
 	}
 
-	protected <T> Boolean add(String collectionName, T element,
+	@Override
+	public <T> Boolean add(String collectionName, T element,
 			Class<T> collectionType) {
 		checkSessionSanity(collectionName, element);
 		return modifyCollection(collectionName, element, collectionType,
 				Action.ADD);
 	}
 
-	protected <T> Boolean remove(String collectionName, T element,
+	@Override
+	public <T> Boolean remove(String collectionName, T element,
 			Class<T> collectionType) {
 		return modifyCollection(collectionName, element, collectionType,
 				Action.REMOVE);
@@ -305,8 +307,14 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 	 */
 	@Override
 	public void attributeSession(Session session) {
-		checkState(this.session == null, "session has already been set");
+		checkState(
+				this.state == State.COMMITED || this.session == null,
+				"can only change session if commited (actual state %s) or session is null %s",
+				this.state, session);
 		checkNotNull(session, "session may not be null");
+		if (this.session != null) {
+			unregisterListener(this.session);
+		}
 		this.session = session;
 		registerListener(session);
 	}

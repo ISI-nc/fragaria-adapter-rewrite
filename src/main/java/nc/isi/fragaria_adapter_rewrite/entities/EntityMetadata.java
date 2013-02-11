@@ -114,6 +114,10 @@ public class EntityMetadata {
 	public String getBackReference(String propertyName) {
 		BackReference reference = getPropertyAnnotation(propertyName,
 				BackReference.class);
+		LOGGER.info(String.format("backReference : %s",
+				reference != null ? reference.value() : entityClass
+						.getSimpleName().substring(0, 1).toLowerCase()
+						+ entityClass.getSimpleName().substring(1)));
 		return reference != null ? reference.value() : entityClass
 				.getSimpleName().substring(0, 1).toLowerCase()
 				+ entityClass.getSimpleName().substring(1);

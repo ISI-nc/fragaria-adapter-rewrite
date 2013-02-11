@@ -73,6 +73,10 @@ public class FragariaDomainModule {
 		binder.bind(FragariaObjectMapperContributor.class);
 	}
 
+	public void contributeReflectionProvider(Configuration<String> configuration) {
+		configuration.add("nc.isi.fragaria_adapter_rewrite");
+	}
+
 	public void contributeScannerProvider(Configuration<Scanner> configuration) {
 		configuration.add(new SubTypesScanner());
 	}

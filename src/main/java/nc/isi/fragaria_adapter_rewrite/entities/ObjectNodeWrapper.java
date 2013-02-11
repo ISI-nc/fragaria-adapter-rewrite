@@ -40,7 +40,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 		checkNotNull(propertyName);
 		T result = null;
 		if (node.has(metadata().getJsonPropertyName(propertyName))) {
-			return resolveFormNode(propertyType, propertyName);
+			return resolveFromNode(propertyType, propertyName);
 		} else {
 			// Object is new
 			if (propertyName.equals(Entity.ID)) {
@@ -54,13 +54,15 @@ public abstract class ObjectNodeWrapper implements Entity {
 		}
 	}
 
-	protected <T> T resolveFormNode(Class<T> propertyType, String propertyName) {
+	protected <T> T resolveFromNode(Class<T> propertyType, String propertyName) {
 		try {
 			T o = objectMapper
 					.treeToValue(
 							node.get(this.metadata().getJsonPropertyName(
 									propertyName)), propertyType);
-			if (o instanceof Entity && ((Entity) o).getSession() == null) {
+			if (o instanceof Entity
+					&& (((Entity) o).getSession() == null || ((Entity) o)
+							.getState() == State.COMMITED)) {
 				((Entity) o).attributeSession(getSession());
 			}
 			return o;
@@ -82,8 +84,8 @@ public abstract class ObjectNodeWrapper implements Entity {
 		Class<? extends Entity> entityClass = getClass();
 		Entity fromDB = getSession().getUnique(
 				new IdQuery<>(entityClass, getId()), false);
-		LOGGER.debug(String.format("fromDB completion %s",
-				fromDB.getCompletion()));
+		LOGGER.debug(String.format("fromDB with session %s completion %s",
+				getSession().getId(), fromDB.getCompletion()));
 		EntityMetadata entityMetadata = metadata();
 		for (String propertyName : entityMetadata.propertyNames()) {
 			if (node.has(entityMetadata.getJsonPropertyName(propertyName))) {
@@ -113,7 +115,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 				for (JsonNode jsonNode : arrayNode) {
 					T temp = objectMapper.treeToValue(jsonNode, propertyType);
 					if (temp instanceof Entity) {
-						((Entity) temp).attributeSession(this.getSession());
+						((Entity) temp).attributeSession(getSession());
 					}
 					result.add(temp);
 				}

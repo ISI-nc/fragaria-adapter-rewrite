@@ -27,8 +27,10 @@ public class ViewInitializer {
 				.getSubTypesOf(AbstractEntity.class)) {
 			if (Modifier.isAbstract(entityClass.getModifiers())
 					|| entityClass.isAnonymousClass()
-					|| entityClass.isInterface())
+					|| entityClass.isInterface()) {
+				LOGGER.info("rejected : " + entityClass);
 				continue;
+			}
 			LOGGER.info("initialize : " + entityClass);
 			viewGenerator.generate(entityClass);
 		}

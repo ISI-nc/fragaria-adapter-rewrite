@@ -46,4 +46,8 @@ public interface Entity extends Serializable, Partialable {
 
 	ObjectNode toJSON(Completion completion);
 
+	<T> Boolean add(String collectionName, T element, Class<T> collectionType);
+
+	<T> Boolean remove(String collectionName, T element, Class<T> collectionType);
+
 }

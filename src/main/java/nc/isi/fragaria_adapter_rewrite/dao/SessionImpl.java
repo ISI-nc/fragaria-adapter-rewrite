@@ -21,6 +21,7 @@ import nc.isi.fragaria_adapter_rewrite.enums.State;
 import org.apache.log4j.Logger;
 
 import com.google.common.base.CaseFormat;
+import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -73,6 +74,7 @@ public class SessionImpl implements Session {
 			LOGGER.debug(String.format("list after cache : %s", objects));
 		}
 		changeSession(objects);
+		LOGGER.info(String.format("session %s get : %s", getId(), objects));
 		return objects;
 	}
 
@@ -96,6 +98,7 @@ public class SessionImpl implements Session {
 		if (entity != null && entity.getSession() == null) {
 			changeSession(entity);
 		}
+		LOGGER.info(String.format("session %s getUnique : %s", getId(), entity));
 		return entity;
 	}
 
@@ -162,6 +165,7 @@ public class SessionImpl implements Session {
 
 	@Override
 	public <T extends Entity> T create(Class<T> entityClass) {
+		LOGGER.info(String.format("session %s create", getId()));
 		T entity = entityBuilder.build(entityClass);
 		return sessionize(entity);
 	}
@@ -225,11 +229,13 @@ public class SessionImpl implements Session {
 
 	@Override
 	public Session post() {
+		LOGGER.info(String.format("post session %s", getId()));
 		adapterManager.post(queue);
 		return renewSession();
 	}
 
 	protected Session renewSession() {
+		LOGGER.info(String.format("renew session %s", getId()));
 		for (Multimap<Class<? extends Entity>, Entity> cache : caches) {
 			cache.clear();
 		}
@@ -251,8 +257,9 @@ public class SessionImpl implements Session {
 	 */
 	protected <T extends Entity> void register(T entity,
 			Multimap<Class<? extends Entity>, Entity> map) {
-		LOGGER.info(String.format("register %s in %s", entity, entity
-				.getState() == State.NEW ? "createdObjects" : "updatedObjects"));
+		LOGGER.info(String.format("session %s register %s in %s", getId(),
+				entity, entity.getState() == State.NEW ? "createdObjects"
+						: "updatedObjects"));
 		map.put(entity.getClass(), entity);
 		queue.add(entity);
 	}
@@ -283,6 +290,26 @@ public class SessionImpl implements Session {
 
 	public UUID getId() {
 		return id;
+	}
+
+	@Override
+	public String toString() {
+		return getId().toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!getClass().isAssignableFrom(obj.getClass())) {
+			return false;
+		}
+		Session session = Session.class.cast(obj);
+		return Objects.equal(this.getId(), session.getId());
 	}
 
 }
