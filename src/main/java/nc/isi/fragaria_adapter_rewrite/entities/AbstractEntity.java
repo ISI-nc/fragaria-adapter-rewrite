@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import nc.isi.fragaria_adapter_rewrite.annotations.Final;
 import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.dao.Session;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews;
@@ -61,6 +60,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 	private Completion completion = Completion.PARTIAL;
 	private Session session;
 	private boolean typesInitialized = false;
+	private final String tempId = UUID.randomUUID().toString();
 
 	public AbstractEntity() {
 		super();
@@ -149,31 +149,15 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 				getClass()));
 		checkGlobalSanity(propertyName, Action.WRITE);
 		Object oldValue = cache.get(propertyName);
-		write(propertyName, value);
 		cache.put(propertyName, value);
-		PropertyChangeEvent propertyChangeEvent = new PropertyChangeEvent(this,
-				propertyName, oldValue, value);
-		eventBus.post(propertyChangeEvent);
+		if (write(propertyName, value) && !Objects.equal(value, oldValue)
+				&& !TYPES.equals(propertyName)) {
+			PropertyChangeEvent propertyChangeEvent = new PropertyChangeEvent(
+					this, propertyName, oldValue, value);
+			eventBus.post(propertyChangeEvent);
+		}
 		if (cache.values().containsAll(entityMetadata.propertyNames())) {
 			setCompletion(Completion.FULL);
-		}
-	}
-
-	/**
-	 * La même chose que write mais seulement si la propriété est vide Lève une
-	 * {@link IllegalStateException} si la propriété a été annotée {@link Final}
-	 * 
-	 * @param propertyName
-	 * @param value
-	 */
-	protected void init(String propertyName, Object value) {
-		LOGGER.debug(String.format("init %s in %s in %s", value, propertyName,
-				getClass()));
-		if (readProperty(value.getClass(), propertyName) == null) {
-			writeProperty(propertyName, value);
-		} else {
-			checkState(!entityMetadata.isFinal(propertyName), "%s is not null",
-					propertyName);
 		}
 	}
 
@@ -273,7 +257,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		String id = readProperty(String.class, ID);
 		if (id == null) {
 			state = State.NEW;
-			writeProperty(ID, UUID.randomUUID().toString());
+			writeProperty(ID, tempId);
 			return getId();
 		}
 		return id;

@@ -162,10 +162,10 @@ public abstract class ObjectNodeWrapper implements Entity {
 	 * a
 	 */
 	@SuppressWarnings("unchecked")
-	protected void write(String propertyName, Object value) {
+	protected Boolean write(String propertyName, Object value) {
 		checkParametersNotNull(propertyName);
 		if (metadata().isNotEmbededList(propertyName))
-			return;
+			return false;
 		if (value != null) {
 			Class<? extends View> view = metadata().getEmbeded(propertyName);
 			if (isEntity(value)) {
@@ -174,7 +174,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 				Entity property = Entity.class.cast(value);
 				node.put(metadata().getJsonPropertyName(propertyName),
 						getJson(property, view));
-				return;
+				return true;
 			}
 			if (Collection.class.isAssignableFrom(value.getClass())) {
 				Class<?> propertyType = metadata().propertyParameterClasses(
@@ -188,7 +188,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 					}
 					node.put(metadata().getJsonPropertyName(propertyName),
 							array);
-					return;
+					return true;
 				}
 			}
 			node.put(metadata().getJsonPropertyName(propertyName),
@@ -196,6 +196,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 		} else {
 			node.remove(propertyName);
 		}
+		return true;
 	}
 
 	@Override

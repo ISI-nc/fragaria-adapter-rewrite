@@ -216,6 +216,10 @@ public class SessionImpl implements Session {
 	@Subscribe
 	public void recordPropertyChange(PropertyChangeEvent e) {
 		Entity entity = (Entity) e.getSource();
+		LOGGER.info(String
+				.format("Entity %s record property %s changed oldValue = %s : newValue = %s",
+						e.getSource(), e.getPropertyName(), e.getOldValue(),
+						e.getNewValue()));
 		if (isRegistered(entity, deletedObjects)) {
 			commitError(entity, entity.getState(), State.DELETED);
 		}
@@ -261,6 +265,7 @@ public class SessionImpl implements Session {
 				entity, entity.getState() == State.NEW ? "createdObjects"
 						: "updatedObjects"));
 		map.put(entity.getClass(), entity);
+		LOGGER.info(String.format("map %s size %s", map, map.size()));
 		queue.add(entity);
 	}
 
@@ -278,7 +283,8 @@ public class SessionImpl implements Session {
 
 	private <T extends Entity> void changeSession(Collection<T> entities) {
 		for (T entity : entities) {
-			if (entity.getSession() == null) {
+			if (entity.getSession() == null
+					|| entity.getState() == State.COMMITED) {
 				entity.attributeSession(this);
 			}
 		}

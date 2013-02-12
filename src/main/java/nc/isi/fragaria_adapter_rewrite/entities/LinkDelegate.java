@@ -2,60 +2,70 @@ package nc.isi.fragaria_adapter_rewrite.entities;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.mysema.query.alias.Alias.$;
-import static com.mysema.query.alias.Alias.alias;
-import static com.mysema.query.collections.MiniApi.from;
 
 import java.util.Collection;
 
+import nc.isi.fragaria_adapter_rewrite.dao.ByViewQuery;
 import nc.isi.fragaria_adapter_rewrite.entities.Link.Side;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.mysema.query.BooleanBuilder;
 
-public class LinkDelegate<L extends Entity, R extends Entity, T extends Link<L, R>> {
+public class LinkDelegate<T extends Link<?, ?>, O extends Entity> {
 
 	private final String propName;
 	private final Class<T> type;
 	private final Entity entity;
+	private final Class<O> othersType;
 
-	public LinkDelegate(String propName, Class<T> type, Entity entity) {
+	public LinkDelegate(String propName, Class<T> type, Entity entity,
+			Class<O> othersType) {
 		this.propName = propName;
 		this.type = type;
 		this.entity = entity;
+		this.othersType = othersType;
 	}
 
 	public void set(Collection<T> links) {
 		for (T link : get()) {
-			remove(link);
+			if (links.contains(link)) {
+				continue;
+			}
+			entity.getSession().delete(link);
 		}
 		entity.writeProperty(propName, links);
 	}
 
-	public Collection<Entity> getOthers() {
-		Collection<Entity> others = Sets.newHashSet();
+	public Collection<O> getOthers() {
+		Collection<String> ids = Sets.newHashSet();
+		Side side = null;
 		for (T link : get()) {
-			Side side = Side.opposite(getThisSide(link));
-			others.add(link.get(side));
+			if (side == null) {
+				side = Side.opposite(getThisSide(link));
+			}
+			ids.add(link.get(side).getId());
 		}
-		return ImmutableSet.copyOf(others);
+		System.out.println(ids);
+		return entity.getSession().get(
+				new ByViewQuery<>(othersType, null).filterBy(Entity.ID, ids));
 	}
 
-	public void setOthers(Collection<? extends Entity> others) {
+	public void setOthers(Collection<O> others) {
 		Collection<T> links = Sets.newHashSet();
-		for (Entity entity : others) {
-			links.add(buildLink(entity));
+		for (O entity : others) {
+			T link = contains(entity);
+			links.add(link == null ? buildLink(entity) : link);
 		}
 		set(links);
 	}
 
-	public Boolean add(Entity entity) {
+	public Boolean add(O entity) {
 		checkNotNull(entity);
 		return add(buildLink(entity));
 	}
 
-	protected T buildLink(Entity entity) {
+	protected T buildLink(O entity) {
 		T link = this.entity.getSession().create(type);
 		Side side = getThisSide(link);
 		link.set(side, this.entity);
@@ -63,19 +73,26 @@ public class LinkDelegate<L extends Entity, R extends Entity, T extends Link<L, 
 		return link;
 	}
 
-	public Boolean remove(Entity entity) {
+	public Boolean remove(O entity) {
 		checkNotNull(entity);
-		T link = alias(type);
-		Side side = getThisSide(link);
-		BooleanBuilder booleanBuilder = new BooleanBuilder($(link.get(side))
-				.eq(this.entity)).and($(link.get(Side.opposite(side))).eq(
-				entity));
-		T toDelete = from($(link), get()).where(booleanBuilder).uniqueResult(
-				$(link));
-		return toDelete == null ? false : remove(toDelete);
+		T link = contains(entity);
+		return link != null ? remove(link) : false;
 	}
 
-	private Side getThisSide(Link<L, R> link) {
+	public T contains(O entity) {
+		Side side = null;
+		for (T link : get()) {
+			if (side == null) {
+				side = Side.opposite(getThisSide(link));
+			}
+			if (Objects.equal(link.get(side), entity)) {
+				return link;
+			}
+		}
+		return null;
+	}
+
+	private Side getThisSide(Link<?, ?> link) {
 		return link.isR(entity) ? Side.R : Side.L;
 	}
 

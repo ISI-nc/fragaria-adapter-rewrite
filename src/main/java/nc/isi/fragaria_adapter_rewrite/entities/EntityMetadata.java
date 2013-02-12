@@ -16,7 +16,6 @@ import nc.isi.fragaria_adapter_rewrite.annotations.BackReference;
 import nc.isi.fragaria_adapter_rewrite.annotations.CollectionType;
 import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
 import nc.isi.fragaria_adapter_rewrite.annotations.Embeded;
-import nc.isi.fragaria_adapter_rewrite.annotations.Final;
 import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.annotations.Partial;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews.Full;
@@ -254,10 +253,6 @@ public class EntityMetadata {
 				| InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	public boolean isFinal(String propertyName) {
-		return getPropertyAnnotation(propertyName, Final.class) != null;
 	}
 
 }
