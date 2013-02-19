@@ -78,7 +78,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 				.getSuperclass()) {
 			tempTypes.addLast(type.getName());
 		}
-		writeProperty(TYPES, tempTypes);
+		writePropertyDirectly(TYPES, tempTypes);
 		typesInitialized = true;
 		return tempTypes;
 	}
@@ -150,12 +150,26 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		checkGlobalSanity(propertyName, Action.WRITE);
 		Object oldValue = cache.get(propertyName);
 		cache.put(propertyName, value);
-		if (write(propertyName, value) && !Objects.equal(value, oldValue)
-				&& !TYPES.equals(propertyName)) {
+		if (write(propertyName, value)) {
 			PropertyChangeEvent propertyChangeEvent = new PropertyChangeEvent(
 					this, propertyName, oldValue, value);
 			eventBus.post(propertyChangeEvent);
 		}
+		if (cache.values().containsAll(entityMetadata.propertyNames())) {
+			setCompletion(Completion.FULL);
+		}
+	}
+
+	/**
+	 * no {@link PropertyChangeEvent}
+	 */
+	public void writePropertyDirectly(String propertyName, Object value) {
+		checkSessionSanity(propertyName, value);
+		LOGGER.debug(String.format("write directly %s in %s in %s", value,
+				propertyName, getClass()));
+		checkGlobalSanity(propertyName, Action.WRITE);
+		cache.put(propertyName, value);
+		write(propertyName, value);
 		if (cache.values().containsAll(entityMetadata.propertyNames())) {
 			setCompletion(Completion.FULL);
 		}
@@ -241,7 +255,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 			return;
 		}
 		Entity entity = (Entity) o;
-		if (getSession().equals(entity.getSession())) {
+		if (Objects.equal(getSession(), entity.getSession())) {
 			return;
 		}
 		if (entity.getState() == State.COMMITED) {
@@ -256,11 +270,16 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 	public String getId() {
 		String id = readProperty(String.class, ID);
 		if (id == null) {
-			state = State.NEW;
-			writeProperty(ID, tempId);
+			init();
 			return getId();
 		}
 		return id;
+	}
+
+	protected void init() {
+		state = State.NEW;
+		writeProperty(ID, tempId);
+		initTypes();
 	}
 
 	@JsonProperty("_rev")
@@ -270,7 +289,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 
 	@JsonProperty("_rev")
 	public void setRev(String rev) {
-		writeProperty(REV, rev);
+		writePropertyDirectly(REV, rev);
 	}
 
 	@JsonIgnore

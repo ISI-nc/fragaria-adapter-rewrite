@@ -167,6 +167,13 @@ public abstract class ObjectNodeWrapper implements Entity {
 		if (metadata().isNotEmbededList(propertyName))
 			return false;
 		if (value != null) {
+			if (node.has(propertyName)
+					&& !Collection.class.isAssignableFrom(metadata()
+							.propertyType(propertyName))) {
+				if (value
+						.equals(resolveFromNode(value.getClass(), propertyName)))
+					return false;
+			}
 			Class<? extends View> view = metadata().getEmbeded(propertyName);
 			if (isEntity(value)) {
 				if (view == null)
@@ -208,9 +215,23 @@ public abstract class ObjectNodeWrapper implements Entity {
 	public ObjectNode toJSON(Completion completion) {
 		if (getSession() != null && completion == Completion.FULL) {
 			for (String property : metadata().writablesPropertyNames()) {
+				if (metadata().getEmbeded(property) == null
+						&& node.has(property)
+						&& Entity.class.isAssignableFrom(metadata()
+								.propertyType(property))) {
+					continue;
+				}
+				if (metadata().isNotEmbededList(property)) {
+					continue;
+				}
+				LOGGER.info(String.format("reading property : %s", property));
 				Object value = metadata().read(this, property);
-				write(property, value);
+				LOGGER.info(String.format("value : %s", value));
+				if (write(property, value)) {
+					LOGGER.info("write");
+				}
 			}
+			setCompletion(completion);
 		}
 		return node.deepCopy();
 	}
@@ -223,8 +244,15 @@ public abstract class ObjectNodeWrapper implements Entity {
 		checkParametersNotNull(view);
 		ObjectNode copy = objectMapper.createObjectNode();
 		for (String property : metadata().propertyNames(view)) {
-			JsonNode value = objectMapper.valueToTree(metadata().read(this,
-					property));
+			JsonNode value;
+			Class<?> propertyType = metadata()
+					.propertyType(property);
+			if (Collection.class.isAssignableFrom(propertyType)) {
+				value = objectMapper.valueToTree(readCollection(metadata()
+						.propertyParameterClasses(property)[0], property));
+			} else {
+				value = objectMapper.valueToTree(resolve(propertyType, property));
+			}
 			copy.put(metadata().getJsonPropertyName(property), value);
 		}
 		return copy;

@@ -29,6 +29,10 @@ public class ByViewQuery<T extends Entity> extends AbstractQuery<T> {
 	private final Class<? extends View> view;
 	private final Map<String, Object> params = Maps.newHashMap();
 
+	public ByViewQuery(Class<T> resultType) {
+		this(resultType, null);
+	}
+
 	public ByViewQuery(Class<T> resultType, Class<? extends View> view) {
 		super(resultType);
 		this.view = view != null ? view : All.class;

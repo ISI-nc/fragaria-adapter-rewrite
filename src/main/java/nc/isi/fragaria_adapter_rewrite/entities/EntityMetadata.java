@@ -28,6 +28,7 @@ import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -73,6 +74,7 @@ public class EntityMetadata {
 			}
 			writableProperties.add(name);
 		}
+		LOGGER.info(writableProperties);
 		return ImmutableSet.copyOf(writableProperties);
 	}
 
@@ -82,6 +84,14 @@ public class EntityMetadata {
 				&& Entity.class
 						.isAssignableFrom(propertyParameterClasses(propertyName)[0])
 				&& getEmbeded(propertyName) == null;
+	}
+
+	public boolean isNaturalyEmbeded(String propertyName) {
+		Class<?> propertyType = propertyType(propertyName);
+		return Collection.class.isAssignableFrom(propertyType)
+				&& !Entity.class
+						.isAssignableFrom(propertyParameterClasses(propertyName)[0]);
+
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -236,7 +246,7 @@ public class EntityMetadata {
 					entity, (Object[]) null);
 		} catch (IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
-			throw new RuntimeException(e);
+			throw Throwables.propagate(e);
 		}
 
 	}
