@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import nc.isi.fragaria_adapter_rewrite.dao.CollectionQueryResponse;
 import nc.isi.fragaria_adapter_rewrite.dao.SearchQuery;
@@ -18,7 +19,9 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +37,7 @@ public class ElasticSearchAdapter {
 		this.objectMapper = objectMapperProvider.provide();
 		this.entityBuilder = entityBuilder;
 		Settings settings = ImmutableSettings.settingsBuilder()
-				.put("cluster.name", "test").build();
+				.put("cluster.name", "elasticsearch").build();
 		this.transportClient = new TransportClient(settings);
 	}
 
@@ -77,6 +80,31 @@ public class ElasticSearchAdapter {
 		checkNotNull(queryBuilder);
 		checkNotNull(resultType);
 		return executeQuery(new SearchQuery<>(resultType, queryBuilder));
+	}
+	
+	public boolean exists(String alias){
+		Boolean exists = false;
+		try {
+			exists = transportClient.admin().indices().prepareExists(alias).execute().get().exists();
+		} catch (InterruptedException | ExecutionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}	
+		return exists;
+	}
+	
+	public void build(EntityMetadata entityMetadata){
+		try {
+			transportClient.admin().indices().prepareAliases().
+					addAlias(entityMetadata.getDsKey(), 
+							entityMetadata.getEsAlias(),
+							FilterBuilders.queryFilter(
+									QueryBuilders.matchQuery(Entity.TYPES,entityMetadata.getEntityClass().getCanonicalName()))).execute().get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

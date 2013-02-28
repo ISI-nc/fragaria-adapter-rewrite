@@ -16,6 +16,7 @@ import nc.isi.fragaria_adapter_rewrite.annotations.BackReference;
 import nc.isi.fragaria_adapter_rewrite.annotations.CollectionType;
 import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
 import nc.isi.fragaria_adapter_rewrite.annotations.Embeded;
+import nc.isi.fragaria_adapter_rewrite.annotations.EsAlias;
 import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.annotations.Partial;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews.Full;
@@ -42,6 +43,7 @@ public class EntityMetadata {
 	private static final Collection<String> excludedProperties = Arrays
 			.asList("class");
 	private static final String ID_TOKEN = "._id";
+	private static final String ALIAS_SUFFIX = "_alias";
 	private final Class<? extends Entity> entityClass;
 	private ImmutableSet<String> propertyNames;
 	private LoadingCache<String, PropertyDescriptor> cache = CacheBuilder
@@ -58,6 +60,7 @@ public class EntityMetadata {
 			.create();
 	private boolean viewPropertiesInitialized = false;
 	private String dsKey;
+	private String esAlias;
 
 	public EntityMetadata(Class<? extends Entity> entityClass) {
 		this.entityClass = entityClass;
@@ -108,6 +111,17 @@ public class EntityMetadata {
 			dsKey = checkNotNull(annotation).value();
 		}
 		return dsKey;
+	}
+	
+	public String getEsAlias() {
+		if (esAlias == null) {
+			EsAlias annotation = ReflectionUtils.getTypeAnnotation(entityClass,
+					EsAlias.class);
+			esAlias = checkNotNull(annotation).value();
+			if(checkNotNull(annotation).value().isEmpty())
+				esAlias = entityClass.getSimpleName()+ALIAS_SUFFIX;				
+		}
+		return esAlias;
 	}
 
 	public Class<? extends View> getEmbeded(String propertyName) {

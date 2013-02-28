@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import nc.isi.fragaria_adapter_rewrite.annotations.EsAlias;
 import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.dao.Session;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews;
@@ -35,6 +36,7 @@ import com.google.common.eventbus.EventBus;
  * @author jmaltat
  * 
  */
+@EsAlias
 public abstract class AbstractEntity extends ObjectNodeWrapper {
 	private static final Logger LOGGER = Logger.getLogger(AbstractEntity.class);
 
