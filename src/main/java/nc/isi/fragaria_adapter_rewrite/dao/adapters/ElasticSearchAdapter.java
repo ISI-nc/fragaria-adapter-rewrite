@@ -71,7 +71,7 @@ public class ElasticSearchAdapter {
 			final SearchQuery<T> searchQuery) {
 		EntityMetadata entityMetadata = new EntityMetadata(
 				searchQuery.getResultType());
-		return transportClient.prepareSearch(entityMetadata.getDsKey())
+		return transportClient.prepareSearch(entityMetadata.getEsAlias())
 				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 				.setQuery(searchQuery.getQueryBuilder())
 				.setSize(searchQuery.getLimit())
