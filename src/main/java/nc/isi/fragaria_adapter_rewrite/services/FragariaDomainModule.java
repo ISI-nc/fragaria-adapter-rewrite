@@ -97,7 +97,7 @@ public class FragariaDomainModule {
 	}
 
 	@Startup
-	public void initializeViews(ViewInitializer viewInitializer,
+	public void initialize(ViewInitializer viewInitializer,
 			FragariaObjectMapperContributor fragariaObjectMapperContributor) {
 		viewInitializer.initialize();
 		fragariaObjectMapperContributor.initialiaze();
