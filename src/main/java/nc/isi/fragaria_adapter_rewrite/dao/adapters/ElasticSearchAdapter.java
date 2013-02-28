@@ -19,6 +19,7 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -28,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ElasticSearchAdapter {
+	static final int DEFAULT_SIZE = 10;
 	private final TransportClient transportClient;
 	private final ObjectMapper objectMapper;
 	private final EntityBuilder entityBuilder;
@@ -39,6 +41,7 @@ public class ElasticSearchAdapter {
 		Settings settings = ImmutableSettings.settingsBuilder()
 				.put("cluster.name", "elasticsearch").build();
 		this.transportClient = new TransportClient(settings);
+		this.transportClient.addTransportAddress(new InetSocketTransportAddress("127.0.0.1", 9300));
 	}
 
 	private <T extends Entity> Collection<T> serialize(
@@ -49,14 +52,12 @@ public class ElasticSearchAdapter {
 			try {
 				list.add(entityBuilder.build(ObjectNode.class.cast(objectMapper
 						.readTree(hit.sourceAsString())), entityClass));
-
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		}
 
 		return list;
-
 	}
 
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
@@ -71,15 +72,17 @@ public class ElasticSearchAdapter {
 		EntityMetadata entityMetadata = new EntityMetadata(
 				searchQuery.getResultType());
 		return transportClient.prepareSearch(entityMetadata.getDsKey())
-				.setSearchType(SearchType.DFS_QUERY_AND_FETCH)
-				.setQuery(searchQuery.getQueryBuilder()).execute().actionGet();
+				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+				.setQuery(searchQuery.getQueryBuilder())
+				.setSize(searchQuery.getLimit())
+				.execute().actionGet();
 	}
 
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 			final QueryBuilder queryBuilder, final Class<T> resultType) {
 		checkNotNull(queryBuilder);
 		checkNotNull(resultType);
-		return executeQuery(new SearchQuery<>(resultType, queryBuilder));
+		return executeQuery(new SearchQuery<>(resultType, queryBuilder,DEFAULT_SIZE));
 	}
 	
 	public boolean exists(String alias){
@@ -87,7 +90,6 @@ public class ElasticSearchAdapter {
 		try {
 			exists = transportClient.admin().indices().prepareExists(alias).execute().get().exists();
 		} catch (InterruptedException | ExecutionException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}	
 		return exists;
