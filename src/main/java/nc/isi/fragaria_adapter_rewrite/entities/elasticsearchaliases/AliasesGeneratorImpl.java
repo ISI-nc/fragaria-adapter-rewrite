@@ -17,8 +17,12 @@ public class AliasesGeneratorImpl implements AliasesGenerator{
 
 	@Override
 	public void generate(EntityMetadata entityMetadata) {
-		LOGGER.info("build alias : " + entityMetadata.getEsAlias());
-		build(entityMetadata);	
+		if(entityMetadata.getEsAlias()==null)
+			LOGGER.info("no alias found");
+		else{
+			LOGGER.info("build alias : " + entityMetadata.getEsAlias());
+			build(entityMetadata);	
+		}
 	}
 
 	private void build(EntityMetadata entityMetadata) {

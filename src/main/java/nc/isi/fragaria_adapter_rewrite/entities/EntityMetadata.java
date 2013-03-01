@@ -60,7 +60,6 @@ public class EntityMetadata {
 			.create();
 	private boolean viewPropertiesInitialized = false;
 	private String dsKey;
-	private String esAlias;
 
 	public EntityMetadata(Class<? extends Entity> entityClass) {
 		this.entityClass = entityClass;
@@ -114,14 +113,11 @@ public class EntityMetadata {
 	}
 	
 	public String getEsAlias() {
-		if (esAlias == null) {
-			EsAlias annotation = ReflectionUtils.getTypeAnnotation(entityClass,
-					EsAlias.class);
-			esAlias = checkNotNull(annotation).value();
-			if(checkNotNull(annotation).value().isEmpty())
-				esAlias = entityClass.getSimpleName()+ALIAS_SUFFIX;				
-		}
-		return esAlias;
+		EsAlias annotation = ReflectionUtils.getTypeAnnotation(entityClass,	EsAlias.class);
+		String alias = annotation != null ? annotation.value() : null;
+		if(annotation!=null)
+			alias =  annotation.value() != null ? annotation.value() : entityClass.getSimpleName()+ALIAS_SUFFIX;				
+		return alias;
 	}
 
 	public Class<? extends View> getEmbeded(String propertyName) {
