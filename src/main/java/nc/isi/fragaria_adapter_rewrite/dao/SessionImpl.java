@@ -196,8 +196,8 @@ public class SessionImpl implements Session {
 			}
 			if (isRegistered(entity, updatedObjects)) {
 				updatedObjects.remove(entity.getClass(), entity);
+				register(entity, deletedObjects);
 			}
-			register(entity, deletedObjects);
 			entity.setState(State.DELETED);
 		}
 	}

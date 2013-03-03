@@ -1,6 +1,7 @@
 package nc.isi.fragaria_adapter_rewrite.entities;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -84,6 +85,10 @@ public abstract class ObjectNodeWrapper implements Entity {
 		Class<? extends Entity> entityClass = getClass();
 		Entity fromDB = getSession().getUnique(
 				new IdQuery<>(entityClass, getId()), false);
+		checkState(
+				fromDB != null,
+				"L'entité n'est pas nouvelle mais n'a pas de correspondance en base : %s",
+				getId());
 		LOGGER.debug(String.format("fromDB with session %s completion %s",
 				getSession().getId(), fromDB.getCompletion()));
 		EntityMetadata entityMetadata = metadata();
@@ -245,13 +250,13 @@ public abstract class ObjectNodeWrapper implements Entity {
 		ObjectNode copy = objectMapper.createObjectNode();
 		for (String property : metadata().propertyNames(view)) {
 			JsonNode value;
-			Class<?> propertyType = metadata()
-					.propertyType(property);
+			Class<?> propertyType = metadata().propertyType(property);
 			if (Collection.class.isAssignableFrom(propertyType)) {
 				value = objectMapper.valueToTree(readCollection(metadata()
 						.propertyParameterClasses(property)[0], property));
 			} else {
-				value = objectMapper.valueToTree(resolve(propertyType, property));
+				value = objectMapper
+						.valueToTree(resolve(propertyType, property));
 			}
 			copy.put(metadata().getJsonPropertyName(property), value);
 		}
