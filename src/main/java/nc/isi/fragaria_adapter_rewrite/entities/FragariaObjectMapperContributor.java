@@ -11,7 +11,7 @@ public class FragariaObjectMapperContributor {
 		this.modules = modules;
 	}
 
-	public void initialiaze() {
+	public void initialize() {
 		for (Module module : modules) {
 			FragariaObjectMapper.INSTANCE.get().registerModule(module);
 		}

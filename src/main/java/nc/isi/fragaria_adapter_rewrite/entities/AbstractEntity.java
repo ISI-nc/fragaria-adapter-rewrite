@@ -35,6 +35,7 @@ import com.google.common.eventbus.EventBus;
  * @author jmaltat
  * 
  */
+
 public abstract class AbstractEntity extends ObjectNodeWrapper {
 	private static final Logger LOGGER = Logger.getLogger(AbstractEntity.class);
 

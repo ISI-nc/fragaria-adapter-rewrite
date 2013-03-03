@@ -12,6 +12,9 @@ import nc.isi.fragaria_adapter_rewrite.dao.adapters.ElasticSearchAdapter;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilderImpl;
 import nc.isi.fragaria_adapter_rewrite.entities.FragariaObjectMapperContributor;
+import nc.isi.fragaria_adapter_rewrite.entities.elasticsearchaliases.AliasesGenerator;
+import nc.isi.fragaria_adapter_rewrite.entities.elasticsearchaliases.AliasesGeneratorImpl;
+import nc.isi.fragaria_adapter_rewrite.entities.elasticsearchaliases.AliasesInitializer;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigBuilderProvider;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigBuilderProviderImpl;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigProvider;
@@ -71,6 +74,8 @@ public class FragariaDomainModule {
 		binder.bind(ViewGeneratorManager.class, ViewGeneratorManagerImpl.class);
 		binder.bind(ViewGenerator.class, ViewGeneratorImpl.class);
 		binder.bind(FragariaObjectMapperContributor.class);
+		binder.bind(AliasesInitializer.class);
+		binder.bind(AliasesGenerator.class,AliasesGeneratorImpl.class);
 	}
 
 	public void contributeReflectionProvider(Configuration<String> configuration) {
@@ -97,10 +102,12 @@ public class FragariaDomainModule {
 	}
 
 	@Startup
-	public void initializeViews(ViewInitializer viewInitializer,
-			FragariaObjectMapperContributor fragariaObjectMapperContributor) {
+	public void initialize(ViewInitializer viewInitializer,
+			FragariaObjectMapperContributor fragariaObjectMapperContributor,
+			AliasesInitializer aliasesInitializer) {
 		viewInitializer.initialize();
-		fragariaObjectMapperContributor.initialiaze();
+		fragariaObjectMapperContributor.initialize();
+		aliasesInitializer.initialize();		
 	}
 
 }

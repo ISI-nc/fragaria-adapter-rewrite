@@ -283,6 +283,8 @@ public class SessionImpl implements Session {
 
 	private <T extends Entity> void changeSession(Collection<T> entities) {
 		for (T entity : entities) {
+			if(entity==null)
+				continue;
 			if (entity.getSession() == null
 					|| entity.getState() == State.COMMITED) {
 				entity.attributeSession(this);
