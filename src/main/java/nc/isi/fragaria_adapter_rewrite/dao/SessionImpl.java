@@ -193,9 +193,10 @@ public class SessionImpl implements Session {
 		for (T entity : entities) {
 			if (isRegistered(entity, createdObjects)) {
 				createdObjects.remove(entity.getClass(), entity);
-			}
-			if (isRegistered(entity, updatedObjects)) {
-				updatedObjects.remove(entity.getClass(), entity);
+			} else {
+				if (isRegistered(entity, updatedObjects)) {
+					updatedObjects.remove(entity.getClass(), entity);
+				}
 				register(entity, deletedObjects);
 			}
 			entity.setState(State.DELETED);
@@ -283,7 +284,7 @@ public class SessionImpl implements Session {
 
 	private <T extends Entity> void changeSession(Collection<T> entities) {
 		for (T entity : entities) {
-			if(entity==null)
+			if (entity == null)
 				continue;
 			if (entity.getSession() == null
 					|| entity.getState() == State.COMMITED) {
