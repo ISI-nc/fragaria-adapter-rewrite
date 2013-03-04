@@ -65,9 +65,9 @@ public class SessionImpl implements Session {
 		LOGGER.debug(String.format("list without cache : %s", objects));
 		if (cache) {
 			Class<T> entityClass = query.getResultType();
-			objects.addAll((Collection<T>) createdObjects.get(entityClass));
-			objects.removeAll(deletedObjects.get(entityClass));
-			for (T o : (Collection<T>) updatedObjects.get(entityClass)) {
+			objects.addAll(findValuesFromCollection((Collection<T>) createdObjects.get(entityClass),query));
+			objects.removeAll(findValuesFromCollection((Collection<T>)deletedObjects.get(entityClass),query));
+			for (T o : findValuesFromCollection((Collection<T>) updatedObjects.get(entityClass),query)) {
 				objects.remove(o);
 				objects.add(o);
 			}
@@ -77,6 +77,7 @@ public class SessionImpl implements Session {
 		LOGGER.info(String.format("session %s get : %s", getId(), objects));
 		return objects;
 	}
+	
 
 	@Override
 	public <T extends Entity> Collection<T> get(Query<T> query) {
@@ -124,6 +125,22 @@ public class SessionImpl implements Session {
 		}
 		return null;
 	}
+	
+	private <T extends Entity> Collection<T> findCachedValues(Query<T> query) {
+		return findValuesFromCollection(getValuesFromCache(query.getResultType()),query);
+	}
+	
+	private <T extends Entity> Collection<T> findValuesFromCollection(Collection<T> coll,Query<T> query) {
+		LOGGER.debug(String.format("collection %s : ", coll));
+		if (query instanceof ByViewQuery) {
+			T entity = alias(query.getResultType());
+			return from($(entity), coll).where(
+					buildFullPredicate((ByViewQuery<T>) query)).list($(entity));
+		}
+		else
+			return getValuesFromCache(query.getResultType());
+	}
+	
 
 	private Predicate buildFullPredicate(ByViewQuery<?> query) {
 		BooleanBuilder booleanBuilder = new BooleanBuilder();
