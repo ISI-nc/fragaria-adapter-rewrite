@@ -27,6 +27,7 @@ import org.elasticsearch.search.SearchHit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Throwables;
 
 public class ElasticSearchAdapter {
 	static final int DEFAULT_SIZE = 10;
@@ -41,7 +42,9 @@ public class ElasticSearchAdapter {
 		Settings settings = ImmutableSettings.settingsBuilder()
 				.put("cluster.name", "elasticsearch").build();
 		this.transportClient = new TransportClient(settings);
-		this.transportClient.addTransportAddress(new InetSocketTransportAddress("127.0.0.1", 9300));
+		this.transportClient
+				.addTransportAddress(new InetSocketTransportAddress(
+						"127.0.0.1", 9300));
 	}
 
 	private <T extends Entity> Collection<T> serialize(
@@ -74,38 +77,44 @@ public class ElasticSearchAdapter {
 		return transportClient.prepareSearch(entityMetadata.getEsAlias())
 				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 				.setQuery(searchQuery.getQueryBuilder())
-				.setSize(searchQuery.getLimit())
-				.execute().actionGet();
+				.setSize(searchQuery.getLimit()).execute().actionGet();
 	}
 
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 			final QueryBuilder queryBuilder, final Class<T> resultType) {
 		checkNotNull(queryBuilder);
 		checkNotNull(resultType);
-		return executeQuery(new SearchQuery<>(resultType, queryBuilder,DEFAULT_SIZE));
+		return executeQuery(new SearchQuery<>(resultType, queryBuilder,
+				DEFAULT_SIZE));
 	}
-	
-	public boolean exists(String alias){
+
+	public boolean exists(String alias) {
 		Boolean exists = false;
 		try {
-			exists = transportClient.admin().indices().prepareExists(alias).execute().get().exists();
-		} catch (InterruptedException | ExecutionException e1) {
-			e1.printStackTrace();
-		}	
+			exists = transportClient.admin().indices().prepareExists(alias)
+					.execute().get().exists();
+		} catch (InterruptedException | ExecutionException e) {
+			throw Throwables.propagate(e);
+		}
 		return exists;
 	}
-	
-	public void build(EntityMetadata entityMetadata){
+
+	public void build(EntityMetadata entityMetadata) {
 		try {
-			transportClient.admin().indices().prepareAliases().
-					addAlias(entityMetadata.getDsKey(), 
+			transportClient
+					.admin()
+					.indices()
+					.prepareAliases()
+					.addAlias(
+							entityMetadata.getDsKey(),
 							entityMetadata.getEsAlias(),
-							FilterBuilders.queryFilter(
-									QueryBuilders.matchQuery(Entity.TYPES,entityMetadata.getEntityClass().getCanonicalName()))).execute().get();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
+							FilterBuilders.queryFilter(QueryBuilders
+									.matchQuery(Entity.TYPES, entityMetadata
+											.getEntityClass()
+											.getCanonicalName()))).execute()
+					.get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw Throwables.propagate(e);
 		}
 	}
 

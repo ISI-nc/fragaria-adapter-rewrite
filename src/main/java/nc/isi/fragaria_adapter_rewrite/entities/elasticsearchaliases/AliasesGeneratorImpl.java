@@ -5,11 +5,11 @@ import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
 
 import org.apache.log4j.Logger;
 
-public class AliasesGeneratorImpl implements AliasesGenerator{
+public class AliasesGeneratorImpl implements AliasesGenerator {
 	private static final Logger LOGGER = Logger
 			.getLogger(AliasesGeneratorImpl.class);
 	private final ElasticSearchAdapter elasticSearchAdapter;
-	
+
 	public AliasesGeneratorImpl(ElasticSearchAdapter elasticSearchAdapter) {
 		super();
 		this.elasticSearchAdapter = elasticSearchAdapter;
@@ -17,16 +17,16 @@ public class AliasesGeneratorImpl implements AliasesGenerator{
 
 	@Override
 	public void generate(EntityMetadata entityMetadata) {
-		if(entityMetadata.getEsAlias()==null)
+		if (entityMetadata.getEsAlias() == null) {
 			LOGGER.info("no alias found");
-		else{
+		} else {
 			LOGGER.info("build alias : " + entityMetadata.getEsAlias());
-			build(entityMetadata);	
+			build(entityMetadata);
 		}
 	}
 
 	private void build(EntityMetadata entityMetadata) {
-		if(exists(entityMetadata.getEsAlias())){
+		if (exists(entityMetadata.getEsAlias())) {
 			LOGGER.info("alias already exists");
 			return;
 		}

@@ -220,6 +220,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 	public ObjectNode toJSON(Completion completion) {
 		if (getSession() != null && completion == Completion.FULL) {
 			for (String property : metadata().writablesPropertyNames()) {
+				LOGGER.info(String.format("working on property : %s", property));
 				if (metadata().getEmbeded(property) == null
 						&& node.has(property)
 						&& Entity.class.isAssignableFrom(metadata()
@@ -228,6 +229,9 @@ public abstract class ObjectNodeWrapper implements Entity {
 				}
 				if (metadata().isNotEmbededList(property)) {
 					continue;
+				}
+				if (property.equals("adress")) {
+					System.out.println(node.get(property));
 				}
 				LOGGER.info(String.format("reading property : %s", property));
 				Object value = metadata().read(this, property);

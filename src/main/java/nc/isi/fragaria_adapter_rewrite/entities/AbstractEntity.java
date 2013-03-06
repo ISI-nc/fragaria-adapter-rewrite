@@ -152,7 +152,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		Object oldValue = cache.get(propertyName);
 		cache.put(propertyName, value);
 		if (write(propertyName, value)) {
-			System.out.println("property changed");
+			LOGGER.debug("property changed");
 			PropertyChangeEvent propertyChangeEvent = new PropertyChangeEvent(
 					this, propertyName, oldValue, value);
 			eventBus.post(propertyChangeEvent);

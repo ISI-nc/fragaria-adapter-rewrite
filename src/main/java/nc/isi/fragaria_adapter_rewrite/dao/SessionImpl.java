@@ -65,9 +65,12 @@ public class SessionImpl implements Session {
 		LOGGER.debug(String.format("list without cache : %s", objects));
 		if (cache) {
 			Class<T> entityClass = query.getResultType();
-			objects.addAll(findValuesFromCollection((Collection<T>) createdObjects.get(entityClass),query));
-			objects.removeAll(findValuesFromCollection((Collection<T>)deletedObjects.get(entityClass),query));
-			for (T o : findValuesFromCollection((Collection<T>) updatedObjects.get(entityClass),query)) {
+			objects.addAll(findValuesFromCollection(
+					(Collection<T>) createdObjects.get(entityClass), query));
+			objects.removeAll(findValuesFromCollection(
+					(Collection<T>) deletedObjects.get(entityClass), query));
+			for (T o : findValuesFromCollection(
+					(Collection<T>) updatedObjects.get(entityClass), query)) {
 				objects.remove(o);
 				objects.add(o);
 			}
@@ -77,7 +80,6 @@ public class SessionImpl implements Session {
 		LOGGER.info(String.format("session %s get : %s", getId(), objects));
 		return objects;
 	}
-	
 
 	@Override
 	public <T extends Entity> Collection<T> get(Query<T> query) {
@@ -119,28 +121,30 @@ public class SessionImpl implements Session {
 		}
 		if (query instanceof ByViewQuery) {
 			T entity = alias(query.getResultType());
-			return from($(entity), cachedValues).where(
-					buildFullPredicate((ByViewQuery<T>) query)).uniqueResult(
-					$(entity));
+			Predicate predicate = buildFullPredicate((ByViewQuery<T>) query);
+			return predicate != null ? from($(entity), cachedValues).where(
+					predicate).uniqueResult($(entity)) : null;
 		}
 		return null;
 	}
-	
+
 	private <T extends Entity> Collection<T> findCachedValues(Query<T> query) {
-		return findValuesFromCollection(getValuesFromCache(query.getResultType()),query);
+		return findValuesFromCollection(
+				getValuesFromCache(query.getResultType()), query);
 	}
-	
-	private <T extends Entity> Collection<T> findValuesFromCollection(Collection<T> coll,Query<T> query) {
+
+	private <T extends Entity> Collection<T> findValuesFromCollection(
+			Collection<T> coll, Query<T> query) {
 		LOGGER.debug(String.format("collection %s : ", coll));
 		if (query instanceof ByViewQuery) {
 			T entity = alias(query.getResultType());
-			return from($(entity), coll).where(
-					buildFullPredicate((ByViewQuery<T>) query)).list($(entity));
-		}
-		else
+			Predicate predicate = buildFullPredicate((ByViewQuery<T>) query);
+			return predicate != null ? from($(entity), coll).where(predicate)
+					.list($(entity)) : coll;
+		} else {
 			return getValuesFromCache(query.getResultType());
+		}
 	}
-	
 
 	private Predicate buildFullPredicate(ByViewQuery<?> query) {
 		BooleanBuilder booleanBuilder = new BooleanBuilder();
@@ -148,7 +152,10 @@ public class SessionImpl implements Session {
 			booleanBuilder.and(createPredicate(query.getResultType(),
 					entry.getKey(), entry.getValue()));
 		}
-		return booleanBuilder.and(query.getPredicate());
+		if (query.getPredicate() != null) {
+			booleanBuilder.and(query.getPredicate());
+		}
+		return booleanBuilder.hasValue() ? booleanBuilder : null;
 	}
 
 	protected Predicate createPredicate(Class<?> type, String key, Object value) {
