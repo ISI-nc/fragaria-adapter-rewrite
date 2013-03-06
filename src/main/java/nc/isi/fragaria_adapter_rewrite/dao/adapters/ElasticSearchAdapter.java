@@ -17,7 +17,6 @@ import nc.isi.fragaria_adapter_rewrite.services.ObjectMapperProvider;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -37,7 +36,6 @@ public class ElasticSearchAdapter {
 		this.objectMapper = objectMapperProvider.provide();
 		this.entityBuilder = entityBuilder;
 		this.transportClient = new TransportClient();
-		this.transportClient.addTransportAddress(new InetSocketTransportAddress("127.0.0.1", 9300));
 	}
 
 	private <T extends Entity> Collection<T> serialize(
