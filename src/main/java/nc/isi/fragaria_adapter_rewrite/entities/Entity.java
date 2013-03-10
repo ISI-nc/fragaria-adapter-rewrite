@@ -6,7 +6,6 @@ import java.util.List;
 
 import nc.isi.fragaria_adapter_rewrite.dao.Session;
 import nc.isi.fragaria_adapter_rewrite.entities.views.View;
-import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -44,10 +43,10 @@ public interface Entity extends Serializable, Partialable {
 	<T> Collection<T> readCollection(Class<T> collectionGenericType,
 			String collectionName);
 
-	ObjectNode toJSON(Completion completion);
-
 	<T> Boolean add(String collectionName, T element, Class<T> collectionType);
 
 	<T> Boolean remove(String collectionName, T element, Class<T> collectionType);
+
+	void prepareForCommit();
 
 }

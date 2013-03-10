@@ -115,6 +115,7 @@ public class AdapterManagerImpl implements AdapterManager {
 		LinkedListMultimap<Adapter, Entity> dispatch = LinkedListMultimap
 				.create();
 		for (Entity entity : entities) {
+			entity.prepareForCommit();
 			dispatch.put(getAdapter(entity.getClass()), entity);
 		}
 		for (Adapter adapter : dispatch.keySet()) {

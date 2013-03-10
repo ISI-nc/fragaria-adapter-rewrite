@@ -213,36 +213,33 @@ public abstract class ObjectNodeWrapper implements Entity {
 
 	@Override
 	public ObjectNode toJSON() {
-		return toJSON(Completion.PARTIAL);
+		return node.deepCopy();
 	}
 
-	@Override
-	public ObjectNode toJSON(Completion completion) {
-		if (getSession() != null && completion == Completion.FULL) {
-			for (String property : metadata().writablesPropertyNames()) {
-				LOGGER.info(String.format("working on property : %s", property));
-				if (metadata().getEmbeded(property) == null
-						&& node.has(property)
-						&& Entity.class.isAssignableFrom(metadata()
-								.propertyType(property))) {
-					continue;
-				}
-				if (metadata().isNotEmbededList(property)) {
-					continue;
-				}
-				if (property.equals("adress")) {
-					System.out.println(node.get(property));
-				}
-				LOGGER.info(String.format("reading property : %s", property));
-				Object value = metadata().read(this, property);
-				LOGGER.info(String.format("value : %s", value));
-				if (write(property, value)) {
-					LOGGER.info("write");
-				}
+	public void prepareForCommit() {
+		checkState(getSession() != null, "object %s is not in session", this);
+		for (String property : metadata().writablesPropertyNames()) {
+			LOGGER.info(String.format("working on property : %s", property));
+			if (metadata().getEmbeded(property) == null
+					&& node.has(property)
+					&& Entity.class.isAssignableFrom(metadata().propertyType(
+							property))) {
+				continue;
 			}
-			setCompletion(completion);
+			if (metadata().isNotEmbededList(property)) {
+				continue;
+			}
+			if (property.equals("adress")) {
+				System.out.println(node.get(property));
+			}
+			LOGGER.info(String.format("reading property : %s", property));
+			Object value = metadata().read(this, property);
+			LOGGER.info(String.format("value : %s", value));
+			if (write(property, value)) {
+				LOGGER.info("write");
+			}
 		}
-		return node.deepCopy();
+		setCompletion(Completion.FULL);
 	}
 
 	private ObjectNode getJson(Entity entity, Class<? extends View> view) {
