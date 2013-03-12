@@ -17,6 +17,7 @@ import nc.isi.fragaria_adapter_rewrite.services.ObjectMapperProvider;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -32,11 +33,13 @@ public class ElasticSearchAdapter {
 	private final ObjectMapper objectMapper;
 	private final EntityBuilder entityBuilder;
 
-	public ElasticSearchAdapter(ObjectMapperProvider objectMapperProvider,
+	public ElasticSearchAdapter(Collection<TransportAddress> transportAdress,ObjectMapperProvider objectMapperProvider,
 			EntityBuilder entityBuilder) {
 		this.objectMapper = objectMapperProvider.provide();
 		this.entityBuilder = entityBuilder;
 		this.transportClient = new TransportClient();
+		for(TransportAddress adress : transportAdress)
+			this.transportClient.addTransportAddress(adress);
 	}
 
 	private <T extends Entity> Collection<T> serialize(

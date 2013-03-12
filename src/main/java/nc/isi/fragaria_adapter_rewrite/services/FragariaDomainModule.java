@@ -81,6 +81,10 @@ public class FragariaDomainModule {
 	public void contributeReflectionProvider(Configuration<String> configuration) {
 		configuration.add("nc.isi.fragaria_adapter_rewrite");
 	}
+	
+//	public void contributeElasticSearchAdapter(Configuration<TransportAddress> configuration) {
+//		configuration.add(new  InetSocketTransportAddress("127.0.0.1", 9300));
+//	}
 
 	public void contributeScannerProvider(Configuration<Scanner> configuration) {
 		configuration.add(new SubTypesScanner());
