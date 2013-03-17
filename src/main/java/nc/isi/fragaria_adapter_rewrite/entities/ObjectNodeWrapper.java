@@ -21,11 +21,15 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 
+@SuppressWarnings("serial")
 public abstract class ObjectNodeWrapper implements Entity {
+
 	private static final Logger LOGGER = Logger
 			.getLogger(ObjectNodeWrapper.class);
-	private final ObjectMapper objectMapper = FragariaObjectMapper.INSTANCE
+
+	private static final ObjectMapper objectMapper = FragariaObjectMapper.INSTANCE
 			.get();
+
 	private final ObjectNode node;
 
 	public ObjectNodeWrapper(ObjectNode objectNode) {
@@ -33,7 +37,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 	}
 
 	public ObjectNodeWrapper() {
-		this.node = objectMapper.createObjectNode();
+		this(objectMapper.createObjectNode());
 	}
 
 	protected <T> T resolve(Class<T> propertyType, String propertyName) {
