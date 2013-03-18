@@ -136,6 +136,14 @@ public class FieldChangeSet {
 		}
 	}
 
+	/**
+	 * Clear the changes recorded by this change set.
+	 */
+	public void clear() {
+		modifications.remove(modifiedFields());
+		deletions.clear();
+	}
+
 	// ------------------------------------------------------------------
 	// ChangeSet level methods
 	//
@@ -165,9 +173,13 @@ public class FieldChangeSet {
 		if (resolution == ConflictResolution.FAIL) {
 			Set<String> conflictingKeys = new TreeSet<>();
 			for (String modifiedField : modifiedFields) {
-				if (isModified(modifiedField)) {
-					conflictingKeys.add(modifiedField);
+				if (!isModified(modifiedField)) {
+					continue;
 				}
+				if (get(modifiedField).equals(other.get(modifiedField))) {
+					continue; // modified by the same value => no conflict
+				}
+				conflictingKeys.add(modifiedField);
 			}
 			if (!conflictingKeys.isEmpty()) {
 				throw new MergeConflictException(conflictingKeys);
@@ -176,12 +188,16 @@ public class FieldChangeSet {
 		// Merge modifications
 		for (String modifiedField : modifiedFields) {
 			if (isModified(modifiedField)) {
+				if (get(modifiedField).equals(other.get(modifiedField))) {
+					continue; // modified by the same value => ignore
+				}
 				// Conflict
 				switch (resolution) {
 				case OURS:
 					// ignore other's change
 					break;
 				case THEIRS:
+					// overwrite our change
 					modify(modifiedField, other.get(modifiedField));
 					break;
 				case FAIL:
