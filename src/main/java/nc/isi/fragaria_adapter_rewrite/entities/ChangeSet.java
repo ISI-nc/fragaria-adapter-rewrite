@@ -58,11 +58,7 @@ public class ChangeSet<K extends Comparable<? super K>> {
 	 * @return All modified fields.
 	 */
 	public Set<K> modifiedFields() {
-		Set<K> modifiedFields = new TreeSet<>();
-		for (K fieldName : modifications.keySet()) {
-			modifiedFields.add(fieldName);
-		}
-		return Collections.unmodifiableSet(modifiedFields);
+		return Collections.unmodifiableSet(modifications.keySet());
 	}
 
 	/**
@@ -80,6 +76,13 @@ public class ChangeSet<K extends Comparable<? super K>> {
 	 */
 	public Set<K> removedFields() {
 		return Collections.unmodifiableSet(deletions);
+	}
+
+	/**
+	 * @return <code>true</code> iff this ChangeSet is empty.
+	 */
+	public boolean isEmpty() {
+		return modifications.isEmpty() && deletions.isEmpty();
 	}
 
 	// ------------------------------------------------------------------
