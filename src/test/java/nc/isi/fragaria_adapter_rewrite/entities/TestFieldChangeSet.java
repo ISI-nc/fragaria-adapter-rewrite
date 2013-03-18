@@ -141,10 +141,10 @@ public class TestFieldChangeSet extends TestCase {
 		set.clear();
 		assertModifiedRemoved(set, (String) null, (String) null);
 	}
-	
+
 	// freeze support
-	
-	public void testFreeze() {
+
+	public void testFreeze() throws Exception {
 		FieldChangeSet set = new FieldChangeSet();
 		set.freeze();
 		try {
@@ -161,6 +161,12 @@ public class TestFieldChangeSet extends TestCase {
 		}
 		try {
 			set.clear();
+			fail("IllegalStateException not thrown");
+		} catch (IllegalStateException e) {
+			assertEquals("frozen", e.getMessage());
+		}
+		try {
+			set.mergeWith(set);
 			fail("IllegalStateException not thrown");
 		} catch (IllegalStateException e) {
 			assertEquals("frozen", e.getMessage());
