@@ -55,8 +55,6 @@ public class TestFieldChangeSet extends TestCase {
 			fail("Exception not thrown");
 		} catch (NoSuchElementException e) {
 			// success
-		} catch (Exception e) {
-			fail("Wrong exception thrown: " + e);
 		}
 	}
 
@@ -119,8 +117,6 @@ public class TestFieldChangeSet extends TestCase {
 			// and the change set hasn't been modified
 			assertModifiedRemoved(set1, "test", null);
 			assertEquals(new TextNode("test1"), set1.get("test"));
-		} catch (Exception e) {
-			fail("Wrong exception thrown");
 		}
 
 		// "ours" resolution
@@ -144,6 +140,31 @@ public class TestFieldChangeSet extends TestCase {
 
 		set.clear();
 		assertModifiedRemoved(set, (String) null, (String) null);
+	}
+	
+	// freeze support
+	
+	public void testFreeze() {
+		FieldChangeSet set = new FieldChangeSet();
+		set.freeze();
+		try {
+			set.modify("test", new TextNode("test"));
+			fail("IllegalStateException not thrown");
+		} catch (IllegalStateException e) {
+			assertEquals("frozen", e.getMessage());
+		}
+		try {
+			set.remove("test");
+			fail("IllegalStateException not thrown");
+		} catch (IllegalStateException e) {
+			assertEquals("frozen", e.getMessage());
+		}
+		try {
+			set.clear();
+			fail("IllegalStateException not thrown");
+		} catch (IllegalStateException e) {
+			assertEquals("frozen", e.getMessage());
+		}
 	}
 
 	// utils

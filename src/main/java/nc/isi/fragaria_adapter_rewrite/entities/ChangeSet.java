@@ -21,6 +21,8 @@ public class ChangeSet<K extends Comparable<? super K>> {
 
 	private final Set<K> deletions = new TreeSet<>();
 
+	private boolean frozen = false;
+
 	// ------------------------------------------------------------------
 	// Status methods
 	//
@@ -116,6 +118,8 @@ public class ChangeSet<K extends Comparable<? super K>> {
 	 *            The new value set.
 	 */
 	public void modify(K fieldName, JsonNode newValue) {
+		failIfFrozen();
+		
 		modifications.put(fieldName, newValue);
 		// Si cette valeur était supprimée, elle ne l'est plus.
 		deletions.remove(fieldName);
@@ -128,6 +132,8 @@ public class ChangeSet<K extends Comparable<? super K>> {
 	 *            The removed field.
 	 */
 	public void remove(K fieldName) {
+		failIfFrozen();
+		
 		deletions.add(fieldName);
 		// Si cette valeur était modifiée, elle n'est plus.
 		if (modifications.containsKey(fieldName)) {
@@ -139,8 +145,24 @@ public class ChangeSet<K extends Comparable<? super K>> {
 	 * Clear the changes recorded by this change set.
 	 */
 	public void clear() {
+		failIfFrozen();
+		
 		modifications.clear();
 		deletions.clear();
+	}
+
+	public void freeze() {
+		frozen = true;
+	}
+
+	public void unfreeze() {
+		frozen = false;
+	}
+
+	protected void failIfFrozen() {
+		if (frozen) {
+			throw new IllegalStateException("frozen");
+		}
 	}
 
 	// ------------------------------------------------------------------
@@ -167,6 +189,8 @@ public class ChangeSet<K extends Comparable<? super K>> {
 	 */
 	public void mergeWith(ChangeSet<K> other, ConflictResolution resolution)
 			throws MergeConflictException {
+		failIfFrozen();
+
 		Set<K> modifiedFields = other.modifiedFields();
 		// Look for merge conflicts
 		if (resolution == ConflictResolution.FAIL) {
