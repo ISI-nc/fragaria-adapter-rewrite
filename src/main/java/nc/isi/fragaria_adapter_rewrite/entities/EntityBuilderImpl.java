@@ -2,6 +2,7 @@ package nc.isi.fragaria_adapter_rewrite.entities;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Throwables;
 
@@ -61,5 +62,16 @@ public class EntityBuilderImpl implements EntityBuilder {
 			throw new RuntimeException(e);
 		}
 
+	}
+
+	@Override
+	public <E extends Entity> E build(ObjectNode objectNode) {
+		try {
+			Class<E> entityClass = FragariaObjectMapper.INSTANCE
+					.getEntityClass(objectNode);
+			return build(objectNode, entityClass);
+		} catch (JsonProcessingException | ClassNotFoundException e) {
+			throw Throwables.propagate(e);
+		}
 	}
 }

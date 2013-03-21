@@ -31,6 +31,7 @@ import nc.isi.fragaria_adapter_rewrite.resources.DataSourceProviderImpl;
 import nc.isi.fragaria_adapter_rewrite.resources.Datasource;
 import nc.isi.fragaria_adapter_rewrite.resources.MasterDsLoader;
 import nc.isi.fragaria_adapter_rewrite.resources.MasterDsLoaderImpl;
+import nc.isi.fragaria_adapter_rewrite.utils.jackson.EntityBeanDeserializerModifier;
 import nc.isi.fragaria_adapter_rewrite.utils.jackson.EntityJacksonModule;
 import nc.isi.fragaria_adapter_rewrite.utils.jackson.JacksonModule;
 import nc.isi.fragaria_reflection.services.FragariaReflectionModule;
@@ -75,16 +76,18 @@ public class FragariaDomainModule {
 		binder.bind(ViewGenerator.class, ViewGeneratorImpl.class);
 		binder.bind(FragariaObjectMapperContributor.class);
 		binder.bind(AliasesInitializer.class);
-		binder.bind(AliasesGenerator.class,AliasesGeneratorImpl.class);
+		binder.bind(AliasesGenerator.class, AliasesGeneratorImpl.class);
 	}
 
 	public void contributeReflectionProvider(Configuration<String> configuration) {
 		configuration.add("nc.isi.fragaria_adapter_rewrite");
 	}
-	
-//	public void contributeElasticSearchAdapter(Configuration<TransportAddress> configuration) {
-//		configuration.add(new  InetSocketTransportAddress("127.0.0.1", 9300));
-//	}
+
+	// public void
+	// contributeElasticSearchAdapter(Configuration<TransportAddress>
+	// configuration) {
+	// configuration.add(new InetSocketTransportAddress("127.0.0.1", 9300));
+	// }
 
 	public void contributeScannerProvider(Configuration<Scanner> configuration) {
 		configuration.add(new SubTypesScanner());
@@ -100,8 +103,10 @@ public class FragariaDomainModule {
 	}
 
 	public void contributeFragariaObjectMapperContributor(
-			Configuration<Module> configuration) {
-		configuration.add(new EntityJacksonModule());
+			Configuration<Module> configuration,
+			EntityBeanDeserializerModifier entityBeanDeserializerModifier) {
+		configuration.add(new EntityJacksonModule(
+				entityBeanDeserializerModifier));
 		configuration.add(new JodaModule());
 	}
 
@@ -111,7 +116,7 @@ public class FragariaDomainModule {
 			AliasesInitializer aliasesInitializer) {
 		viewInitializer.initialize();
 		fragariaObjectMapperContributor.initialize();
-		aliasesInitializer.initialize();		
+		aliasesInitializer.initialize();
 	}
 
 }

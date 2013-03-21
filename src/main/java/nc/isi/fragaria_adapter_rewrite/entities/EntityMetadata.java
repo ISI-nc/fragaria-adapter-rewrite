@@ -51,8 +51,10 @@ public class EntityMetadata {
 
 				@Override
 				public PropertyDescriptor load(String key) {
-					return checkNotNull(BeanUtils.getPropertyDescriptor(
-							entityClass, key));
+					return checkNotNull(
+							BeanUtils.getPropertyDescriptor(entityClass, key),
+							"property %s should exist for class %s", key,
+							entityClass);
 				}
 			});
 
@@ -65,6 +67,10 @@ public class EntityMetadata {
 		this.entityClass = entityClass;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public ImmutableSet<String> writablesPropertyNames() {
 		Set<String> writableProperties = Sets.newHashSet();
 		for (String name : propertyNames) {
@@ -111,12 +117,14 @@ public class EntityMetadata {
 		}
 		return dsKey;
 	}
-	
+
 	public String getEsAlias() {
-		EsAlias annotation = ReflectionUtils.getTypeAnnotation(entityClass,	EsAlias.class);
+		EsAlias annotation = ReflectionUtils.getTypeAnnotation(entityClass,
+				EsAlias.class);
 		String alias = annotation != null ? annotation.value() : null;
-		if(annotation!=null)
-			alias =  annotation.value() != null ? annotation.value() : entityClass.getSimpleName()+ALIAS_SUFFIX;				
+		if (annotation != null)
+			alias = annotation.value() != null ? annotation.value()
+					: entityClass.getSimpleName() + ALIAS_SUFFIX;
 		return alias;
 	}
 

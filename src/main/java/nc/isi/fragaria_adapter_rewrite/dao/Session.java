@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * 
  * @author bjonathas
@@ -43,5 +45,7 @@ public interface Session {
 	Session cancel();
 
 	UUID getId();
+
+	<T extends Entity> T create(ObjectNode node);
 
 }

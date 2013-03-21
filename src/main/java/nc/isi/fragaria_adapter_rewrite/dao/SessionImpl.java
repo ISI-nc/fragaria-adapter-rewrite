@@ -20,6 +20,7 @@ import nc.isi.fragaria_adapter_rewrite.enums.State;
 
 import org.apache.log4j.Logger;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
@@ -191,6 +192,13 @@ public class SessionImpl implements Session {
 	public <T extends Entity> T create(Class<T> entityClass) {
 		LOGGER.info(String.format("session %s create", getId()));
 		T entity = entityBuilder.build(entityClass);
+		return sessionize(entity);
+	}
+
+	@Override
+	public <T extends Entity> T create(ObjectNode node) {
+		LOGGER.info(String.format("session %s create", getId()));
+		T entity = entityBuilder.build(node);
 		return sessionize(entity);
 	}
 

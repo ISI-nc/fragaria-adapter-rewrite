@@ -99,8 +99,22 @@ public abstract class ObjectNodeWrapper implements Entity {
 			if (metadata().isNotEmbededList(propertyName)) {
 				continue;
 			}
+
 			Class<?> propertyType = metadata().propertyType(propertyName);
-			write(propertyName, fromDB.readProperty(propertyType, propertyName));
+			LOGGER.info(String.format("completing property %s of type %s",
+					propertyName, propertyType));
+			if (Collection.class.isAssignableFrom(propertyType)) {
+				LOGGER.info(String.format("with value %s", fromDB
+						.readCollection(
+								metadata().propertyParameterClasses(
+										propertyName)[0], propertyName)));
+				write(propertyName, fromDB.readCollection(metadata()
+						.propertyParameterClasses(propertyName)[0],
+						propertyName));
+			} else {
+				write(propertyName,
+						fromDB.readProperty(propertyType, propertyName));
+			}
 		}
 	}
 
@@ -195,6 +209,9 @@ public abstract class ObjectNodeWrapper implements Entity {
 					Collection<? extends Entity> collection = Collection.class
 							.cast(value);
 					ArrayNode array = objectMapper.createArrayNode();
+					LOGGER.info(String.format(
+							"writing property %s of type %s and value %s",
+							propertyName, propertyType, value));
 					for (Entity temp : collection) {
 						array.add(getJson(temp, view));
 					}
@@ -250,6 +267,9 @@ public abstract class ObjectNodeWrapper implements Entity {
 		checkParametersNotNull(view);
 		ObjectNode copy = objectMapper.createObjectNode();
 		for (String property : metadata().propertyNames(view)) {
+			if (!metadata().writablesPropertyNames().contains(property)) {
+				continue;
+			}
 			JsonNode value;
 			Class<?> propertyType = metadata().propertyType(property);
 			if (Collection.class.isAssignableFrom(propertyType)) {
