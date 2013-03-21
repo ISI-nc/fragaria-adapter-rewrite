@@ -119,7 +119,7 @@ public class ChangeSet<K extends Comparable<? super K>> {
 	 */
 	public void modify(K fieldName, JsonNode newValue) {
 		failIfFrozen();
-		
+
 		modifications.put(fieldName, newValue);
 		// Si cette valeur était supprimée, elle ne l'est plus.
 		deletions.remove(fieldName);
@@ -133,7 +133,7 @@ public class ChangeSet<K extends Comparable<? super K>> {
 	 */
 	public void remove(K fieldName) {
 		failIfFrozen();
-		
+
 		deletions.add(fieldName);
 		// Si cette valeur était modifiée, elle n'est plus.
 		if (modifications.containsKey(fieldName)) {
@@ -146,7 +146,7 @@ public class ChangeSet<K extends Comparable<? super K>> {
 	 */
 	public void clear() {
 		failIfFrozen();
-		
+
 		modifications.clear();
 		deletions.clear();
 	}
@@ -176,7 +176,7 @@ public class ChangeSet<K extends Comparable<? super K>> {
 	 *            The {@link ChangeSet} to merge with.
 	 */
 	public void mergeWith(ChangeSet<K> other) throws MergeConflictException {
-		mergeWith(other, ConflictResolution.FAIL);
+		mergeWith(other, ConflictSolver.FAIL);
 	}
 
 	/**
@@ -187,62 +187,71 @@ public class ChangeSet<K extends Comparable<? super K>> {
 	 * @param resolution
 	 *            The resolution to apply in the event of a conflict.
 	 */
-	public void mergeWith(ChangeSet<K> other, ConflictResolution resolution)
+	public void mergeWith(ChangeSet<K> other, ConflictSolver conflictSolver)
 			throws MergeConflictException {
 		failIfFrozen();
-
-		Set<K> modifiedFields = other.modifiedFields();
-		// Look for merge conflicts
-		if (resolution == ConflictResolution.FAIL) {
-			Set<K> conflictingKeys = new TreeSet<>();
-			for (K modifiedField : modifiedFields) {
-				if (!isModified(modifiedField)) {
-					continue;
-				}
-				JsonNode mine = get(modifiedField);
-				JsonNode their = other.get(modifiedField);
-				if (nullSafeEquals(mine, their)) {
-					continue; // modified by the same value => no conflict
-				}
-				conflictingKeys.add(modifiedField);
-			}
-			if (!conflictingKeys.isEmpty()) {
-				throw new MergeConflictException(conflictingKeys);
+		// Look for merge conflicts, fail if unresolved ones exist.
+		Set<K> conflictingKeys = conflictsWith(other);
+		Set<K> unresolvedConflicts = new TreeSet<>();
+		for (K conflictingKey : conflictingKeys) {
+			if (!conflictSolver.canSolve(conflictingKey, this, other)) {
+				unresolvedConflicts.add(conflictingKey);
 			}
 		}
+		if (!unresolvedConflicts.isEmpty()) {
+			throw new MergeConflictException(unresolvedConflicts);
+		}
 		// Merge modifications
-		for (K modifiedField : modifiedFields) {
-			if (isModified(modifiedField)) {
-				JsonNode mine = get(modifiedField);
-				JsonNode their = other.get(modifiedField);
-				if (nullSafeEquals(mine, their)) {
-					continue; // modified by the same value => ignore
-				}
-				// Conflict
-				switch (resolution) {
-				case OURS:
-					// ignore other's change
-					break;
-				case THEIRS:
-					// overwrite our change
-					modify(modifiedField, their);
-					break;
-				case FAIL:
-					throw new IllegalStateException("Unreachable code");
-				default:
-					throw new IllegalArgumentException("Unknown resolution: "
-							+ resolution);
-				}
-			} else if (isRemoved(modifiedField)) {
-				// removed on our side, so ignore the other's change
+		for (K change : other.changes()) {
+			if (conflictingKeys.contains(change)) {
+				// Conflit => merge
+				conflictSolver.merge(change, this, other);
 			} else {
-				modify(modifiedField, other.get(modifiedField));
+				// Apply theirs' change
+				if (other.isModified(change)) {
+					modify(change, other.get(change));
+				} else if (other.isRemoved(change)) {
+					remove(change);
+				}
 			}
 		}
 		// Merge removals
 		for (K removedField : other.removedFields()) {
 			remove(removedField);
 		}
+	}
+
+	/**
+	 * Look for conflicts with another change set. Does not change any of them.
+	 * 
+	 * @param other
+	 *            The other change set to "compare" with.
+	 * @return The keys in conflict.
+	 */
+	public Set<K> conflictsWith(ChangeSet<K> other) {
+		Set<K> conflictingKeys = new TreeSet<>();
+		for (K change : changes()) {
+			if (!other.isChanged(change)) {
+				continue;
+			}
+			if (isModified(change) || other.isModified(change)) {
+				// M? or ?M conflict
+				if (isRemoved(change) || other.isRemoved(change)) {
+					// MD or DM conflict
+					conflictingKeys.add(change);
+				}
+				// MM conflict
+				JsonNode mine = get(change);
+				JsonNode their = other.get(change);
+				if (nullSafeEquals(mine, their)) {
+					continue; // modified by the same value => no conflict
+				}
+				conflictingKeys.add(change);
+			} else {
+				// DD conflict => same change on both sides => no conflict
+			}
+		}
+		return conflictingKeys;
 	}
 
 	private boolean nullSafeEquals(Object mine, Object their) {

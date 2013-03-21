@@ -77,18 +77,17 @@ public class TestFieldChangeSet extends TestCase {
 		FieldChangeSet set1 = new FieldChangeSet();
 		FieldChangeSet set2 = new FieldChangeSet();
 
-		// M test + D test => D test
+		// M test + D test => ! test
 		set1.modify("test", null);
 		set2.remove("test");
-		set1.mergeWith(set2);
-		assertModifiedRemoved(set1, null, "test");
+		assertMergeFails(set1, set2, singleton("test"));
 
-		// D test + M test => D test
+		// D test + M test => ! test
 		set1 = new FieldChangeSet();
 		set2 = new FieldChangeSet();
 		set1.remove("test");
 		set2.modify("test", null);
-		assertModifiedRemoved(set1, null, "test");
+		assertMergeFails(set1, set2, singleton("test"));
 	}
 
 	public void testMergeConflict() throws Exception {
@@ -108,24 +107,18 @@ public class TestFieldChangeSet extends TestCase {
 		set2.remove("test2");
 
 		// no auto-resolution => conflict
-		try {
-			set1.mergeWith(set2);
-			fail("Exception not thrown");
-		} catch (MergeConflictException e) {
-			// The key in conflict is "test"
-			assertEquals(singleton("test"), e.getConflictingKeys());
-			// and the change set hasn't been modified
-			assertModifiedRemoved(set1, "test", null);
-			assertEquals(new TextNode("test1"), set1.get("test"));
-		}
+		assertMergeFails(set1, set2, singleton("test"));
+		// and the change set hasn't been modified
+		assertModifiedRemoved(set1, "test", null);
+		assertEquals(new TextNode("test1"), set1.get("test"));
 
 		// "ours" resolution
-		set1.mergeWith(set2, ConflictResolution.OURS);
+		set1.mergeWith(set2, ConflictSolver.OURS);
 		assertModifiedRemoved(set1, "test", "test2");
 		assertEquals(new TextNode("test1"), set1.get("test"));
 
 		// "theirs" resolution
-		set1.mergeWith(set2, ConflictResolution.THEIRS);
+		set1.mergeWith(set2, ConflictSolver.THEIRS);
 		assertModifiedRemoved(set1, "test", "test2");
 		assertEquals(new TextNode("test2"), set1.get("test"));
 	}
@@ -174,6 +167,17 @@ public class TestFieldChangeSet extends TestCase {
 	}
 
 	// utils
+
+	private void assertMergeFails(FieldChangeSet set1, FieldChangeSet set2,
+			Set<String> conflictingKeys) {
+		try {
+			set1.mergeWith(set2);
+			fail("Exception not thrown");
+		} catch (MergeConflictException e) {
+			// The key in conflict is "test"
+			assertEquals(conflictingKeys, e.getConflictingKeys());
+		}
+	}
 
 	private void assertModifiedRemoved(FieldChangeSet set, String modified,
 			String removed) {
