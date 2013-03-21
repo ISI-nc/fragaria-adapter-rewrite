@@ -15,7 +15,8 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author Mikaël Cluseau
  * 
  */
-public class ChangeSet<K extends Comparable<? super K>> {
+public class ChangeSet<K extends Comparable<? super K>> implements
+		KeyValueGet<K, JsonNode> {
 
 	private final Map<K, JsonNode> modifications = new TreeMap<>();
 

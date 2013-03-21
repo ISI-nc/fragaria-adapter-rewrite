@@ -1,6 +1,5 @@
 package nc.isi.fragaria_adapter_rewrite.entities;
 
-
 /**
  * Classe représentant un ensemble de changements.
  * 
@@ -8,4 +7,5 @@ package nc.isi.fragaria_adapter_rewrite.entities;
  * 
  */
 public class FieldChangeSet extends ChangeSet<String> {
+
 }
