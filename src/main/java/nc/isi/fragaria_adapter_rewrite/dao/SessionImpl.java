@@ -72,7 +72,8 @@ public class SessionImpl implements Session {
 					(Collection<T>) deletedObjects.get(entityClass), query));
 			for (T o : findValuesFromCollection(
 					(Collection<T>) updatedObjects.get(entityClass), query)) {
-				objects.remove(o);
+				if (objects.contains(o))
+					continue;
 				objects.add(o);
 			}
 			LOGGER.debug(String.format("list after cache : %s", objects));
