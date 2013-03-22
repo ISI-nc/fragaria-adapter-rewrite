@@ -32,6 +32,9 @@ public class TestUser {
 
 	private String lastName;
 
+	@Embedded
+	private TestAdress adress;
+
 	@ManyToOne
 	private TestUser manager;
 
@@ -40,7 +43,7 @@ public class TestUser {
 
 	@OneToMany(mappedBy = "manager")
 	private List<TestUser> fellows;
-	
+
 	@Embedded
 	private Set<TestPhone> phones;
 
@@ -114,6 +117,14 @@ public class TestUser {
 
 	public void setBirthDate(Date birthDate) {
 		this.birthDate = birthDate;
+	}
+
+	protected TestAdress getAdress() {
+		return adress;
+	}
+
+	protected void setAdress(TestAdress adress) {
+		this.adress = adress;
 	}
 
 }
