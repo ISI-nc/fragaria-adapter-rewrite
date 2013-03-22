@@ -19,6 +19,7 @@ import nc.isi.fragaria_adapter_rewrite.resources.DataSourceProvider;
 
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.LinkedListMultimap;
 
 public class AdapterManagerImpl implements AdapterManager {
@@ -114,7 +115,7 @@ public class AdapterManagerImpl implements AdapterManager {
 		LOGGER.info("post : " + entities);
 		LinkedListMultimap<Adapter, Entity> dispatch = LinkedListMultimap
 				.create();
-		for (Entity entity : entities) {
+		for (Entity entity : ImmutableList.copyOf(entities)) {
 			entity.prepareForCommit();
 			dispatch.put(getAdapter(entity.getClass()), entity);
 		}

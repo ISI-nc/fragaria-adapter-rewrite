@@ -46,6 +46,6 @@ public interface Session {
 
 	UUID getId();
 
-	<T extends Entity> T create(ObjectNode node);
+	<T extends Entity> T build(ObjectNode node);
 
 }

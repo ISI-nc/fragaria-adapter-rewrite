@@ -124,6 +124,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 
 	protected <T> Boolean modifyCollection(String collectionName, T element,
 			Class<T> collectionType, Action action) {
+		checkNotNull(element);
 		LOGGER.debug(String.format("%s %s %s %s in %s", action, element,
 				action == Action.READ ? "from" : "to", collectionName,
 				getClass()));
@@ -140,14 +141,32 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		default:
 			throw new IllegalArgumentException(action.toString());
 		}
+		if (element instanceof Entity) {
+			manageDependency(action, (Entity) element, collectionName);
+		}
 		writeProperty(collectionName, collection);
 		return result;
+	}
+
+	private void manageDependency(Action action, Entity entity,
+			String collectionName) {
+		String backReferencePropertyName = metadata().getBackReference(
+				collectionName);
+		if (action == Action.ADD) {
+			entity.attributeSession(getSession());
+		}
+		entity.writeProperty(backReferencePropertyName,
+				action == Action.REMOVE ? null : this);
 	}
 
 	public void writeProperty(String propertyName, Object value) {
 		checkSessionSanity(propertyName, value);
 		LOGGER.debug(String.format("write %s in %s in %s", value, propertyName,
 				getClass()));
+		if (value != null && value instanceof Entity
+				&& ((Entity) value).getSession() == null) {
+			((Entity) value).attributeSession(getSession());
+		}
 		checkGlobalSanity(propertyName, Action.WRITE);
 		Object oldValue = cache.get(propertyName);
 		cache.put(propertyName, value);
@@ -169,6 +188,10 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		checkSessionSanity(propertyName, value);
 		LOGGER.debug(String.format("write directly %s in %s in %s", value,
 				propertyName, getClass()));
+		if (value != null && value instanceof Entity
+				&& ((Entity) value).getSession() == null) {
+			((Entity) value).attributeSession(getSession());
+		}
 		checkGlobalSanity(propertyName, Action.WRITE);
 		cache.put(propertyName, value);
 		write(propertyName, value);
@@ -228,10 +251,6 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 	}
 
 	protected void checkGlobalSanity(String propertyName, Action action) {
-		if (action != Action.READ) {
-			checkState(state != State.DELETED,
-					"impossible de %s les propriétés d'un objet effacé", action);
-		}
 		checkArgument(entityMetadata.propertyNames().contains(propertyName),
 				"La propriété %s n'est pas connu pour les objets de type %s",
 				propertyName, getClass());
@@ -260,7 +279,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		if (Objects.equal(getSession(), entity.getSession())) {
 			return;
 		}
-		if (entity.getState() == State.COMMITED) {
+		if (entity.getState() == State.COMMITED || entity.getSession() == null) {
 			return;
 		}
 		throw new IllegalArgumentException(
@@ -312,6 +331,9 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 	 */
 	@Override
 	public void attributeSession(Session session) {
+		if (Objects.equal(this.session, session)) {
+			return;
+		}
 		checkState(
 				this.state == State.COMMITED || this.session == null,
 				"can only change session if commited (actual state %s) or session is null %s",
