@@ -38,8 +38,17 @@ public class AliasesInitializer {
 				LOGGER.info("rejected : " + entityClass);
 				continue;
 			}
-			LOGGER.info("initialize : " + entityClass);
-			generator.generate(new EntityMetadata(entityClass));
+			initializeIfEsAlias(new EntityMetadata(entityClass));	
 		}
+	}
+
+	private void initializeIfEsAlias(EntityMetadata entityMetadata) {
+		if (entityMetadata.getEsAlias() == null) {
+			LOGGER.info("no alias found for "+entityMetadata.getEntityClass());
+		} else {
+			LOGGER.info("initialize : " + entityMetadata.getEntityClass());
+			generator.generate(entityMetadata);
+		}
+		
 	}
 }
