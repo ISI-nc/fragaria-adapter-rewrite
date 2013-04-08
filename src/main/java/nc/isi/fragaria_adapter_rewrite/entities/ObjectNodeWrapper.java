@@ -250,9 +250,6 @@ public abstract class ObjectNodeWrapper implements Entity {
 			if (metadata().isNotEmbededList(property)) {
 				continue;
 			}
-			if (property.equals("adress")) {
-				System.out.println(node.get(property));
-			}
 			LOGGER.info(String.format("reading property : %s", property));
 			Object value = metadata().read(this, property);
 			LOGGER.info(String.format("value : %s", value));

@@ -1,16 +1,25 @@
 package nc.isi.fragaria_adapter_rewrite.entities;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+
+import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Throwables;
 
 public class EntityBuilderImpl implements EntityBuilder {
+	private static final Logger LOGGER = Logger
+			.getLogger(EntityBuilderImpl.class);
 
 	@Override
 	public <E extends Entity> E build(ObjectNode objectNode,
 			Class<E> entityClass) {
+		if (Modifier.isAbstract(entityClass.getModifiers())) {
+			return build(objectNode);
+		}
+		LOGGER.info("building " + entityClass);
 		try {
 			return entityClass.getConstructor(ObjectNode.class).newInstance(
 					objectNode);
@@ -69,8 +78,12 @@ public class EntityBuilderImpl implements EntityBuilder {
 		try {
 			Class<E> entityClass = FragariaObjectMapper.INSTANCE
 					.getEntityClass(objectNode);
+			if (Modifier.isAbstract(entityClass.getModifiers())) {
+				throw new InstantiationException();
+			}
 			return build(objectNode, entityClass);
-		} catch (JsonProcessingException | ClassNotFoundException e) {
+		} catch (JsonProcessingException | ClassNotFoundException
+				| InstantiationException e) {
 			throw Throwables.propagate(e);
 		}
 	}

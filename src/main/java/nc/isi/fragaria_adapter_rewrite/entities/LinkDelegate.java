@@ -49,20 +49,6 @@ public class LinkDelegate<T extends Link<?, ?>, O extends Entity> {
 		return entity.getSession().get(
 				new ByViewQuery<>(othersType, null).filterBy(Entity.ID, ids));
 	}
-	
-	public Collection<O> getOthers(Collection<T> links) {
-		Collection<String> ids = Sets.newHashSet();
-		Side side = null;
-		for (T link : links) {
-			if (side == null) {
-				side = Side.opposite(getThisSide(link));
-			}
-			ids.add(link.get(side).getId());
-		}
-		System.out.println(ids);
-		return entity.getSession().get(
-				new ByViewQuery<>(othersType, null).filterBy(Entity.ID, ids));
-	}
 
 	public void setOthers(Collection<O> others) {
 		set(prepareOthers(others));

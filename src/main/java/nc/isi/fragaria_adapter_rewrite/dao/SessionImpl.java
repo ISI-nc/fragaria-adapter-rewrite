@@ -197,10 +197,11 @@ public class SessionImpl implements Session {
 	}
 
 	@Override
-	public <T extends Entity> T create(ObjectNode node) {
+	public <T extends Entity> T build(ObjectNode node) {
 		LOGGER.info(String.format("session %s create", getId()));
 		T entity = entityBuilder.build(node);
-		return sessionize(entity);
+		entity.attributeSession(this);
+		return entity;
 	}
 
 	@Override
