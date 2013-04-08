@@ -46,7 +46,6 @@ public class LinkDelegate<T extends Link<?, ?>, O extends Entity> {
 			}
 			ids.add(link.get(side).getId());
 		}
-		System.out.println(ids);
 		return entity.getSession().get(
 				new ByViewQuery<>(othersType, null).filterBy(Entity.ID, ids));
 	}
