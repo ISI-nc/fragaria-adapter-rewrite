@@ -46,20 +46,41 @@ public class LinkDelegate<T extends Link<?, ?>, O extends Entity> {
 			}
 			ids.add(link.get(side).getId());
 		}
+		return entity.getSession().get(
+				new ByViewQuery<>(othersType, null).filterBy(Entity.ID, ids));
+	}
+	
+	public Collection<O> getOthers(Collection<T> links) {
+		Collection<String> ids = Sets.newHashSet();
+		Side side = null;
+		for (T link : links) {
+			if (side == null) {
+				side = Side.opposite(getThisSide(link));
+			}
+			ids.add(link.get(side).getId());
+		}
 		System.out.println(ids);
 		return entity.getSession().get(
 				new ByViewQuery<>(othersType, null).filterBy(Entity.ID, ids));
 	}
 
 	public void setOthers(Collection<O> others) {
+		set(prepareOthers(others));
+	}
+	
+	public Collection<T> prepareOthers(Collection<O> others) {
 		Collection<T> links = Sets.newHashSet();
 		for (O entity : others) {
 			T link = contains(entity);
 			links.add(link == null ? buildLink(entity) : link);
 		}
-		set(links);
+		return links;
 	}
-
+	
+	public T prepareOther(O other) {
+		T link = contains(other);
+		return link == null ? buildLink(other) : link;
+	}
 	public Boolean add(O entity) {
 		checkNotNull(entity);
 		return add(buildLink(entity));
@@ -99,7 +120,7 @@ public class LinkDelegate<T extends Link<?, ?>, O extends Entity> {
 	public Collection<T> get() {
 		return ImmutableSet.copyOf(entity.readCollection(type, propName));
 	}
-
+	
 	public Boolean add(T link) {
 		checkArgument(!get().contains(link), "link already exists");
 		return entity.add(propName, link, type);
