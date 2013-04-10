@@ -15,6 +15,7 @@ import nc.isi.fragaria_adapter_rewrite.enums.State;
 
 import org.apache.log4j.Logger;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -97,6 +98,13 @@ public abstract class ObjectNodeWrapper implements Entity {
 				getSession().getId(), fromDB.getCompletion()));
 		EntityMetadata entityMetadata = metadata();
 		for (String propertyName : entityMetadata.propertyNames()) {
+			if (entityMetadata.getPropertyAnnotation(propertyName,
+					JsonIgnore.class) != null) {
+				continue;
+			}
+			if (hasFilledProperty(propertyName)) {
+				continue;
+			}
 			if (node.has(entityMetadata.getJsonPropertyName(propertyName))) {
 				continue;
 			}
@@ -292,5 +300,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 	protected boolean isEntity(Class<?> cl) {
 		return cl != null && Entity.class.isAssignableFrom(cl);
 	}
+
+	public abstract Boolean hasFilledProperty(String propertyName);
 
 }

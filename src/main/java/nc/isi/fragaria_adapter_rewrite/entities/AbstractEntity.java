@@ -200,6 +200,10 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		}
 	}
 
+	public Boolean hasFilledProperty(String propertyName) {
+		return cache.keySet().contains(propertyName);
+	}
+
 	@JsonIgnore
 	@Override
 	public State getState() {
@@ -240,6 +244,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 	}
 
 	@Override
+	@JsonIgnore
 	public Completion getCompletion() {
 		return this.completion;
 	}
