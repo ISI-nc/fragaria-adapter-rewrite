@@ -25,16 +25,16 @@ public abstract class Link<L extends Entity, R extends Entity> extends
 	public static final String L = "l";
 	public static final String R = "r";
 
-	private final Class<R> rType;
-	private final Class<L> lType;
+	private final Class<? extends R> rType;
+	private final Class<? extends L> lType;
 
-	public Link(Class<L> lType, Class<R> rType) {
+	public Link(Class<? extends L> lType, Class<? extends R> rType) {
 		super();
 		this.rType = rType;
 		this.lType = lType;
 	}
 
-	public Link(Class<L> lType, Class<R> rType, ObjectNode node) {
+	public Link(Class<? extends L> lType, Class<? extends R> rType, ObjectNode node) {
 		super(node);
 		this.rType = rType;
 		this.lType = lType;
