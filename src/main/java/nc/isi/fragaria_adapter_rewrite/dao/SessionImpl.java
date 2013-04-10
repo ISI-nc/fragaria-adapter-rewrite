@@ -225,10 +225,9 @@ public class SessionImpl implements Session {
 	public <T extends Entity> void delete(Collection<T> entities) {
 		checkNotDeleted(entities);
 		for (T entity : entities) {
-			System.out.println("delete object "+entity.getId());
-			
 			if (isRegistered(entity, createdObjects)) {
 				createdObjects.remove(entity.getClass(), entity);
+				queue.remove(entity);
 			} else {
 				if (isRegistered(entity, updatedObjects)) {
 					updatedObjects.remove(entity.getClass(), entity);
