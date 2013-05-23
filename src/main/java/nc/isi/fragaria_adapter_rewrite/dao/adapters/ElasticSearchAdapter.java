@@ -33,20 +33,22 @@ public class ElasticSearchAdapter {
 	private final ObjectMapper objectMapper;
 	private final EntityBuilder entityBuilder;
 
-	public ElasticSearchAdapter(Collection<TransportAddress> transportAdress,ObjectMapperProvider objectMapperProvider,
+	public ElasticSearchAdapter(Collection<TransportAddress> transportAdress,
+			ObjectMapperProvider objectMapperProvider,
 			EntityBuilder entityBuilder) {
 		this.objectMapper = objectMapperProvider.provide();
 		this.entityBuilder = entityBuilder;
 		this.transportClient = new TransportClient();
-		for(TransportAddress adress : transportAdress)
+		for (TransportAddress adress : transportAdress)
 			this.transportClient.addTransportAddress(adress);
 	}
 
 	private <T extends Entity> Collection<T> serialize(
 			final SearchResponse searchResponse, final Class<T> entityClass) {
 
-		List<T> list = new ArrayList<T>((int) searchResponse.hits().totalHits());
-		for (SearchHit hit : searchResponse.hits()) {
+		List<T> list = new ArrayList<T>((int) searchResponse.getHits()
+				.totalHits());
+		for (SearchHit hit : searchResponse.getHits()) {
 			try {
 				list.add(entityBuilder.build(ObjectNode.class.cast(objectMapper
 						.readTree(hit.sourceAsString())), entityClass));
@@ -87,7 +89,7 @@ public class ElasticSearchAdapter {
 		Boolean exists = false;
 		try {
 			exists = transportClient.admin().indices().prepareExists(alias)
-					.execute().get().exists();
+					.execute().get().isExists();
 		} catch (InterruptedException | ExecutionException e) {
 			throw Throwables.propagate(e);
 		}
