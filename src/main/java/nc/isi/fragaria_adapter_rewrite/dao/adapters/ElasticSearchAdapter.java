@@ -14,6 +14,7 @@ import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
 import nc.isi.fragaria_adapter_rewrite.services.ObjectMapperProvider;
 
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
@@ -71,10 +72,16 @@ public class ElasticSearchAdapter {
 			final SearchQuery<T> searchQuery) {
 		EntityMetadata entityMetadata = new EntityMetadata(
 				searchQuery.getResultType());
-		return transportClient.prepareSearch(entityMetadata.getEsAlias())
+		
+		SearchRequestBuilder searchRequestBuilder = transportClient.prepareSearch(entityMetadata.getEsAlias())
 				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 				.setQuery(searchQuery.getQueryBuilder())
-				.setSize(searchQuery.getLimit()).execute().actionGet();
+				.setFrom(searchQuery.getOffset())
+				.setSize(searchQuery.getLimit());
+		
+		if(searchQuery.isHasSortOrder())
+			searchRequestBuilder.addSort(searchQuery.getElasticSorting().getField(),searchQuery.getElasticSorting().getSortOrder());	
+		return searchRequestBuilder.execute().actionGet();
 	}
 
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
