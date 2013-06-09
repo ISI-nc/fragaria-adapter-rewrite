@@ -44,7 +44,6 @@ public class LinkDelegate<T extends Link<?, ?>, O extends Entity> {
 			if (side == null) {
 				side = Side.opposite(getThisSide(link));
 			}
-			System.out.println(link.getId());
 			ids.add(link.get(side).getId());
 		}
 		return entity.getSession().get(

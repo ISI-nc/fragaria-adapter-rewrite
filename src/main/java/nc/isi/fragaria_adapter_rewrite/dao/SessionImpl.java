@@ -63,7 +63,8 @@ public class SessionImpl implements Session {
 		CollectionQueryResponse<T> response = (CollectionQueryResponse<T>) adapterManager
 				.executeQuery(query);
 		Collection<T> objects = response.getResponse();
-		LOGGER.debug(String.format("list without cache : %s", objects));
+//		if object needs session to get toString property -> Bug
+//		LOGGER.debug(String.format("list without cache : %s", objects));
 		if (cache) {
 			Class<T> entityClass = query.getResultType();
 			if (createdObjects.get(entityClass).size() > 0)
@@ -80,7 +81,7 @@ public class SessionImpl implements Session {
 				objects.add(o);
 			}
 			}
-			LOGGER.debug(String.format("list after cache : %s", objects));
+//			LOGGER.debug(String.format("list after cache : %s", objects));
 		}
 		changeSession(objects);
 		LOGGER.info(String.format("session %s get : %s", getId(), objects));
@@ -319,9 +320,6 @@ public class SessionImpl implements Session {
 
 	private Boolean isRegistered(Entity entity,
 			Multimap<Class<? extends Entity>, Entity> map) {
-		System.out.println(entity.getId());
-		System.out.println(entity.getClass());
-		System.out.println(map.containsValue(entity));
 		return map.containsValue(entity);
 	}
 
