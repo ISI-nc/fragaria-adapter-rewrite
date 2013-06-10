@@ -88,7 +88,6 @@ public abstract class ObjectNodeWrapper implements Entity {
 
 	protected void completeFromDS() {
 		Class<? extends Entity> entityClass = getClass();
-		System.out.println("test session"+getSession());
 		Entity fromDB = getSession().getUnique(
 				new IdQuery<>(entityClass, getId()), false);
 		checkState(
