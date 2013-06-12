@@ -48,4 +48,6 @@ public interface Session {
 
 	<T extends Entity> T build(ObjectNode node);
 
+	void register(Entity entity);
+
 }

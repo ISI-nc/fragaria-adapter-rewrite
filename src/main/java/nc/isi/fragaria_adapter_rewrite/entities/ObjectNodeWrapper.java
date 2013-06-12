@@ -92,8 +92,8 @@ public abstract class ObjectNodeWrapper implements Entity {
 				new IdQuery<>(entityClass, getId()), false);
 		checkState(
 				fromDB != null,
-				"L'entité n'est pas nouvelle mais n'a pas de correspondance en base : %s",
-				getId());
+				"L'entité n'est pas nouvelle mais n'a pas de correspondance en base : classe %s, id %s",
+				entityClass, getId());
 		LOGGER.debug(String.format("fromDB with session %s completion %s",
 				getSession().getId(), fromDB.getCompletion()));
 		EntityMetadata entityMetadata = metadata();

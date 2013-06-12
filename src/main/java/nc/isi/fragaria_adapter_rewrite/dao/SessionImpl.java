@@ -255,15 +255,7 @@ public class SessionImpl implements Session {
 				.format("Entity %s record property %s changed oldValue = %s : newValue = %s",
 						e.getSource(), e.getPropertyName(), e.getOldValue(),
 						e.getNewValue()));
-		if (isRegistered(entity, deletedObjects)) {
-			commitError(entity, entity.getState(), State.DELETED);
-		}
-		if (entity.getState() == State.NEW) {
-			register(entity, createdObjects);
-			return;
-		}
-		entity.setState(State.MODIFIED);
-		register(entity, updatedObjects);
+		register(entity);
 	}
 
 	@Override
@@ -353,6 +345,21 @@ public class SessionImpl implements Session {
 		}
 		Session session = Session.class.cast(obj);
 		return Objects.equal(this.getId(), session.getId());
+	}
+
+	@Override
+	public void register(Entity entity) {
+		changeSession(entity);
+		if (isRegistered(entity, deletedObjects)) {
+			commitError(entity, entity.getState(), State.DELETED);
+		}
+		if (entity.getState() == State.NEW) {
+			register(entity, createdObjects);
+			return;
+		}
+		entity.setState(State.MODIFIED);
+		register(entity, updatedObjects);
+
 	}
 
 }
