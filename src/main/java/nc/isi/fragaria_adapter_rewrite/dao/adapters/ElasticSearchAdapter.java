@@ -14,6 +14,7 @@ import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
 import nc.isi.fragaria_adapter_rewrite.services.ObjectMapperProvider;
 
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
@@ -33,20 +34,22 @@ public class ElasticSearchAdapter {
 	private final ObjectMapper objectMapper;
 	private final EntityBuilder entityBuilder;
 
-	public ElasticSearchAdapter(Collection<TransportAddress> transportAdress,ObjectMapperProvider objectMapperProvider,
+	public ElasticSearchAdapter(Collection<TransportAddress> transportAdress,
+			ObjectMapperProvider objectMapperProvider,
 			EntityBuilder entityBuilder) {
 		this.objectMapper = objectMapperProvider.provide();
 		this.entityBuilder = entityBuilder;
 		this.transportClient = new TransportClient();
-		for(TransportAddress adress : transportAdress)
+		for (TransportAddress adress : transportAdress)
 			this.transportClient.addTransportAddress(adress);
 	}
 
 	private <T extends Entity> Collection<T> serialize(
 			final SearchResponse searchResponse, final Class<T> entityClass) {
 
-		List<T> list = new ArrayList<T>((int) searchResponse.hits().totalHits());
-		for (SearchHit hit : searchResponse.hits()) {
+		List<T> list = new ArrayList<T>((int) searchResponse.getHits()
+				.totalHits());
+		for (SearchHit hit : searchResponse.getHits()) {
 			try {
 				list.add(entityBuilder.build(ObjectNode.class.cast(objectMapper
 						.readTree(hit.sourceAsString())), entityClass));
@@ -69,10 +72,16 @@ public class ElasticSearchAdapter {
 			final SearchQuery<T> searchQuery) {
 		EntityMetadata entityMetadata = new EntityMetadata(
 				searchQuery.getResultType());
-		return transportClient.prepareSearch(entityMetadata.getEsAlias())
+		
+		SearchRequestBuilder searchRequestBuilder = transportClient.prepareSearch(entityMetadata.getEsAlias())
 				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 				.setQuery(searchQuery.getQueryBuilder())
-				.setSize(searchQuery.getLimit()).execute().actionGet();
+				.setFrom(searchQuery.getOffset())
+				.setSize(searchQuery.getLimit());
+		
+		if(searchQuery.isHasSortOrder())
+			searchRequestBuilder.addSort(searchQuery.getElasticSorting().getField(),searchQuery.getElasticSorting().getSortOrder());	
+		return searchRequestBuilder.execute().actionGet();
 	}
 
 	public <T extends Entity> CollectionQueryResponse<T> executeQuery(
@@ -87,7 +96,7 @@ public class ElasticSearchAdapter {
 		Boolean exists = false;
 		try {
 			exists = transportClient.admin().indices().prepareExists(alias)
-					.execute().get().exists();
+					.execute().get().isExists();
 		} catch (InterruptedException | ExecutionException e) {
 			throw Throwables.propagate(e);
 		}

@@ -63,20 +63,25 @@ public class SessionImpl implements Session {
 		CollectionQueryResponse<T> response = (CollectionQueryResponse<T>) adapterManager
 				.executeQuery(query);
 		Collection<T> objects = response.getResponse();
-		LOGGER.debug(String.format("list without cache : %s", objects));
+//		if object needs session to get toString property -> Bug
+//		LOGGER.debug(String.format("list without cache : %s", objects));
 		if (cache) {
 			Class<T> entityClass = query.getResultType();
-			objects.addAll(findValuesFromCollection(
-					(Collection<T>) createdObjects.get(entityClass), query));
-			objects.removeAll(findValuesFromCollection(
-					(Collection<T>) deletedObjects.get(entityClass), query));
+			if (createdObjects.get(entityClass).size() > 0)
+				objects.addAll(findValuesFromCollection(
+						(Collection<T>) createdObjects.get(entityClass), query));
+			if (deletedObjects.get(entityClass).size() > 0)
+				objects.removeAll(findValuesFromCollection(
+						(Collection<T>) deletedObjects.get(entityClass), query));
+			if(updatedObjects.get(entityClass).size()>0){
 			for (T o : findValuesFromCollection(
 					(Collection<T>) updatedObjects.get(entityClass), query)) {
 				if (objects.contains(o))
 					continue;
 				objects.add(o);
 			}
-			LOGGER.debug(String.format("list after cache : %s", objects));
+			}
+//			LOGGER.debug(String.format("list after cache : %s", objects));
 		}
 		changeSession(objects);
 		LOGGER.info(String.format("session %s get : %s", getId(), objects));
@@ -224,12 +229,17 @@ public class SessionImpl implements Session {
 	@Override
 	public <T extends Entity> void delete(Collection<T> entities) {
 		checkNotDeleted(entities);
+		
 		for (T entity : entities) {
 			if (isRegistered(entity, createdObjects)) {
 				createdObjects.remove(entity.getClass(), entity);
+				while(queue.contains(entity))
+					queue.remove(entity);
 			} else {
 				if (isRegistered(entity, updatedObjects)) {
 					updatedObjects.remove(entity.getClass(), entity);
+					while(queue.contains(entity))
+						queue.remove(entity);
 				}
 				register(entity, deletedObjects);
 			}

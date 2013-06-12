@@ -2,7 +2,6 @@ package nc.isi.fragaria_adapter_rewrite.entities;
 
 import java.math.BigDecimal;
 
-
 import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;

@@ -91,7 +91,7 @@
 		<dependency>
 			<groupId>org.elasticsearch</groupId>
 			<artifactId>elasticsearch</artifactId>
-			<version>0.20.2</version>
+			<version>${elasticsearch-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>nc.isi</groupId>
@@ -183,5 +183,6 @@
 		<querydsl.version>2.7.0</querydsl.version>
 		<jackson-version>2.1.2</jackson-version>
 		<slf4j.version>1.6.4</slf4j.version>
+		<elasticsearch-version>0.90.0</elasticsearch-version>
 	</properties>
 </project>
