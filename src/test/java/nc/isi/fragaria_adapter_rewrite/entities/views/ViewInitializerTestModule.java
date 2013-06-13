@@ -1,11 +1,8 @@
 package nc.isi.fragaria_adapter_rewrite.entities.views;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import nc.isi.fragaria_adapter_rewrite.dao.CollectionQueryResponse;
@@ -104,11 +101,12 @@ public class ViewInitializerTestModule {
 			}
 
 			@Override
-			public ViewConfig build(String name, File file) {
+			public ViewConfig build(String name, String fileName) {
 				String s;
 				try {
-					BufferedReader bufferedReader = Files.newBufferedReader(
-							Paths.get(file.toURI()), Charset.defaultCharset());
+					BufferedReader bufferedReader = new BufferedReader(
+							new InputStreamReader(ClassLoader
+									.getSystemResourceAsStream(fileName)));
 					s = bufferedReader.readLine();
 					bufferedReader.close();
 				} catch (IOException e) {

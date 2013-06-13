@@ -79,7 +79,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 				.getSuperclass()) {
 			tempTypes.addLast(type.getName());
 		}
-		if(state!=State.DELETED)
+		if (state != State.DELETED)
 			writePropertyDirectly(TYPES, tempTypes);
 		typesInitialized = true;
 		return tempTypes;

@@ -2,7 +2,6 @@ package nc.isi.fragaria_adapter_rewrite.entities.views;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
@@ -10,18 +9,19 @@ import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_reflection.services.ResourceFinder;
 
 import com.google.common.collect.Lists;
+
 /**
  * 
  * @author bjonathas
- *
- *This service will provide a ViewConfig for a given Class and View thanks 
- *to a ViewConfigBuilder. The ViewConfigBuilder can be different depending 
- *on the Datasource type (like Cayenne or Couchdb). In order to build the 
- *ViewConfig, the ViewConfigBuilder uses the View definition file which has to :
- *	- have the same extension as the one in fileExtensions for 
- *		the Datasource Type of this class,
- *	- respect the naming convention, by default : “class-view.ext” (in lower case) 
- *		(ex : etablissement-name.sql)
+ * 
+ *         This service will provide a ViewConfig for a given Class and View
+ *         thanks to a ViewConfigBuilder. The ViewConfigBuilder can be different
+ *         depending on the Datasource type (like Cayenne or Couchdb). In order
+ *         to build the ViewConfig, the ViewConfigBuilder uses the View
+ *         definition file which has to : - have the same extension as the one
+ *         in fileExtensions for the Datasource Type of this class, - respect
+ *         the naming convention, by default : “class-view.ext” (in lower case)
+ *         (ex : etablissement-name.sql)
  */
 
 public class ViewConfigProviderImpl implements ViewConfigProvider {
@@ -38,7 +38,7 @@ public class ViewConfigProviderImpl implements ViewConfigProvider {
 	@Override
 	public ViewConfig provide(Class<? extends Entity> entityClass,
 			Class<? extends QueryView> view, ViewConfigBuilder viewConfigBuilder) {
-		List<File> files = Lists.newArrayList();
+		List<String> files = Lists.newArrayList();
 		for (String fileExtension : fileExtensions) {
 			files.addAll(resourceFinder.getResourcesMatching(String.format(
 					FORMAT, entityClass.getSimpleName().toLowerCase(), view
