@@ -178,7 +178,7 @@
 	</repositories>
 
 	<properties>
-		<tapestry-release-version>5.4-alpha-4</tapestry-release-version>
+		<tapestry-release-version>5.4-alpha-9</tapestry-release-version>
 		<easymock-release-version>3.0</easymock-release-version>
 		<querydsl.version>2.7.0</querydsl.version>
 		<jackson-version>2.1.2</jackson-version>
