@@ -60,7 +60,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>14.0-rc1</version>
+			<version>14.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.reflections</groupId>
@@ -113,7 +113,6 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.0</version>
 					<configuration>
 						<source>1.7</source>
 						<target>1.7</target>
@@ -178,11 +177,11 @@
 	</repositories>
 
 	<properties>
-		<tapestry-release-version>5.4-alpha-4</tapestry-release-version>
+		<tapestry-release-version>5.4-alpha-8</tapestry-release-version>
 		<easymock-release-version>3.0</easymock-release-version>
 		<querydsl.version>2.7.0</querydsl.version>
 		<jackson-version>2.1.2</jackson-version>
 		<slf4j.version>1.6.4</slf4j.version>
-		<elasticsearch-version>0.90.0</elasticsearch-version>
+		<elasticsearch-version>0.90.1</elasticsearch-version>
 	</properties>
 </project>

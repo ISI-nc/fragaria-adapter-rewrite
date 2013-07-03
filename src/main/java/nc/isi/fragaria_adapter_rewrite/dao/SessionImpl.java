@@ -271,6 +271,7 @@ public class SessionImpl implements Session {
 	@Override
 	public Session post() {
 		LOGGER.info(String.format("post session %s", getId()));
+		System.out.println();
 		adapterManager.post(queue);
 		return renewSession();
 	}
