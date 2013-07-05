@@ -374,5 +374,4 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		Entity entity = Entity.class.cast(obj);
 		return Objects.equal(this.getId(), entity.getId());
 	}
-
 }
