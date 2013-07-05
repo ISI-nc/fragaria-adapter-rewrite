@@ -103,5 +103,4 @@ public class ByViewQuery<T extends Entity> extends AbstractQuery<T> {
 		sb.append("and predicate : " + getPredicate());
 		return sb.toString();
 	}
-
 }
