@@ -62,6 +62,7 @@ public class SessionImpl implements Session {
 	public <T extends Entity> Collection<T> get(Query<T> query, boolean cache) {
 		CollectionQueryResponse<T> response = (CollectionQueryResponse<T>) adapterManager
 				.executeQuery(query);
+		
 		Collection<T> objects = response.getResponse();
 //		if object needs session to get toString property -> Bug
 //		LOGGER.debug(String.format("list without cache : %s", objects));
@@ -156,9 +157,16 @@ public class SessionImpl implements Session {
 	private Predicate buildFullPredicate(ByViewQuery<?> query) {
 		BooleanBuilder booleanBuilder = new BooleanBuilder();
 		for (Entry<String, Object> entry : query.getFilter().entrySet()) {
-			booleanBuilder.and(createPredicate(query.getResultType(),
+			if (entry.getValue() instanceof Collection){
+				for(Object object : (Collection)entry.getValue()){
+					booleanBuilder.and(createPredicate(query.getResultType(),
+							entry.getKey(), object));
+				}		
+			}else
+				booleanBuilder.and(createPredicate(query.getResultType(),
 					entry.getKey(), entry.getValue()));
 		}
+		
 		if (query.getPredicate() != null) {
 			booleanBuilder.and(query.getPredicate());
 		}
@@ -271,7 +279,6 @@ public class SessionImpl implements Session {
 	@Override
 	public Session post() {
 		LOGGER.info(String.format("post session %s", getId()));
-		System.out.println();
 		adapterManager.post(queue);
 		return renewSession();
 	}
