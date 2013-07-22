@@ -62,7 +62,9 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 	private Session session;
 	private boolean typesInitialized = false;
 	private final String tempId = UUID.randomUUID().toString();
-
+	
+	
+	
 	public AbstractEntity() {
 		super();
 		state = State.NEW;
@@ -100,8 +102,8 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 			String collectionName) {
 		LOGGER.debug(String.format("read collection : %s in %s",
 				collectionName, getClass()));
-		checkGlobalSanity(collectionName, Action.READ);
-		if (!cache.containsKey(collectionName)) {
+		checkGlobalSanity(collectionName, Action.READ);		
+		if (!cache.containsKey(collectionName) || metadata().isNotEmbededList(collectionName)) {
 			cache.put(collectionName,
 					resolveCollection(collectionGenericType, collectionName));
 		}
@@ -373,5 +375,10 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		}
 		Entity entity = Entity.class.cast(obj);
 		return Objects.equal(this.getId(), entity.getId());
+	}
+	
+	@Override
+	public String toString(){
+		return getId();
 	}
 }

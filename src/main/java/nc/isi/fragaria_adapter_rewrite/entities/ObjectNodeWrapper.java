@@ -175,7 +175,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 	}
 
 	protected <T extends Entity> Collection<T> getListByBackReference(
-			String propertyName, Class<T> propertyEntity) {
+			String propertyName, Class<T> propertyEntity) {		
 		return getSession().get(
 				new ByViewQuery<>(propertyEntity, metadata().getPartial(
 						propertyName)).filterBy(

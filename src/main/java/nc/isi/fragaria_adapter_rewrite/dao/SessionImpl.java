@@ -16,6 +16,7 @@ import java.util.UUID;
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManager;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
+import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 
 import org.apache.log4j.Logger;
@@ -62,10 +63,9 @@ public class SessionImpl implements Session {
 	public <T extends Entity> Collection<T> get(Query<T> query, boolean cache) {
 		CollectionQueryResponse<T> response = (CollectionQueryResponse<T>) adapterManager
 				.executeQuery(query);
-		
 		Collection<T> objects = response.getResponse();
-//		if object needs session to get toString property -> Bug
-//		LOGGER.debug(String.format("list without cache : %s", objects));
+		// if object needs session to get toString property -> Bug
+		// LOGGER.debug(String.format("list without cache : %s", objects));
 		if (cache) {
 			Class<T> entityClass = query.getResultType();
 			if (createdObjects.get(entityClass).size() > 0)
@@ -74,15 +74,15 @@ public class SessionImpl implements Session {
 			if (deletedObjects.get(entityClass).size() > 0)
 				objects.removeAll(findValuesFromCollection(
 						(Collection<T>) deletedObjects.get(entityClass), query));
-			if(updatedObjects.get(entityClass).size()>0){
-			for (T o : findValuesFromCollection(
-					(Collection<T>) updatedObjects.get(entityClass), query)) {
-				if (objects.contains(o))
-					continue;
-				objects.add(o);
+			if (updatedObjects.get(entityClass).size() > 0) {
+				for (T o : findValuesFromCollection(
+						(Collection<T>) updatedObjects.get(entityClass), query)) {
+					if (objects.contains(o))
+						continue;
+					objects.add(o);
+				}
 			}
-			}
-//			LOGGER.debug(String.format("list after cache : %s", objects));
+			// LOGGER.debug(String.format("list after cache : %s", objects));
 		}
 		changeSession(objects);
 		LOGGER.info(String.format("session %s get : %s", getId(), objects));
@@ -91,7 +91,7 @@ public class SessionImpl implements Session {
 
 	@Override
 	public <T extends Entity> Collection<T> get(Query<T> query) {
-		return get(query, true);
+		return get(query, false);
 	}
 
 	@Override
@@ -145,8 +145,21 @@ public class SessionImpl implements Session {
 			Collection<T> coll, Query<T> query) {
 		LOGGER.debug(String.format("collection %s : ", coll));
 		if (query instanceof ByViewQuery) {
+			EntityMetadata metadata = new EntityMetadata(query.getResultType());
+
 			T entity = alias(query.getResultType());
 			Predicate predicate = buildFullPredicate((ByViewQuery<T>) query);
+			for (Entry<String, Object> entry : ((ByViewQuery<T>) query)
+					.getFilter().entrySet()) {
+				if (entry.getValue() instanceof Entity) {
+					T e = alias(query.getResultType());
+					return from($(e), coll)
+							.where($(
+									e.readProperty(Entity.class, entry.getKey())
+											.getId()).eq(
+									((Entity) entry.getValue()).getId())).list($(e));
+				}
+			}
 			return predicate != null ? from($(entity), coll).where(predicate)
 					.list($(entity)) : coll;
 		} else {
@@ -156,17 +169,17 @@ public class SessionImpl implements Session {
 
 	private Predicate buildFullPredicate(ByViewQuery<?> query) {
 		BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+		// TODO handle case when propertyType is Entity
 		for (Entry<String, Object> entry : query.getFilter().entrySet()) {
-			if (entry.getValue() instanceof Collection){
-				for(Object object : (Collection)entry.getValue()){
+			if (entry.getValue() instanceof Collection) {
+				for (Object object : (Collection) entry.getValue()) {
 					booleanBuilder.and(createPredicate(query.getResultType(),
 							entry.getKey(), object));
-				}		
-			}else
-				booleanBuilder.and(createPredicate(query.getResultType(),
-					entry.getKey(), entry.getValue()));
+				}
+			}
 		}
-		
+
 		if (query.getPredicate() != null) {
 			booleanBuilder.and(query.getPredicate());
 		}
@@ -237,16 +250,16 @@ public class SessionImpl implements Session {
 	@Override
 	public <T extends Entity> void delete(Collection<T> entities) {
 		checkNotDeleted(entities);
-		
+
 		for (T entity : entities) {
 			if (isRegistered(entity, createdObjects)) {
 				createdObjects.remove(entity.getClass(), entity);
-				while(queue.contains(entity))
+				while (queue.contains(entity))
 					queue.remove(entity);
 			} else {
 				if (isRegistered(entity, updatedObjects)) {
 					updatedObjects.remove(entity.getClass(), entity);
-					while(queue.contains(entity))
+					while (queue.contains(entity))
 						queue.remove(entity);
 				}
 				register(entity, deletedObjects);
