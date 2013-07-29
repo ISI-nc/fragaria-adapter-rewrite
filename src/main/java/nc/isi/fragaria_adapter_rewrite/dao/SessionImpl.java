@@ -91,7 +91,7 @@ public class SessionImpl implements Session {
 
 	@Override
 	public <T extends Entity> Collection<T> get(Query<T> query) {
-		return get(query, false);
+		return get(query, true);
 	}
 
 	@Override
@@ -178,6 +178,8 @@ public class SessionImpl implements Session {
 							entry.getKey(), object));
 				}
 			}
+			booleanBuilder.and(createPredicate(query.getResultType(),
+					entry.getKey(), entry.getValue()));
 		}
 
 		if (query.getPredicate() != null) {
