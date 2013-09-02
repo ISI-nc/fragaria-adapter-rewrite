@@ -1,11 +1,10 @@
 package nc.isi.fragaria_adapter_rewrite.model;
 
-import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
 import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.entities.AbstractEntity;
 import nc.isi.fragaria_adapter_rewrite.model.CityViews.Name;
 
-@DsKey("test")
+//@DsKey("test")
 public class City extends AbstractEntity {
 	public static final String NAME = "name";
 

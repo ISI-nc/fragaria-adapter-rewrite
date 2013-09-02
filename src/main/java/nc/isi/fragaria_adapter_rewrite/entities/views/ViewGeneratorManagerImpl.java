@@ -34,6 +34,7 @@ public class ViewGeneratorManagerImpl implements ViewGeneratorManager {
 		Datasource datasource = dataSourceProvider.provide(entityMetadata
 				.getDsKey());
 		String dsType = datasource.getDsMetadata().getType();
+		System.out.println(dsType);
 		LOGGER.debug("dsType : " + dsType);
 		viewGenerator.generate(entityMetadata,
 				viewConfigBuilderProvider.provide(dsType));

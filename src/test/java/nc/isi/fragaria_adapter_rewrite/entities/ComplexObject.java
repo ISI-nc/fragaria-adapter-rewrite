@@ -1,10 +1,8 @@
 package nc.isi.fragaria_adapter_rewrite.entities;
 
-import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
-
 import org.joda.time.DateTime;
 
-@DsKey("test")
+//@DsKey("test")
 public class ComplexObject extends AbstractEntity {
 	private final String test;
 	private final DateTime creation;

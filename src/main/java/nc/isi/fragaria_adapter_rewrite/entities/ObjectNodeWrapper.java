@@ -179,7 +179,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 		return getSession().get(
 				new ByViewQuery<>(propertyEntity, metadata().getPartial(
 						propertyName)).filterBy(
-						metadata().getBackReference(propertyName), getId()));
+						metadata().getBackReference(propertyName), getId()),false);
 	}
 
 	protected void checkParametersNotNull(Object... objects) {

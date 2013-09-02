@@ -77,8 +77,7 @@ public class ElasticSearchAdapter {
 				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 				.setQuery(searchQuery.getQueryBuilder())
 				.setFrom(searchQuery.getOffset())
-				.setSize(searchQuery.getLimit());
-		
+				.setSize(searchQuery.getLimit());		
 		if(searchQuery.isHasSortOrder())
 			searchRequestBuilder.addSort(searchQuery.getElasticSorting().getField(),searchQuery.getElasticSorting().getSortOrder());	
 		return searchRequestBuilder.execute().actionGet();

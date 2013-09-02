@@ -3,7 +3,6 @@ package nc.isi.fragaria_adapter_rewrite.model;
 import java.util.Arrays;
 import java.util.Collection;
 
-import nc.isi.fragaria_adapter_rewrite.annotations.DsKey;
 import nc.isi.fragaria_adapter_rewrite.annotations.Embeded;
 import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.entities.AbstractEntity;
@@ -11,7 +10,7 @@ import nc.isi.fragaria_adapter_rewrite.model.CityViews.Name;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-@DsKey("test")
+//@DsKey("test")
 public class PersonData extends AbstractEntity {
 
 	public static final String NAME = "name";
