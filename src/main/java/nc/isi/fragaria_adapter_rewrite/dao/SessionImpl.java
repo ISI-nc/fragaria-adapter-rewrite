@@ -4,7 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.mysema.query.alias.Alias.$;
 import static com.mysema.query.alias.Alias.alias;
-import static com.mysema.query.collections.MiniApi.from;
+import static com.mysema.query.collections.CollQueryFactory.from;
 
 import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManager;
+import nc.isi.fragaria_adapter_rewrite.entities.AbstractEntity;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
@@ -123,9 +124,14 @@ public class SessionImpl implements Session {
 		LOGGER.debug(String.format("cachedValues %s : ", cachedValues));
 		if (query instanceof IdQuery) {
 			T entity = alias(query.getResultType());
-			return from($(entity), cachedValues).where(
-					$(entity.getId()).eq(((IdQuery<T>) query).getId()))
-					.uniqueResult($(entity));
+			for (HashMultimap<Class<? extends Entity>, Entity> cache : caches) {
+				T result = from($(entity), (Collection<T>) cache.values()).where(
+						$(entity.getId()).eq(((IdQuery<T>) query).getId()))
+						.uniqueResult($(entity));
+				if(result!=null)
+					return result;
+			}	
+			return null;
 		}
 		if (query instanceof ByViewQuery) {
 			T entity = alias(query.getResultType());
@@ -146,18 +152,19 @@ public class SessionImpl implements Session {
 		LOGGER.debug(String.format("collection %s : ", coll));
 		if (query instanceof ByViewQuery) {
 			EntityMetadata metadata = new EntityMetadata(query.getResultType());
-
 			T entity = alias(query.getResultType());
 			Predicate predicate = buildFullPredicate((ByViewQuery<T>) query);
 			for (Entry<String, Object> entry : ((ByViewQuery<T>) query)
 					.getFilter().entrySet()) {
-				if (entry.getValue() instanceof Entity) {
+				Class<?> propertyClass = metadata.getPropertyDescriptor(
+						entry.getKey()).getPropertyType();
+				if (AbstractEntity.class.isAssignableFrom(propertyClass)) {
 					T e = alias(query.getResultType());
-					return from($(e), coll)
-							.where($(
-									e.readProperty(Entity.class, entry.getKey())
-											.getId()).eq(
-									((Entity) entry.getValue()).getId())).list($(e));
+					return from($(e), coll).where(
+							$(metadata.read(e, entry.getKey())).eq(
+									getUnique(new IdQuery(propertyClass,
+											(String) entry.getValue())))).list(
+							$(e));
 				}
 			}
 			return predicate != null ? from($(entity), coll).where(predicate)
@@ -199,7 +206,7 @@ public class SessionImpl implements Session {
 
 	@SuppressWarnings("unchecked")
 	private <T extends Entity> Collection<T> getValuesFromCache(Class<T> type) {
-		Collection<T> cachedValue = Lists.newArrayList();
+		Collection<T> cachedValue = Lists.newArrayList();		
 		for (HashMultimap<Class<? extends Entity>, Entity> cache : caches) {
 			cachedValue.addAll((Collection<? extends T>) cache.get(type));
 		}
