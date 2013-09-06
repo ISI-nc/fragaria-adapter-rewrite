@@ -1,6 +1,5 @@
 package nc.isi.fragaria_adapter_rewrite.entities;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
@@ -126,7 +125,7 @@ public class LinkDelegate<T extends Link<?, ?>, O extends Entity> {
 	}
 	
 	public Boolean add(T link) {
-		checkArgument(!get().contains(link), "link already exists");
+//		checkArgument(!get().contains(link), "link already exists");
 		return entity.add(propName, link, type);
 	}
 

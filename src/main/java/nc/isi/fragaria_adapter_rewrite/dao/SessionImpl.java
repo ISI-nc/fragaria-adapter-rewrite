@@ -125,12 +125,18 @@ public class SessionImpl implements Session {
 		if (query instanceof IdQuery) {
 			T entity = alias(query.getResultType());
 			for (HashMultimap<Class<? extends Entity>, Entity> cache : caches) {
-				T result = from($(entity), (Collection<T>) cache.values()).where(
-						$(entity.getId()).eq(((IdQuery<T>) query).getId()))
-						.uniqueResult($(entity));
-				if(result!=null)
-					return result;
-			}	
+				for (Class<? extends Entity> type : cache.keySet()) {
+					if (query.getResultType().isAssignableFrom(type)) {
+						T result = from($(entity),
+								(Collection<T>) cache.get(type)).where(
+								$(entity.getId()).eq(
+										((IdQuery<T>) query).getId()))
+								.uniqueResult($(entity));
+						if (result != null)
+							return result;
+					}
+				}
+			}
 			return null;
 		}
 		if (query instanceof ByViewQuery) {
@@ -206,7 +212,7 @@ public class SessionImpl implements Session {
 
 	@SuppressWarnings("unchecked")
 	private <T extends Entity> Collection<T> getValuesFromCache(Class<T> type) {
-		Collection<T> cachedValue = Lists.newArrayList();		
+		Collection<T> cachedValue = Lists.newArrayList();
 		for (HashMultimap<Class<? extends Entity>, Entity> cache : caches) {
 			cachedValue.addAll((Collection<? extends T>) cache.get(type));
 		}
