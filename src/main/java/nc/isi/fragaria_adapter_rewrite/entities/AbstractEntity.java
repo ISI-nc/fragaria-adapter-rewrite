@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import nc.isi.fragaria_adapter_rewrite.annotations.BackReference;
 import nc.isi.fragaria_adapter_rewrite.annotations.InView;
 import nc.isi.fragaria_adapter_rewrite.dao.Session;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews;
@@ -62,9 +63,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 	private Session session;
 	private boolean typesInitialized = false;
 	private final String tempId = UUID.randomUUID().toString();
-	
-	
-	
+
 	public AbstractEntity() {
 		super();
 		state = State.NEW;
@@ -92,7 +91,16 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 				getClass()));
 		checkGlobalSanity(propertyName, Action.READ);
 		if (!cache.keySet().contains(propertyName)) {
-			cache.put(propertyName, resolve(propertyType, propertyName));
+			// isEmbedded
+			if (metadata().getPropertyAnnotation(propertyName,
+					BackReference.class) == null) {
+				cache.put(propertyName, resolve(propertyType, propertyName));
+			} else {
+				cache.put(
+						propertyName,
+						resolvePropertyByBackReference(propertyType,
+								propertyName));
+			}
 		}
 		return propertyType.cast(cache.get(propertyName));
 	}
@@ -102,8 +110,9 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 			String collectionName) {
 		LOGGER.debug(String.format("read collection : %s in %s",
 				collectionName, getClass()));
-		checkGlobalSanity(collectionName, Action.READ);		
-		if (!cache.containsKey(collectionName) || metadata().isNotEmbededList(collectionName)) {
+		checkGlobalSanity(collectionName, Action.READ);
+		if (!cache.containsKey(collectionName)
+				|| metadata().isNotEmbededList(collectionName)) {
 			cache.put(collectionName,
 					resolveCollection(collectionGenericType, collectionName));
 		}
@@ -376,9 +385,9 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		Entity entity = Entity.class.cast(obj);
 		return Objects.equal(this.getId(), entity.getId());
 	}
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		return getId();
 	}
 }

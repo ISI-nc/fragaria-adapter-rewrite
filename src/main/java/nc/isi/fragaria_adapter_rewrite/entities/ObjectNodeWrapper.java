@@ -60,6 +60,17 @@ public abstract class ObjectNodeWrapper implements Entity {
 		}
 	}
 
+	protected <T> T resolvePropertyByBackReference(Class<T> propertyType,
+			String propertyName) {
+		checkNotNull(propertyType);
+		checkNotNull(propertyName);
+		T result = null;
+		result = (T) getSession().getUnique(
+				new ByViewQuery(propertyType).filterBy(metadata()
+						.getBackReference(propertyName), getId()));
+		return result;
+	}
+
 	protected <T> T resolveFromNode(Class<T> propertyType, String propertyName) {
 		try {
 			T o = objectMapper
@@ -175,11 +186,12 @@ public abstract class ObjectNodeWrapper implements Entity {
 	}
 
 	protected <T extends Entity> Collection<T> getListByBackReference(
-			String propertyName, Class<T> propertyEntity) {		
+			String propertyName, Class<T> propertyEntity) {
 		return getSession().get(
 				new ByViewQuery<>(propertyEntity, metadata().getPartial(
 						propertyName)).filterBy(
-						metadata().getBackReference(propertyName), getId()),true);
+						metadata().getBackReference(propertyName), getId()),
+				true);
 	}
 
 	protected void checkParametersNotNull(Object... objects) {
