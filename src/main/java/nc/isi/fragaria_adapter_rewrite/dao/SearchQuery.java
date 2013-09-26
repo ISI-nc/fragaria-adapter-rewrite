@@ -33,7 +33,7 @@ public class SearchQuery<T extends Entity> implements Query<T> {
 		this.queryBuilder = queryBuilder;
 		this.limit = limit;
 		this.offset=offset;
-		this.hasSortOrder = false;
+		this.hasSortOrder = true;
 		this.setElasticSorting(elasticSorting);
 	}
 
