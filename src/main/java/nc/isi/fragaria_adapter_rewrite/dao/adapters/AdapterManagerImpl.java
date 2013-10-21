@@ -115,10 +115,12 @@ public class AdapterManagerImpl implements AdapterManager {
 		LOGGER.info("post : " + entities);
 		LinkedListMultimap<Adapter, Entity> dispatch = LinkedListMultimap
 				.create();
+		
 		for (Entity entity : ImmutableList.copyOf(entities)) {
 			entity.prepareForCommit();
 			dispatch.put(getAdapter(entity.getClass()), entity);
 		}
+		
 		for (Adapter adapter : dispatch.keySet()) {
 			adapter.post(new LinkedList<>(dispatch.get(adapter)));
 		}

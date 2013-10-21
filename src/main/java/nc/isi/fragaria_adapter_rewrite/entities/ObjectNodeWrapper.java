@@ -259,22 +259,24 @@ public abstract class ObjectNodeWrapper implements Entity {
 
 	public void prepareForCommit() {
 		checkState(getSession() != null, "object %s is not in session", this);
-		for (String property : metadata().writablesPropertyNames()) {
-			LOGGER.info(String.format("working on property : %s", property));
-			if (metadata().getEmbeded(property) == null
-					&& node.has(property)
-					&& Entity.class.isAssignableFrom(metadata().propertyType(
-							property))) {
-				continue;
-			}
-			if (metadata().isNotEmbededList(property)) {
-				continue;
-			}
-			LOGGER.info(String.format("reading property : %s", property));
-			Object value = metadata().read(this, property);
-			LOGGER.info(String.format("value : %s", value));
-			if (write(property, value)) {
-				LOGGER.info("write");
+		if (!this.getState().equals(State.DELETED) && !this.getState().equals(State.NEW) ) {
+			for (String property : metadata().writablesPropertyNames()) {
+				LOGGER.info(String.format("working on property : %s", property));
+				if (metadata().getEmbeded(property) == null
+						&& node.has(property)
+						&& Entity.class.isAssignableFrom(metadata()
+								.propertyType(property))) {
+					continue;
+				}
+				if (metadata().isNotEmbededList(property)) {
+					continue;
+				}
+				LOGGER.info(String.format("reading property : %s", property));
+				Object value = metadata().read(this, property);
+				LOGGER.info(String.format("value : %s", value));
+				if (write(property, value)) {
+					LOGGER.info("write");
+				}
 			}
 		}
 		setCompletion(Completion.FULL);

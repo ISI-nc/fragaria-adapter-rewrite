@@ -110,7 +110,7 @@ public class FragariaDomainModule {
 			AliasesInitializer aliasesInitializer) {
 //		viewInitializer.initialize();
 		fragariaObjectMapperContributor.initialize();
-		aliasesInitializer.initialize();
+//		aliasesInitializer.initialize();
 	}
 
 }
