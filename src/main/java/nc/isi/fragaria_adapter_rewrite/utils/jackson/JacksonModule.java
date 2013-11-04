@@ -10,6 +10,7 @@ public class JacksonModule {
 		binder.bind(EntityBeanDeserializerModifier.class);
 		binder.bind(EntitySerializers.class);
 		binder.bind(EntityJacksonModule.class);
+
 	}
 
 }
