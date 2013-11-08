@@ -19,7 +19,7 @@ import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfig;
 import nc.isi.fragaria_adapter_rewrite.model.PersonData;
 import nc.isi.fragaria_adapter_rewrite.model.QaRegistry;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 
 public class TestSession extends TestCase {
 	final EntityBuilder entityBuilder = QaRegistry.INSTANCE.getRegistry()

@@ -18,13 +18,15 @@ public class ViewGeneratorImpl implements ViewGenerator {
 		this.adapterManager = adapterManager;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void generate(EntityMetadata entityMetadata,
 			ViewConfigBuilder viewConfigBuilder) {
-		for (Class<? extends QueryView> view : entityMetadata
+		for (Class<? extends View> view : entityMetadata
 				.getViews(QueryView.class)) {
 			LOGGER.info("build view : " + view.getSimpleName());
-			build(entityMetadata, viewConfigBuilder, view);
+			build(entityMetadata, viewConfigBuilder,
+					(Class<? extends QueryView>) view);
 		}
 		build(entityMetadata, viewConfigBuilder, All.class);
 	}

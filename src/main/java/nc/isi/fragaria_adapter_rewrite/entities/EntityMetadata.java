@@ -2,13 +2,9 @@ package nc.isi.fragaria_adapter_rewrite.entities;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.beans.PropertyDescriptor;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -22,10 +18,10 @@ import nc.isi.fragaria_adapter_rewrite.annotations.Partial;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews.Full;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericQueryViews.All;
 import nc.isi.fragaria_adapter_rewrite.entities.views.View;
+import nc.isi.fragaria_reflection.utils.ObjectMetadata;
 import nc.isi.fragaria_reflection.utils.ReflectionUtils;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,36 +31,150 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
-public class EntityMetadata {
+public class EntityMetadata extends ObjectMetadata {
 	private static final Logger LOGGER = Logger.getLogger(EntityMetadata.class);
 	private static final Collection<String> excludedProperties = Arrays
 			.asList("class");
 	private static final String ID_TOKEN = "._id";
 	private static final String ALIAS_SUFFIX = "_alias";
 	private final Class<? extends Entity> entityClass;
-	private ImmutableSet<String> propertyNames;
-	private LoadingCache<String, PropertyDescriptor> cache = CacheBuilder
-			.newBuilder().build(new CacheLoader<String, PropertyDescriptor>() {
-
-				@Override
-				public PropertyDescriptor load(String key) {
-					return checkNotNull(
-							BeanUtils.getPropertyDescriptor(entityClass, key),
-							"property %s should exist for class %s", key,
-							entityClass);
-				}
-			});
+	private final String esAlias;
 
 	private Multimap<Class<? extends View>, String> viewProperties = HashMultimap
 			.create();
 	private boolean viewPropertiesInitialized = false;
 	private String dsKey;
+	private ImmutableSet<String> writableProperyNamesCache;
+	private final LoadingCache<String, Boolean> isNotEmbededListCache = CacheBuilder
+			.newBuilder().build(new CacheLoader<String, Boolean>() {
+
+				@Override
+				public Boolean load(String key) throws Exception {
+					Class<?> propertyType = propertyType(key);
+					return Collection.class.isAssignableFrom(propertyType)
+							&& Entity.class
+									.isAssignableFrom(propertyParameterClasses(key)[0])
+							&& getEmbeded(key) == null;
+				}
+
+			});
+
+	private final LoadingCache<String, Boolean> isNaturallyEmbededCache = CacheBuilder
+			.newBuilder().build(new CacheLoader<String, Boolean>() {
+
+				@Override
+				public Boolean load(String key) throws Exception {
+					Class<?> propertyType = propertyType(key);
+					return Collection.class.isAssignableFrom(propertyType)
+							&& !Entity.class
+									.isAssignableFrom(propertyParameterClasses(key)[0]);
+				}
+
+			});
+
+	private final Map<String, Class<? extends Collection>> collectionTypeCache = Maps
+			.newHashMap();
+
+	private final Map<String, Class<? extends View>> embededCache = Maps
+			.newHashMap();
+
+	private final LoadingCache<String, Class<? extends View>> partialCache = CacheBuilder
+			.newBuilder().build(
+					new CacheLoader<String, Class<? extends View>>() {
+
+						@Override
+						public Class<? extends View> load(String key)
+								throws Exception {
+							Partial partial = getPropertyAnnotation(key,
+									Partial.class);
+							return partial != null ? partial.value()
+									: All.class;
+						}
+
+					});
+
+	private final LoadingCache<String, String> backReferenceCache = CacheBuilder
+			.newBuilder().build(new CacheLoader<String, String>() {
+
+				@Override
+				public String load(String key) throws Exception {
+					BackReference reference = getPropertyAnnotation(key,
+							BackReference.class);
+					LOGGER.debug(String.format("backReference : %s",
+							reference != null ? reference.value() : entityClass
+									.getSimpleName().substring(0, 1)
+									.toLowerCase()
+									+ entityClass.getSimpleName().substring(1)));
+					return reference != null ? reference.value() : entityClass
+							.getSimpleName().substring(0, 1).toLowerCase()
+							+ entityClass.getSimpleName().substring(1);
+				}
+
+			});
+
+	private LoadingCache<Class<? extends View>, Collection<String>> propertyNamesByViewCache = CacheBuilder
+			.newBuilder()
+			.build(new CacheLoader<Class<? extends View>, Collection<String>>() {
+
+				@SuppressWarnings("unchecked")
+				@Override
+				public Collection<String> load(Class<? extends View> key)
+						throws Exception {
+					initViewProperties();
+					if (Full.class.isAssignableFrom(key)) {
+						return propertyNames();
+					}
+					Collection<String> properties = viewProperties.get(key);
+					if (View.class.isAssignableFrom(key.getSuperclass())) {
+						properties
+								.addAll(propertyNames((Class<? extends View>) key
+										.getSuperclass()));
+					}
+					return properties;
+				}
+
+			});
+
+	private LoadingCache<String, String> jsonPropertyNameCache = CacheBuilder
+			.newBuilder().build(new CacheLoader<String, String>() {
+
+				@Override
+				public String load(String key) throws Exception {
+					JsonProperty jsonProperty = getPropertyAnnotation(key,
+							JsonProperty.class);
+					return jsonProperty == null ? key : jsonProperty.value();
+				}
+
+			});
+
+	private LoadingCache<Class<? extends View>, Collection<Class<? extends View>>> viewsCache = CacheBuilder
+			.newBuilder()
+			.build(new CacheLoader<Class<? extends View>, Collection<Class<? extends View>>>() {
+
+				@Override
+				public Collection<Class<? extends View>> load(
+						Class<? extends View> key) throws Exception {
+					checkNotNull(key);
+					Collection<Class<? extends View>> views = Sets.newHashSet();
+					for (Class<? extends View> view : viewProperties.keySet()) {
+						if (key.isAssignableFrom(view)) {
+							views.add(view);
+						}
+					}
+					return views;
+				}
+
+			});
 
 	public EntityMetadata(Class<? extends Entity> entityClass) {
+		super(entityClass);
 		this.entityClass = entityClass;
+		this.esAlias = initEsAlias();
+		initViewProperties();
 	}
 
 	/**
@@ -72,41 +182,48 @@ public class EntityMetadata {
 	 * @return
 	 */
 	public ImmutableSet<String> writablesPropertyNames() {
-		Set<String> writableProperties = Sets.newHashSet();
-		for (String name : propertyNames) {
-			if (getPropertyAnnotation(name, JsonIgnore.class) != null) {
-				continue;
+		if (writableProperyNamesCache == null) {
+			Set<String> writableProperties = Sets.newHashSet();
+			for (String name : propertyNames()) {
+				if (getPropertyAnnotation(name, JsonIgnore.class) != null) {
+					continue;
+				}
+				if (excludedProperties.contains(name)) {
+					continue;
+				}
+				writableProperties.add(name);
 			}
-			if (excludedProperties.contains(name)) {
-				continue;
-			}
-			writableProperties.add(name);
+			LOGGER.info(writableProperties);
+			writableProperyNamesCache = ImmutableSet.copyOf(writableProperties);
 		}
-		LOGGER.info(writableProperties);
-		return ImmutableSet.copyOf(writableProperties);
+		return writableProperyNamesCache;
 	}
 
 	public boolean isNotEmbededList(String propertyName) {
-		Class<?> propertyType = propertyType(propertyName);
-		return Collection.class.isAssignableFrom(propertyType)
-				&& Entity.class
-						.isAssignableFrom(propertyParameterClasses(propertyName)[0])
-				&& getEmbeded(propertyName) == null;
+		try {
+			return isNotEmbededListCache.get(propertyName);
+		} catch (ExecutionException e) {
+			throw Throwables.propagate(e);
+		}
 	}
 
 	public boolean isNaturalyEmbeded(String propertyName) {
-		Class<?> propertyType = propertyType(propertyName);
-		return Collection.class.isAssignableFrom(propertyType)
-				&& !Entity.class
-						.isAssignableFrom(propertyParameterClasses(propertyName)[0]);
-
+		try {
+			return isNaturallyEmbededCache.get(propertyName);
+		} catch (ExecutionException e) {
+			throw Throwables.propagate(e);
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
 	public Class<? extends Collection> getCollectionType(String propertyName) {
-		CollectionType collectionType = getPropertyAnnotation(propertyName,
-				CollectionType.class);
-		return collectionType != null ? collectionType.value() : null;
+		if (!collectionTypeCache.keySet().contains(propertyName)) {
+			CollectionType collectionType = getPropertyAnnotation(propertyName,
+					CollectionType.class);
+			collectionTypeCache.put(propertyName,
+					collectionType != null ? collectionType.value() : null);
+		}
+		return collectionTypeCache.get(propertyName);
 	}
 
 	public String getDsKey() {
@@ -119,9 +236,13 @@ public class EntityMetadata {
 	}
 
 	public String getEsAlias() {
+		return esAlias;
+	}
+
+	protected String initEsAlias() {
 		EsAlias annotation = ReflectionUtils.getTypeAnnotation(entityClass,
 				EsAlias.class);
-		String alias = annotation != null ? annotation.value() : null;
+		String alias = null;
 		if (annotation != null)
 			alias = annotation.value() != null ? annotation.value()
 					: entityClass.getSimpleName() + ALIAS_SUFFIX;
@@ -129,58 +250,36 @@ public class EntityMetadata {
 	}
 
 	public Class<? extends View> getEmbeded(String propertyName) {
-		Embeded embeded = getPropertyAnnotation(propertyName, Embeded.class);
-		return embeded != null ? embeded.value() : null;
+		if (!embededCache.keySet().contains(propertyName)) {
+			Embeded embeded = getPropertyAnnotation(propertyName, Embeded.class);
+			embededCache.put(propertyName, embeded != null ? embeded.value()
+					: null);
+		}
+		return embededCache.get(propertyName);
 	}
 
 	public Class<? extends View> getPartial(String propertyName) {
-		Partial partial = getPropertyAnnotation(propertyName, Partial.class);
-		return partial != null ? partial.value() : All.class;
+		try {
+			return partialCache.get(propertyName);
+		} catch (ExecutionException e) {
+			throw Throwables.propagate(e);
+		}
 	}
 
 	public String getBackReference(String propertyName) {
-		BackReference reference = getPropertyAnnotation(propertyName,
-				BackReference.class);
-		LOGGER.info(String.format("backReference : %s",
-				reference != null ? reference.value() : entityClass
-						.getSimpleName().substring(0, 1).toLowerCase()
-						+ entityClass.getSimpleName().substring(1)));
-		return reference != null ? reference.value() : entityClass
-				.getSimpleName().substring(0, 1).toLowerCase()
-				+ entityClass.getSimpleName().substring(1);
-	}
-
-	protected <T extends Annotation> T getPropertyAnnotation(
-			String propertyName, Class<T> annotation) {
-		return ReflectionUtils.getRecursivePropertyAnnotation(getEntityClass(),
-				annotation, propertyName);
-	}
-
-	public ImmutableSet<String> propertyNames() {
-		if (propertyNames == null) {
-			Set<String> temp = Sets.newHashSet();
-			for (PropertyDescriptor propertyDescriptor : BeanUtils
-					.getPropertyDescriptors(entityClass)) {
-				String propertyName = propertyDescriptor.getName();
-				temp.add(propertyName);
-			}
-			propertyNames = ImmutableSet.copyOf(temp);
+		try {
+			return backReferenceCache.get(propertyName);
+		} catch (ExecutionException e) {
+			throw Throwables.propagate(e);
 		}
-		return propertyNames;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Collection<String> propertyNames(Class<? extends View> view) {
-		initViewProperties();
-		if (Full.class.isAssignableFrom(view)) {
-			return propertyNames();
+		try {
+			return propertyNamesByViewCache.get(view);
+		} catch (ExecutionException e) {
+			throw Throwables.propagate(e);
 		}
-		Collection<String> properties = viewProperties.get(view);
-		if (View.class.isAssignableFrom(view.getSuperclass())) {
-			properties.addAll(propertyNames((Class<? extends View>) view
-					.getSuperclass()));
-		}
-		return properties;
 	}
 
 	protected void initViewProperties() {
@@ -201,85 +300,21 @@ public class EntityMetadata {
 		return entityClass;
 	}
 
-	public Class<?> propertyType(String propertyName) {
-		return getPropertyDescriptor(propertyName).getPropertyType();
-	}
-
 	public String getJsonPropertyName(String propertyName) {
-		JsonProperty jsonProperty = getPropertyAnnotation(propertyName,
-				JsonProperty.class);
-		return jsonProperty == null ? propertyName : jsonProperty.value();
+		try {
+			return jsonPropertyNameCache.get(propertyName);
+		} catch (ExecutionException e) {
+			throw Throwables.propagate(e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends View> Collection<Class<? extends T>> getViews(
-			Class<T> viewType) {
-		checkNotNull(viewType);
-		initViewProperties();
-		Collection<Class<? extends T>> views = Sets.newHashSet();
-		for (Class<? extends View> view : viewProperties.keySet()) {
-			if (viewType.isAssignableFrom(view)) {
-				views.add((Class<? extends T>) view);
-			}
-		}
-		return views;
-	}
-
-	/**
-	 * 
-	 * Renvoie les types des paramètres de la propriété
-	 * 
-	 * @param propertyName
-	 * @return
-	 * @return
-	 */
-	public Class<?>[] propertyParameterClasses(String propertyName) {
-		Type type = getPropertyDescriptor(propertyName).getReadMethod()
-				.getGenericReturnType();
-		if (type instanceof ParameterizedType) {
-			ParameterizedType realType = ParameterizedType.class.cast(type);
-			int length = realType.getActualTypeArguments().length;
-			Class<?>[] classes = new Class[length];
-			for (int i = 0; i < length; i++) {
-				classes[i] = ReflectionUtils.getClass(realType
-						.getActualTypeArguments()[i]);
-			}
-			return classes;
-		}
-		return new Class[0];
-	}
-
-	public PropertyDescriptor getPropertyDescriptor(String propertyName) {
+	public Collection<Class<? extends View>> getViews(
+			Class<? extends View> viewType) {
 		try {
-			return cache.get(propertyName);
+			return viewsCache.get(viewType);
 		} catch (ExecutionException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public Object read(Entity entity, String propertyName) {
-		LOGGER.debug(String.format("read %s in %s", propertyName, entity));
-		try {
-			return getPropertyDescriptor(propertyName).getReadMethod().invoke(
-					entity, (Object[]) null);
-		} catch (IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
 			throw Throwables.propagate(e);
-		}
-
-	}
-
-	public Boolean canWrite(String propertyName) {
-		return getPropertyDescriptor(propertyName).getWriteMethod() != null;
-	}
-
-	public void write(Entity entity, String propertyName, Object value) {
-		try {
-			checkNotNull(getPropertyDescriptor(propertyName).getWriteMethod())
-					.invoke(entity, value);
-		} catch (IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			throw new RuntimeException(e);
 		}
 	}
 

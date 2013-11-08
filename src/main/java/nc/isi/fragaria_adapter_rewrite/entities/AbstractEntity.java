@@ -17,6 +17,8 @@ import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews;
 import nc.isi.fragaria_adapter_rewrite.enums.Completion;
 import nc.isi.fragaria_adapter_rewrite.enums.State;
 import nc.isi.fragaria_adapter_rewrite.exceptions.StateChangeException;
+import nc.isi.fragaria_adapter_rewrite.services.EntityMetadataProvider;
+import nc.isi.fragaria_adapter_rewrite.utils.DefaultRegistry;
 
 import org.apache.log4j.Logger;
 
@@ -55,7 +57,8 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 	}
 
 	private final Map<String, Object> cache = Maps.newHashMap();
-	private EntityMetadata entityMetadata = new EntityMetadata(getClass());
+	private EntityMetadata entityMetadata = DefaultRegistry.getService(
+			EntityMetadataProvider.class).provide(getClass());
 	private final EventBus eventBus = new EventBus();
 	private State state = State.COMMITED;
 	private Completion completion = Completion.PARTIAL;

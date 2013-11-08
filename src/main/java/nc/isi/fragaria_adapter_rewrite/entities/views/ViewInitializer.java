@@ -3,6 +3,7 @@ package nc.isi.fragaria_adapter_rewrite.entities.views;
 import nc.isi.fragaria_adapter_rewrite.entities.AbstractEntity;
 import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
+import nc.isi.fragaria_adapter_rewrite.services.EntityMetadataProvider;
 import nc.isi.fragaria_reflection.services.ReflectionProvider;
 
 import org.apache.log4j.Logger;
@@ -13,11 +14,14 @@ public class ViewInitializer {
 			.getLogger(ViewInitializer.class);
 	private final ViewGeneratorManager viewGenerator;
 	private final Reflections reflections;
+	private final EntityMetadataProvider entityMetadataProvider;
 
 	public ViewInitializer(ViewGeneratorManager viewGenerator,
-			ReflectionProvider reflectionProvider) {
+			ReflectionProvider reflectionProvider,
+			EntityMetadataProvider entityMetadataProvider) {
 		this.viewGenerator = viewGenerator;
 		this.reflections = reflectionProvider.provide();
+		this.entityMetadataProvider = entityMetadataProvider;
 	}
 
 	public void initialize() {
@@ -35,7 +39,8 @@ public class ViewInitializer {
 	}
 
 	private boolean hasDsKey(Class<? extends Entity> entityClass) {
-		EntityMetadata entityMetadata = new EntityMetadata(entityClass);
+		EntityMetadata entityMetadata = entityMetadataProvider
+				.provide(entityClass);
 		try {
 			entityMetadata.getDsKey();
 			return true;

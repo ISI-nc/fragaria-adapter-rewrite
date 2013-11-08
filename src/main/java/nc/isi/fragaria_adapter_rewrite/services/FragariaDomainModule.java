@@ -8,13 +8,9 @@ import nc.isi.fragaria_adapter_rewrite.dao.SessionManager;
 import nc.isi.fragaria_adapter_rewrite.dao.SessionManagerImpl;
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManager;
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManagerImpl;
-import nc.isi.fragaria_adapter_rewrite.dao.adapters.ElasticSearchAdapter;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilderImpl;
 import nc.isi.fragaria_adapter_rewrite.entities.FragariaObjectMapperContributor;
-import nc.isi.fragaria_adapter_rewrite.entities.elasticsearchaliases.AliasesGenerator;
-import nc.isi.fragaria_adapter_rewrite.entities.elasticsearchaliases.AliasesGeneratorImpl;
-import nc.isi.fragaria_adapter_rewrite.entities.elasticsearchaliases.AliasesInitializer;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigBuilderProvider;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigBuilderProviderImpl;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfigProvider;
@@ -58,7 +54,6 @@ public class FragariaDomainModule {
 
 	public static void bind(ServiceBinder binder) {
 		binder.bind(AdapterManager.class, AdapterManagerImpl.class);
-		binder.bind(ElasticSearchAdapter.class);
 		binder.bind(EntityBuilder.class, EntityBuilderImpl.class);
 		binder.bind(ObjectMapperProvider.class, ObjectMapperProviderImpl.class);
 		binder.bind(MasterDsLoader.class, MasterDsLoaderImpl.class);
@@ -75,8 +70,8 @@ public class FragariaDomainModule {
 		binder.bind(ViewGeneratorManager.class, ViewGeneratorManagerImpl.class);
 		binder.bind(ViewGenerator.class, ViewGeneratorImpl.class);
 		binder.bind(FragariaObjectMapperContributor.class);
-		binder.bind(AliasesInitializer.class);
-		binder.bind(AliasesGenerator.class, AliasesGeneratorImpl.class);
+		binder.bind(EntityMetadataProvider.class,
+				EntityMetadataProviderImpl.class);
 	}
 
 	public void contributeReflectionProvider(Configuration<String> configuration) {
@@ -112,11 +107,9 @@ public class FragariaDomainModule {
 
 	@Startup
 	public void initialize(ViewInitializer viewInitializer,
-			FragariaObjectMapperContributor fragariaObjectMapperContributor,
-			AliasesInitializer aliasesInitializer) {
+			FragariaObjectMapperContributor fragariaObjectMapperContributor) {
 		viewInitializer.initialize();
 		fragariaObjectMapperContributor.initialize();
-		aliasesInitializer.initialize();
 	}
 
 }
