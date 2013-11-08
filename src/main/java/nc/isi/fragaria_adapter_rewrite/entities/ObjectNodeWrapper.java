@@ -60,6 +60,17 @@ public abstract class ObjectNodeWrapper implements Entity {
 		}
 	}
 
+	protected <T> T resolvePropertyByBackReference(Class<T> propertyType,
+			String propertyName) {
+		checkNotNull(propertyType);
+		checkNotNull(propertyName);
+		T result = null;
+		result = (T) getSession().getUnique(
+				new ByViewQuery(propertyType).filterBy(metadata()
+						.getBackReference(propertyName), getId()));
+		return result;
+	}
+
 	protected <T> T resolveFromNode(Class<T> propertyType, String propertyName) {
 		try {
 			T o = objectMapper
@@ -88,7 +99,6 @@ public abstract class ObjectNodeWrapper implements Entity {
 
 	protected void completeFromDS() {
 		Class<? extends Entity> entityClass = getClass();
-		System.out.println("test session"+getSession());
 		Entity fromDB = getSession().getUnique(
 				new IdQuery<>(entityClass, getId()), false);
 		checkState(
@@ -180,7 +190,8 @@ public abstract class ObjectNodeWrapper implements Entity {
 		return getSession().get(
 				new ByViewQuery<>(propertyEntity, metadata().getPartial(
 						propertyName)).filterBy(
-						metadata().getBackReference(propertyName), getId()));
+						metadata().getBackReference(propertyName), getId()),
+				true);
 	}
 
 	protected void checkParametersNotNull(Object... objects) {
@@ -248,22 +259,24 @@ public abstract class ObjectNodeWrapper implements Entity {
 
 	public void prepareForCommit() {
 		checkState(getSession() != null, "object %s is not in session", this);
-		for (String property : metadata().writablesPropertyNames()) {
-			LOGGER.info(String.format("working on property : %s", property));
-			if (metadata().getEmbeded(property) == null
-					&& node.has(property)
-					&& Entity.class.isAssignableFrom(metadata().propertyType(
-							property))) {
-				continue;
-			}
-			if (metadata().isNotEmbededList(property)) {
-				continue;
-			}
-			LOGGER.info(String.format("reading property : %s", property));
-			Object value = metadata().read(this, property);
-			LOGGER.info(String.format("value : %s", value));
-			if (write(property, value)) {
-				LOGGER.info("write");
+		if (!this.getState().equals(State.DELETED) && !this.getState().equals(State.NEW) ) {
+			for (String property : metadata().writablesPropertyNames()) {
+				LOGGER.info(String.format("working on property : %s", property));
+				if (metadata().getEmbeded(property) == null
+						&& node.has(property)
+						&& Entity.class.isAssignableFrom(metadata()
+								.propertyType(property))) {
+					continue;
+				}
+				if (metadata().isNotEmbededList(property)) {
+					continue;
+				}
+				LOGGER.info(String.format("reading property : %s", property));
+				Object value = metadata().read(this, property);
+				LOGGER.info(String.format("value : %s", value));
+				if (write(property, value)) {
+					LOGGER.info("write");
+				}
 			}
 		}
 		setCompletion(Completion.FULL);

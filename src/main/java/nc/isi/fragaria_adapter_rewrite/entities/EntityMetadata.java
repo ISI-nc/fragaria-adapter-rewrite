@@ -242,11 +242,10 @@ public class EntityMetadata extends ObjectMetadata {
 	protected String initEsAlias() {
 		EsAlias annotation = ReflectionUtils.getTypeAnnotation(entityClass,
 				EsAlias.class);
-		String alias = null;
-		if (annotation != null)
-			alias = annotation.value() != null ? annotation.value()
-					: entityClass.getSimpleName() + ALIAS_SUFFIX;
-		return alias;
+		if (annotation == null)
+			return null;
+		return annotation.value().equals("") ? entityClass.getSimpleName()
+				+ ALIAS_SUFFIX : annotation.value();
 	}
 
 	public Class<? extends View> getEmbeded(String propertyName) {

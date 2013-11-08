@@ -1,6 +1,5 @@
 package nc.isi.fragaria_adapter_rewrite.entities;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
@@ -15,8 +14,8 @@ import com.google.common.collect.Sets;
 public class LinkDelegate<T extends Link<?, ?>, O extends Entity> {
 
 	private final String propName;
-	private final Class<T> type;
-	private final Entity entity;
+	protected final Class<T> type;
+	protected final Entity entity;
 	private final Class<O> othersType;
 
 	public LinkDelegate(String propName, Class<T> type, Entity entity,
@@ -38,6 +37,12 @@ public class LinkDelegate<T extends Link<?, ?>, O extends Entity> {
 	}
 
 	public Collection<O> getOthers() {
+		Collection<String> ids = getOtherIds();
+		return entity.getSession().get(
+				new ByViewQuery<>(othersType, null).filterBy(Entity.ID, ids));
+	}
+
+	protected Collection<String> getOtherIds() {
 		Collection<String> ids = Sets.newHashSet();
 		Side side = null;
 		for (T link : get()) {
@@ -46,8 +51,7 @@ public class LinkDelegate<T extends Link<?, ?>, O extends Entity> {
 			}
 			ids.add(link.get(side).getId());
 		}
-		return entity.getSession().get(
-				new ByViewQuery<>(othersType, null).filterBy(Entity.ID, ids));
+		return ids;
 	}
 	
 	public Collection<O> getOthers(Collection<T> links) {
@@ -112,7 +116,7 @@ public class LinkDelegate<T extends Link<?, ?>, O extends Entity> {
 		return null;
 	}
 
-	private Side getThisSide(Link<?, ?> link) {
+	protected Side getThisSide(Link<?, ?> link) {
 		return link.isR(entity) ? Side.R : Side.L;
 	}
 
@@ -121,7 +125,7 @@ public class LinkDelegate<T extends Link<?, ?>, O extends Entity> {
 	}
 	
 	public Boolean add(T link) {
-		checkArgument(!get().contains(link), "link already exists");
+//		checkArgument(!get().contains(link), "link already exists");
 		return entity.add(propName, link, type);
 	}
 

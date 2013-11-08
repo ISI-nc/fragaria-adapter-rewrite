@@ -46,7 +46,6 @@ public interface Entity extends Serializable, Partialable {
 	<T> Boolean add(String collectionName, T element, Class<T> collectionType);
 
 	<T> Boolean remove(String collectionName, T element, Class<T> collectionType);
-
+	
 	void prepareForCommit();
-
 }

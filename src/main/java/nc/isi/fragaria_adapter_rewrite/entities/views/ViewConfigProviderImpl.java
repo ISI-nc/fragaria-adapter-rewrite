@@ -47,7 +47,7 @@ public class ViewConfigProviderImpl implements ViewConfigProvider {
 		checkState(
 				files.size() <= 1,
 				"trop de fichiers de conf trouver pour la vue %s et l'entité %s",
-				view, entityClass);
+				view, entityClass);		
 		return files.size() == 1 ? viewConfigBuilder.build(view.getSimpleName()
 				.toLowerCase(), files.get(0)) : viewConfigBuilder.buildDefault(
 				entityClass, view);
