@@ -10,8 +10,8 @@ import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
  *         Classe permettant la création de session.
  */
 public class SessionManagerImpl implements SessionManager {
-	private final AdapterManager adapterManager;
-	private final EntityBuilder entityBuilder;
+	protected final AdapterManager adapterManager;
+	protected final EntityBuilder entityBuilder;
 
 	public SessionManagerImpl(AdapterManager adapterManager,
 			EntityBuilder entityBuilder) {

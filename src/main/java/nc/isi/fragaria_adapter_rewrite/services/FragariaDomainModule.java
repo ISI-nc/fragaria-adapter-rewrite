@@ -4,8 +4,6 @@ import java.util.Map.Entry;
 
 import nc.isi.fragaria_adapter_rewrite.dao.QueryExecutorForCollection;
 import nc.isi.fragaria_adapter_rewrite.dao.QueryExecutorForCollectionImpl;
-import nc.isi.fragaria_adapter_rewrite.dao.SessionManager;
-import nc.isi.fragaria_adapter_rewrite.dao.SessionManagerImpl;
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManager;
 import nc.isi.fragaria_adapter_rewrite.dao.adapters.AdapterManagerImpl;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
@@ -58,7 +56,6 @@ public class FragariaDomainModule {
 		binder.bind(ObjectMapperProvider.class, ObjectMapperProviderImpl.class);
 		binder.bind(MasterDsLoader.class, MasterDsLoaderImpl.class);
 		binder.bind(DataSourceProvider.class, DataSourceProviderImpl.class);
-		binder.bind(SessionManager.class, SessionManagerImpl.class);
 		binder.bind(QueryExecutorForCollection.class,
 				QueryExecutorForCollectionImpl.class);
 		binder.bind(ConnectionDataBuilder.class,
