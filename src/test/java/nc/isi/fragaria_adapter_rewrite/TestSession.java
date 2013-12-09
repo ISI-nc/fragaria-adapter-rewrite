@@ -1,10 +1,14 @@
 package nc.isi.fragaria_adapter_rewrite;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import junit.framework.TestCase;
 import nc.isi.fragaria_adapter_rewrite.dao.ByViewQuery;
 import nc.isi.fragaria_adapter_rewrite.dao.CollectionQueryResponse;
 import nc.isi.fragaria_adapter_rewrite.dao.Query;
@@ -16,97 +20,56 @@ import nc.isi.fragaria_adapter_rewrite.entities.Entity;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityBuilder;
 import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
 import nc.isi.fragaria_adapter_rewrite.entities.views.ViewConfig;
+import nc.isi.fragaria_adapter_rewrite.enums.State;
 import nc.isi.fragaria_adapter_rewrite.model.PersonData;
 import nc.isi.fragaria_adapter_rewrite.model.QaRegistry;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import com.google.common.collect.Lists;
 
-public class TestSession extends TestCase {
+public class TestSession {
 	final EntityBuilder entityBuilder = QaRegistry.INSTANCE.getRegistry()
 			.getService(EntityBuilder.class);
-	final PersonData personData = entityBuilder.build(PersonData.class);
-	final List<PersonData> listOfPersons = Lists.newArrayList();
 
+	private Session session;
+
+	@Before
+	public void init() {
+		session = buildSession(true);
+	}
+
+	@Test
 	public void testCreate() {
-		List<String> ids = Lists.newArrayList();
-		for (int i = 0; i < 10; i++) {
-			PersonData person = entityBuilder.build(PersonData.class);
-			ids.add(person.getId());
-			listOfPersons.add(person);
-		}
-
-		Session session = buildSession();
+		Session session = buildSession(false);
 		Collection<PersonData> listGet = session.get(new ByViewQuery<>(
 				PersonData.class, null));
 		int nbBefore = listGet.size();
-		System.out.println(listGet);
-		System.out.println(nbBefore);
-		session.create(PersonData.class);
+		PersonData sample = session.create(PersonData.class);
+		assertNotNull(sample);
+		assertNotNull(sample.getId());
+		assertTrue(State.NEW == sample.getState());
 		listGet = session.get(new ByViewQuery<>(PersonData.class, null));
 		int nbAfter = listGet.size();
-		System.out.println(listGet);
-		System.out.println(nbAfter);
-		for (PersonData personData : listGet) {
-			System.out.println(personData.getId() + " : "
-					+ personData.getState());
-		}
 		assertTrue(nbAfter == nbBefore + 1);
 	}
 
-	public void testUpdate() {
-		List<String> ids = Lists.newArrayList();
-		for (int i = 0; i < 10; i++) {
-			PersonData person = entityBuilder.build(PersonData.class);
-			ids.add(person.getId());
-			listOfPersons.add(person);
-		}
-
-		Session session = buildSession();
+	@Test
+	public void testUpdateAnObjectDoesntChangeListSize() {
 		List<PersonData> listGet = new ArrayList<>(
 				session.get(new ByViewQuery<>(PersonData.class, null)));
+		int sizeBefore = listGet.size();
 		PersonData pers = (PersonData) listGet.get(0);
 		pers.setName("salut");
 		listGet = new ArrayList<>(session.get(new ByViewQuery<>(
 				PersonData.class, null)));
-		assertTrue(listGet.size() == 10);
-		listOfPersons.clear();
-		listGet = new ArrayList<>(session.get(new ByViewQuery<>(
-				PersonData.class, null)));
-		assertTrue(listGet.size() == 1);
+		int sizeAfter = listGet.size();
+		assertEquals(sizeBefore, sizeAfter);
 	}
 
-	public void testUpdateCollection() {
-		List<String> ids = Lists.newArrayList();
-		for (int i = 0; i < 10; i++) {
-			PersonData person = entityBuilder.build(PersonData.class);
-			ids.add(person.getId());
-			listOfPersons.add(person);
-		}
-
-		Session session = buildSession();
-		List<PersonData> listGet = new ArrayList<>(
-				session.get(new ByViewQuery<>(PersonData.class, null)));
-		for (int i = 0; i < 5; i++) {
-			PersonData pers = (PersonData) listGet.get(i);
-			pers.setName("salut");
-		}
-		listGet = new ArrayList<>(session.get(new ByViewQuery<>(
-				PersonData.class, null)));
-		assertTrue(listGet.size() == 10);
-		listOfPersons.clear();
-		listGet = new ArrayList<>(session.get(new ByViewQuery<>(
-				PersonData.class, null)));
-		assertTrue(listGet.size() == 5);
-	}
-
+	@Test
 	public void testDelete() {
-		List<String> ids = Lists.newArrayList();
-		for (int i = 0; i < 10; i++) {
-			PersonData person = entityBuilder.build(PersonData.class);
-			ids.add(person.getId());
-			listOfPersons.add(person);
-		}
-		Session session = buildSession();
 		List<PersonData> listGet = new ArrayList<>(
 				session.get(new ByViewQuery<>(PersonData.class, null)));
 		int nbBefore = listGet.size();
@@ -116,33 +79,35 @@ public class TestSession extends TestCase {
 				PersonData.class, null)));
 		int nbAfter = listGet.size();
 		assertTrue(nbAfter == nbBefore - 1);
+		assertFalse(listGet.contains(pers));
 
 	}
 
+	@Test
 	public void testDeleteCollection() {
-		List<String> ids = Lists.newArrayList();
-		for (int i = 0; i < 10; i++) {
-			PersonData person = entityBuilder.build(PersonData.class);
-			ids.add(person.getId());
-			listOfPersons.add(person);
-		}
-		Session session = buildSession();
 		List<PersonData> listGet = new ArrayList<>(
 				session.get(new ByViewQuery<>(PersonData.class, null)));
 		int nbBefore = listGet.size();
+		Collection<PersonData> deletedPersons = Lists.newArrayList();
 		for (int i = 0; i < 5; i++) {
 			PersonData pers = (PersonData) listGet.get(i);
 			session.delete(pers);
+			deletedPersons.add(pers);
 		}
 		listGet = new ArrayList<>(session.get(new ByViewQuery<>(
 				PersonData.class, null)));
 		int nbAfter = listGet.size();
-		assertTrue(nbAfter == nbBefore - 5);
+		assertTrue(nbAfter == nbBefore - deletedPersons.size());
+		for (PersonData personData : deletedPersons) {
+			assertFalse(listGet.contains(personData));
+		}
 
 	}
 
-	public Session buildSession() {
-
+	private final Session buildSession(boolean addData) {
+		final PersonData personData = entityBuilder.build(PersonData.class);
+		final List<PersonData> listOfPersons = Lists.newArrayList();
+		System.out.println("init");
 		SessionImpl session = new SessionImpl(new AdapterManager() {
 
 			@Override
@@ -167,8 +132,7 @@ public class TestSession extends TestCase {
 			public <T extends Entity> CollectionQueryResponse<T> executeQuery(
 					Query<T> query) {
 
-				return new CollectionQueryResponse<T>(
-						(Collection<T>) listOfPersons);
+				return new CollectionQueryResponse<T>(new ArrayList<T>());
 			}
 
 			@Override
@@ -199,6 +163,11 @@ public class TestSession extends TestCase {
 
 			}
 		}, entityBuilder);
+		if (addData) {
+			for (int i = 0; i < 10; i++) {
+				session.create(PersonData.class);
+			}
+		}
 
 		return (Session) session;
 	}

@@ -184,7 +184,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		checkGlobalSanity(propertyName, Action.WRITE);
 		Object oldValue = cache.get(propertyName);
 		cache.put(propertyName, value);
-		if (write(propertyName, value)) {
+		if (write(propertyName, value) && !ID.equals(propertyName)) {
 			LOGGER.debug("property changed");
 			PropertyChangeEvent propertyChangeEvent = new PropertyChangeEvent(
 					this, propertyName, oldValue, value);
