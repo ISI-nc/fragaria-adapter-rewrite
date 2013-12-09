@@ -120,8 +120,6 @@ public class SessionImpl implements Session {
 	}
 
 	private <T extends Entity> T findCachedValue(Query<T> query) {
-		Collection<T> cachedValues = getValuesFromCache(query.getResultType());
-		LOGGER.debug(String.format("cachedValues %s : ", cachedValues));
 		if (query instanceof IdQuery) {
 			T entity = alias(query.getResultType());
 			for (HashMultimap<Class<? extends Entity>, Entity> cache : caches) {
@@ -139,6 +137,8 @@ public class SessionImpl implements Session {
 			}
 			return null;
 		}
+		Collection<T> cachedValues = getValuesFromCache(query.getResultType());
+		LOGGER.debug(String.format("cachedValues %s : ", cachedValues));
 		if (query instanceof ByViewQuery) {
 			T entity = alias(query.getResultType());
 			Predicate predicate = buildFullPredicate((ByViewQuery<T>) query);

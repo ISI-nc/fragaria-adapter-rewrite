@@ -18,7 +18,7 @@ import nc.isi.fragaria_adapter_rewrite.annotations.Partial;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericEmbedingViews.Full;
 import nc.isi.fragaria_adapter_rewrite.entities.views.GenericQueryViews.All;
 import nc.isi.fragaria_adapter_rewrite.entities.views.View;
-import nc.isi.fragaria_reflection.utils.ObjectMetadata;
+import nc.isi.fragaria_reflection.utils.DefaultObjectMetadata;
 import nc.isi.fragaria_reflection.utils.ReflectionUtils;
 
 import org.apache.log4j.Logger;
@@ -35,7 +35,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
-public class EntityMetadata extends ObjectMetadata {
+public class EntityMetadata extends DefaultObjectMetadata {
 	private static final Logger LOGGER = Logger.getLogger(EntityMetadata.class);
 	private static final Collection<String> excludedProperties = Arrays
 			.asList("class");

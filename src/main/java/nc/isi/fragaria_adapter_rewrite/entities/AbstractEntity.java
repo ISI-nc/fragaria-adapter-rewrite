@@ -114,8 +114,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		LOGGER.debug(String.format("read collection : %s in %s",
 				collectionName, getClass()));
 		checkGlobalSanity(collectionName, Action.READ);
-		if (!cache.containsKey(collectionName)
-				|| metadata().isNotEmbededList(collectionName)) {
+		if (!cache.containsKey(collectionName)) {
 			cache.put(collectionName,
 					resolveCollection(collectionGenericType, collectionName));
 		}
