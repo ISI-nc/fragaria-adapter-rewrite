@@ -23,7 +23,7 @@ import org.apache.tapestry5.ioc.annotations.SubModule;
 
 @SubModule(FragariaDomainModule.class)
 public class ViewInitializerTestModule {
-
+	
 	public void contributeReflectionProvider(Configuration<String> configuration) {
 		configuration.add("nc.isi.fragaria_adapter_rewrite");
 	}

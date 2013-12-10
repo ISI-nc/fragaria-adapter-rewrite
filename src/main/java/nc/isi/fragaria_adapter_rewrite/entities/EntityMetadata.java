@@ -244,8 +244,11 @@ public class EntityMetadata extends DefaultObjectMetadata {
 				EsAlias.class);
 		if (annotation == null)
 			return null;
-		return annotation.value().equals("") ? entityClass.getSimpleName()
+		String esAlias = getDsKey() + "_";
+		esAlias += annotation.value().equals("") ? entityClass.getSimpleName()
 				+ ALIAS_SUFFIX : annotation.value();
+		;
+		return esAlias;
 	}
 
 	public Class<? extends View> getEmbeded(String propertyName) {
