@@ -48,6 +48,12 @@ public abstract class ObjectNodeWrapper implements Entity {
 		if (node.has(metadata().getJsonPropertyName(propertyName))) {
 			return resolveFromNode(propertyType, propertyName);
 		} else {
+			if (!Entity.class.isAssignableFrom(metadata().propertyType(
+					propertyName))
+					|| (metadata().getCollectionType(propertyName) != null && !Entity.class
+							.isAssignableFrom(metadata().getCollectionType(
+									propertyName))))
+				return null;
 			// Object is new
 			if (propertyName.equals(Entity.ID)) {
 				setCompletion(Completion.FULL);
@@ -259,7 +265,8 @@ public abstract class ObjectNodeWrapper implements Entity {
 
 	public void prepareForCommit() {
 		checkState(getSession() != null, "object %s is not in session", this);
-		if (!this.getState().equals(State.DELETED) && !this.getState().equals(State.NEW) ) {
+		if (!this.getState().equals(State.DELETED)
+				&& !this.getState().equals(State.NEW)) {
 			for (String property : metadata().writablesPropertyNames()) {
 				LOGGER.info(String.format("working on property : %s", property));
 				if (metadata().getEmbeded(property) == null
