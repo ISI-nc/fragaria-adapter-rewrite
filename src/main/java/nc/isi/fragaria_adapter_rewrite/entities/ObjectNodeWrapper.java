@@ -48,11 +48,9 @@ public abstract class ObjectNodeWrapper implements Entity {
 		if (node.has(metadata().getJsonPropertyName(propertyName))) {
 			return resolveFromNode(propertyType, propertyName);
 		} else {
-			if ((getState().equals(State.NEW) || (!getState().equals(State.NEW) && !toJSON().toString().equals("{\"_id\":\""+getId()+"\"}")  )) && (!Entity.class.isAssignableFrom(metadata().propertyType(
-					propertyName))
-					|| (metadata().getCollectionType(propertyName) != null && !Entity.class
-							.isAssignableFrom(metadata().getCollectionType(
-									propertyName)))))
+			if ((getState().equals(State.NEW) || (!getState().equals(State.NEW) && !toJSON()
+					.toString().equals("{\"_id\":\"" + getId() + "\"}")))
+					&& metadata().getBackReference(propertyName) == null)
 				return null;
 			// Object is new
 			if (propertyName.equals(Entity.ID)) {
