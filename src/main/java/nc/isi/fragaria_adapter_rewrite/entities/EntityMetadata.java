@@ -69,9 +69,7 @@ public class EntityMetadata extends DefaultObjectMetadata {
 				@Override
 				public Boolean load(String key) throws Exception {
 					Class<?> propertyType = propertyType(key);
-					return Collection.class.isAssignableFrom(propertyType)
-							&& !Entity.class
-									.isAssignableFrom(propertyParameterClasses(key)[0]);
+					return (Collection.class.isAssignableFrom(propertyType));
 				}
 
 			});

@@ -48,9 +48,9 @@ public abstract class ObjectNodeWrapper implements Entity {
 		if (node.has(metadata().getJsonPropertyName(propertyName))) {
 			return resolveFromNode(propertyType, propertyName);
 		} else {
+			//No backReference, object is in Json
 			if ((getState().equals(State.NEW) || (!getState().equals(State.NEW) && !toJSON()
-					.toString().equals("{\"_id\":\"" + getId() + "\"}")))
-					&& metadata().isNaturalyEmbeded(propertyName))
+					.toString().equals("{\"_id\":\"" + getId() + "\"}"))))
 				return null;
 			// Object is new
 			if (propertyName.equals(Entity.ID)) {
