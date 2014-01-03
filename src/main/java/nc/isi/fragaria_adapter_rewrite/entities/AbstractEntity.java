@@ -30,6 +30,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
+import com.mysema.query.alias.Alias;
 
 /**
  * Classe de base pour toutes les entités Gère la complétion des objets
@@ -41,7 +42,8 @@ import com.google.common.eventbus.EventBus;
 
 public abstract class AbstractEntity extends ObjectNodeWrapper {
 	private static final Logger LOGGER = Logger.getLogger(AbstractEntity.class);
-
+	public static final AbstractEntity alias = Alias.alias(AbstractEntity.class);
+	
 	private enum Action {
 		READ("lire"), WRITE("écrire"), ADD("Ajouté"), REMOVE("enlevé");
 
