@@ -6,15 +6,15 @@ import nc.isi.fragaria_adapter_rewrite.entities.EntityMetadata;
 import nc.isi.fragaria_adapter_rewrite.entities.views.QueryView;
 import nc.isi.fragaria_adapter_rewrite.model.CityViews.Name;
 import nc.isi.fragaria_adapter_rewrite.model.PersonData;
-import nc.isi.fragaria_adapter_rewrite.model.QaRegistry;
 import nc.isi.fragaria_adapter_rewrite.services.EntityMetadataProvider;
+import nc.isi.fragaria_adapter_rewrite.utils.DefaultRegistry;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
 
 public class TestEntityMetadata {
-	private final EntityMetadataProvider entityMetadataProvider = QaRegistry.INSTANCE
-			.getRegistry().getService(EntityMetadataProvider.class);
+	private final EntityMetadataProvider entityMetadataProvider = DefaultRegistry
+			.getService(EntityMetadataProvider.class);
 
 	@Test
 	public void testMetadata() throws ClassNotFoundException {

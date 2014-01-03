@@ -69,12 +69,14 @@ public class SessionImpl implements Session {
 		// LOGGER.debug(String.format("list without cache : %s", objects));
 		if (cache) {
 			Class<T> entityClass = query.getResultType();
-			if (createdObjects.get(entityClass).size() > 0)
+			if (createdObjects.get(entityClass).size() > 0) {
 				objects.addAll(findValuesFromCollection(
 						(Collection<T>) createdObjects.get(entityClass), query));
-			if (deletedObjects.get(entityClass).size() > 0)
+			}
+			if (deletedObjects.get(entityClass).size() > 0) {
 				objects.removeAll(findValuesFromCollection(
 						(Collection<T>) deletedObjects.get(entityClass), query));
+			}
 			if (updatedObjects.get(entityClass).size() > 0) {
 				for (T o : findValuesFromCollection(
 						(Collection<T>) updatedObjects.get(entityClass), query)) {
