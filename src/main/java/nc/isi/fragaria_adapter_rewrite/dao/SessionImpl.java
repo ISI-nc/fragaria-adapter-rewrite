@@ -356,7 +356,7 @@ public class SessionImpl implements Session {
 		return map.containsValue(entity);
 	}
 
-	private <T extends Entity> void changeSession(Collection<T> entities) {
+	protected <T extends Entity> void changeSession(Collection<T> entities) {
 		for (T entity : entities) {
 			if (entity == null)
 				continue;
