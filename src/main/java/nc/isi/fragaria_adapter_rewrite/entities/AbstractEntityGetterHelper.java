@@ -15,7 +15,7 @@ public abstract class AbstractEntityGetterHelper extends AbstractEntity {
 	public AbstractEntityGetterHelper(ObjectNode objectNode) {
 		super(objectNode);
 	}
-
+	
 	public DateTime readDateTimeProperty(String propertyName) {
 		return readProperty(DateTime.class, propertyName);
 	}

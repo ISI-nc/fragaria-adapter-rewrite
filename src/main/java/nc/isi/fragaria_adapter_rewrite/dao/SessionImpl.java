@@ -267,7 +267,6 @@ public class SessionImpl implements Session {
 	@Override
 	public <T extends Entity> void delete(Collection<T> entities) {
 		checkNotDeleted(entities);
-
 		for (T entity : entities) {
 			if (isRegistered(entity, createdObjects)) {
 				createdObjects.remove(entity.getClass(), entity);

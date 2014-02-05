@@ -59,6 +59,11 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		}
 	}
 
+	//TODO remove
+	public void setId(String id){
+		writeProperty(ID, id);
+	}
+	
 	private final Map<String, Object> cache = Maps.newHashMap();
 	private EntityMetadata entityMetadata = DefaultRegistry.getService(
 			EntityMetadataProvider.class).provide(getClass());
@@ -156,7 +161,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 			break;
 		default:
 			throw new IllegalArgumentException(action.toString());
-		}
+		}		
 		if (element instanceof Entity) {
 			manageDependency(action, (Entity) element, collectionName);
 		}
@@ -381,9 +386,6 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 			return true;
 		}
 		if (obj == null) {
-			return false;
-		}
-		if (!getClass().isAssignableFrom(obj.getClass())) {
 			return false;
 		}
 		Entity entity = Entity.class.cast(obj);
