@@ -2,6 +2,7 @@ package nc.isi.fragaria_adapter_rewrite.entities;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -240,6 +241,9 @@ public class EntityMetadata extends DefaultObjectMetadata {
 	protected String initEsAlias() {
 		EsAlias annotation = ReflectionUtils.getTypeAnnotation(entityClass,
 				EsAlias.class);
+		if (Modifier.isAbstract(entityClass.getModifiers())
+				|| entityClass.isAnonymousClass() || entityClass.isInterface())
+			return null;
 		if (annotation == null) {
 			String esAlias = getDsKey() + "_";
 			esAlias += entityClass.getSimpleName() + ALIAS_SUFFIX;
