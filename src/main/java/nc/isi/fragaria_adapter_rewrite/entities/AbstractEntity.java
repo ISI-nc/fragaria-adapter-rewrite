@@ -151,7 +151,6 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 				getClass()));
 		Collection<T> collection = readCollection(collectionType,
 				collectionName);
-		System.out.println(collection);
 		boolean result = false;
 		switch (action) {
 		case ADD:
@@ -162,11 +161,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 			break;
 		default:
 			throw new IllegalArgumentException(action.toString());
-		}
-		System.out.println(action);
-		System.out.println(result);
-		System.out.println(collection);
-		
+		}		
 		if (element instanceof Entity) {
 			manageDependency(action, (Entity) element, collectionName);
 		}

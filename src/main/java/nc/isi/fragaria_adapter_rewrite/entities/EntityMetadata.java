@@ -240,13 +240,17 @@ public class EntityMetadata extends DefaultObjectMetadata {
 	protected String initEsAlias() {
 		EsAlias annotation = ReflectionUtils.getTypeAnnotation(entityClass,
 				EsAlias.class);
-		if (annotation == null)
-			return null;
-		String esAlias = getDsKey() + "_";
-		esAlias += annotation.value().equals("") ? entityClass.getSimpleName()
-				+ ALIAS_SUFFIX : annotation.value();
-		;
-		return esAlias;
+		if (annotation == null) {
+			String esAlias = getDsKey() + "_";
+			esAlias += entityClass.getSimpleName() + ALIAS_SUFFIX;
+			return esAlias;
+		} else {
+			String esAlias = getDsKey() + "_";
+			esAlias += annotation.value().equals("") ? entityClass
+					.getSimpleName() + ALIAS_SUFFIX : annotation.value();
+			;
+			return esAlias;
+		}
 	}
 
 	public Class<? extends View> getEmbeded(String propertyName) {
