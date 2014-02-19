@@ -43,12 +43,12 @@ public class EntityMetadata extends DefaultObjectMetadata {
 	private static final String ID_TOKEN = "._id";
 	private static final String ALIAS_SUFFIX = "_alias";
 	private final Class<? extends Entity> entityClass;
-	private final String esAlias;
 
 	private Multimap<Class<? extends View>, String> viewProperties = HashMultimap
 			.create();
 	private boolean viewPropertiesInitialized = false;
 	private String dsKey;
+	private String esAlias;
 	private ImmutableSet<String> writableProperyNamesCache;
 	private final LoadingCache<String, Boolean> isNotEmbededListCache = CacheBuilder
 			.newBuilder().build(new CacheLoader<String, Boolean>() {
@@ -172,7 +172,6 @@ public class EntityMetadata extends DefaultObjectMetadata {
 	public EntityMetadata(Class<? extends Entity> entityClass) {
 		super(entityClass);
 		this.entityClass = entityClass;
-		this.esAlias = initEsAlias();
 		initViewProperties();
 	}
 
@@ -235,24 +234,25 @@ public class EntityMetadata extends DefaultObjectMetadata {
 	}
 
 	public String getEsAlias() {
-		return esAlias;
-	}
-
-	protected String initEsAlias() {
 		EsAlias annotation = ReflectionUtils.getTypeAnnotation(entityClass,
 				EsAlias.class);
-		if (Modifier.isAbstract(entityClass.getModifiers())
-				|| entityClass.isAnonymousClass() || entityClass.isInterface())
-			return null;
-		if (annotation == null) {
-			String esAlias = getDsKey() + "_";
-			esAlias += entityClass.getSimpleName() + ALIAS_SUFFIX;
-			return esAlias;
-		} else {
-			String esAlias = getDsKey() + "_";
-			esAlias += annotation.value().equals("") ? entityClass
-					.getSimpleName() + ALIAS_SUFFIX : annotation.value();
-			;
+		if (esAlias == null) {
+			if (Modifier.isAbstract(entityClass.getModifiers())
+					|| entityClass.isAnonymousClass()
+					|| entityClass.isInterface())
+				return esAlias;
+			if (annotation == null) {
+				esAlias = getDsKey() + "_";
+				esAlias += entityClass.getSimpleName() + ALIAS_SUFFIX;
+				return esAlias;
+			} else {
+				esAlias = getDsKey() + "_";
+				esAlias += annotation.value().equals("") ? entityClass
+						.getSimpleName() + ALIAS_SUFFIX : annotation.value();
+				;
+				return esAlias;
+			}
+		}else{
 			return esAlias;
 		}
 	}
