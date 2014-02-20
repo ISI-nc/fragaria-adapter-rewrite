@@ -42,8 +42,9 @@ import com.mysema.query.alias.Alias;
 
 public abstract class AbstractEntity extends ObjectNodeWrapper {
 	private static final Logger LOGGER = Logger.getLogger(AbstractEntity.class);
-	public static final AbstractEntity alias = Alias.alias(AbstractEntity.class);
-	
+	public static final AbstractEntity alias = Alias
+			.alias(AbstractEntity.class);
+
 	private enum Action {
 		READ("lire"), WRITE("écrire"), ADD("Ajouté"), REMOVE("enlevé");
 
@@ -59,11 +60,11 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		}
 	}
 
-	//TODO remove
-	public void setId(String id){
+	// TODO remove
+	public void setId(String id) {
 		writeProperty(ID, id);
 	}
-	
+
 	private final Map<String, Object> cache = Maps.newHashMap();
 	private EntityMetadata entityMetadata = DefaultRegistry.getService(
 			EntityMetadataProvider.class).provide(getClass());
@@ -161,8 +162,9 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 			break;
 		default:
 			throw new IllegalArgumentException(action.toString());
-		}		
-		if (element instanceof Entity) {
+		}
+		if (element instanceof Entity
+				&& metadata().isNotEmbededList(collectionName)) {
 			manageDependency(action, (Entity) element, collectionName);
 		}
 		writeProperty(collectionName, collection);
