@@ -84,7 +84,7 @@ public abstract class AbstractEntity extends ObjectNodeWrapper {
 		super(node);
 	}
 
-	private List<String> initTypes() {
+	public List<String> initTypes() {
 		LOGGER.debug("initializing types");
 		LinkedList<String> tempTypes = new LinkedList<>();
 		for (Class<?> type = getClass(); Entity.class.isAssignableFrom(type); type = type
