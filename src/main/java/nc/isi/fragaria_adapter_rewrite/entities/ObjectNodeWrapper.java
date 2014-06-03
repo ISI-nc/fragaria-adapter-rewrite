@@ -260,7 +260,7 @@ public abstract class ObjectNodeWrapper implements Entity {
 	public void prepareForCommit() {
 		checkState(getSession() != null, "object %s is not in session", this);
 		if (!this.getState().equals(State.DELETED))
-		// && !this.getState().equals(State.NEW)) {
+		// && !this.getState().equals(State.NEW))
 		{
 			for (String property : metadata().writablesPropertyNames()) {
 				LOGGER.info(String.format("working on property : %s", property));
